@@ -9,7 +9,3 @@ Audrey:
 - start playing with terraform.
 
 ### Realised
-Charlotte:
-- documentation of all endpoints and start of creation of corresponding Rust
-files
-- learning more about terraform.
