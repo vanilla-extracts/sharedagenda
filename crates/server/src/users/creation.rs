@@ -1,6 +1,6 @@
 extern crate rocket;
 
-#[get("/")]
-pub fn index() -> &'static str {
+#[get("/user/create")]
+pub fn create() -> &'static str {
     "Hello, World!"
 }
