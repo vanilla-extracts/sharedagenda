@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DatabaseConfiguration {
-    host: String,
-    port: String,
-    user: String,
-    password: String,
-    database: String,
+    pub host: String,
+    pub port: String,
+    pub user: String,
+    pub password: String,
+    pub database: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
