@@ -1,4 +1,7 @@
+use std::process::exit;
+
 use configuration::{load, write_default_config};
+use database::Database;
 use users::{creation::create, delete::delete, login::login, logout::logout, modify::modify};
 
 #[macro_use]
@@ -20,6 +23,15 @@ fn rocket() -> _ {
                 std::process::exit(1);
             }
         },
+    };
+
+    let database = Database::new();
+    match database.setup_database() {
+        Ok(_) => println!("Tables have been created."),
+        Err(e) => {
+            println!("{e}");
+            exit(1)
+        }
     };
 
     let figment = rocket::Config::figment()
