@@ -155,6 +155,7 @@ impl Database {
                 "
             create table if not exists token(
                 id serial primary key,
+                token varchar(255) not null,
                 owner varchar(255) not null references users(uuid),
                 expiration_date date not null
             );",
