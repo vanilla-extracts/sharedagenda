@@ -1,6 +1,16 @@
+use rocket::serde::{Deserialize, Serialize, json::Json};
+
 extern crate rocket;
 
-#[get("/user/create")]
-pub fn create() -> &'static str {
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+struct UserCreation<'r> {
+    name: &'r str,
+    email: &'r str,
+    password: &'r str,
+}
+
+#[post("/user/create", data = "<body>")]
+pub fn create(body: Json<UserCreation<'_>>) -> &'static str {
     "Hello, World!"
 }
