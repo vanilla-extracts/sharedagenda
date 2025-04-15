@@ -1,7 +1,4 @@
-use rocket::{
-    Data,
-    serde::{Deserialize, Serialize, json::Json},
-};
+use rocket::serde::{Deserialize, Serialize, json::Json};
 use uuid::Uuid;
 
 use crate::database::Database;

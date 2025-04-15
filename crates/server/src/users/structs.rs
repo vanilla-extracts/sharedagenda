@@ -4,11 +4,27 @@ use tokio_postgres::Row;
 use crate::database::QueriedData;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MyDate {
+    pub year: i32,
+    pub month: i32,
+    pub day: i32,
+    pub hour: i32,
+    pub minute: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub uuid: String,
     pub email: String,
     pub name: String,
     pub password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Token {
+    pub token: String,
+    pub owner: String,
+    pub expiration_date: MyDate,
 }
 
 impl QueriedData for User {
