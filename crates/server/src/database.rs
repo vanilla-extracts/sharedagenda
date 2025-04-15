@@ -1,6 +1,7 @@
-use std::fmt::Display;
+use std::{fmt::Display, process::exit};
 
-use postgres::{Client, NoTls, Row};
+use rocket::tokio;
+use tokio_postgres::{Client, Connection, NoTls, Row, Socket, tls::NoTlsStream};
 
 use crate::configuration::{Configuration, load};
 
@@ -31,13 +32,13 @@ impl std::error::Error for DatabaseError<'_> {
 }
 
 impl Database {
-    pub fn new() -> Self {
+    async fn database_connect() -> Option<(Client, Connection<Socket, NoTlsStream>)> {
         let config = match load() {
             Ok(cfg) => cfg,
             Err(_) => Configuration::default(),
         };
         let database_configuration = config.database;
-        let client = Client::connect(
+        match tokio_postgres::connect(
             &format!(
                 "postgres://{}:{}@{}:{}/{}",
                 &database_configuration.user,
@@ -47,26 +48,35 @@ impl Database {
                 &database_configuration.database
             ),
             NoTls,
-        );
-
-        match client {
-            Ok(connection) => {
-                println!(
-                    "Connection with the database {} is good.",
-                    database_configuration.database
-                );
-                Self { connection }
-            }
+        )
+        .await
+        {
+            Ok((client, connection)) => Some((client, connection)),
             Err(e) => {
-                println!("Error, could not connect to the database. {e}");
-                std::process::exit(0);
+                println!("Error while connecting to database {e}");
+                None
             }
         }
     }
+    pub async fn new() -> Self {
+        let (connection, stream) = match Self::database_connect().await {
+            Some((client, stream)) => (client, stream),
+            None => {
+                eprintln!("Error while connecting to database");
+                exit(1);
+            }
+        };
+        tokio::spawn(async move {
+            if let Err(e) = stream.await {
+                eprintln!("connection error: {}", e);
+            }
+        });
+        Self { connection }
+    }
 
-    pub fn query<T: QueriedData>(mut self, sql: &str) -> Vec<T> {
+    pub async fn query<T: QueriedData>(self, sql: &str) -> Vec<T> {
         let mut res: Vec<T> = vec![];
-        match self.connection.query(sql, &[]) {
+        match self.connection.query(sql, &[]).await {
             Ok(rows) => {
                 for row in rows {
                     if row.len() < T::len() {
@@ -82,16 +92,20 @@ impl Database {
         res
     }
 
-    pub fn setup_database(mut self) -> Result<(), DatabaseError<'static>> {
-        let user_success = match self.connection.batch_execute(
-            "
+    pub async fn setup_database(self) -> Result<(), DatabaseError<'static>> {
+        let user_success = match self
+            .connection
+            .batch_execute(
+                "
             create table if not exists users(
                 uuid varchar(255) primary key,
                 email varchar(50) not null,
                 name varchar(50) not null,
                 password varchar(50) not null
             );",
-        ) {
+            )
+            .await
+        {
             Ok(_) => true,
             Err(e) => {
                 println!("{e}");
@@ -99,13 +113,17 @@ impl Database {
             }
         };
 
-        let agenda_success = match self.connection.batch_execute(
-            "
+        let agenda_success = match self
+            .connection
+            .batch_execute(
+                "
             create table if not exists agendas(
                 id serial primary key,
                 owner varchar(255) not null references users(uuid)
             );",
-        ) {
+            )
+            .await
+        {
             Ok(_) => true,
             Err(e) => {
                 println!("{e}");
@@ -113,8 +131,10 @@ impl Database {
             }
         };
 
-        let events_success = match self.connection.batch_execute(
-            "
+        let events_success = match self
+            .connection
+            .batch_execute(
+                "
                 create table if not exists events(
                     id serial primary key,
                     agenda_id int not null references agendas(id),
@@ -122,7 +142,9 @@ impl Database {
                     date_start date not null,
                     date_end date not null
                 );",
-        ) {
+            )
+            .await
+        {
             Ok(_) => true,
             Err(e) => {
                 println!("{e}");
@@ -130,25 +152,24 @@ impl Database {
             }
         };
 
-        let token_success = match self.connection.batch_execute(
-            "
+        let token_success = match self
+            .connection
+            .batch_execute(
+                "
             create table if not exists token(
                 id serial primary key,
                 owner varchar(255) not null references users(uuid),
                 expiration_date date not null
             );",
-        ) {
+            )
+            .await
+        {
             Ok(_) => true,
             Err(e) => {
                 println!("{e}");
                 false
             }
         };
-
-        match self.connection.close() {
-            Ok(_) => println!("Connection to database was closed successfully."),
-            Err(e) => println!("Error while closing database: {e}"),
-        }
 
         if user_success && agenda_success && events_success && token_success {
             Ok(())
@@ -159,12 +180,8 @@ impl Database {
         }
     }
 
-    pub fn execute_statement(mut self, sql: &str) {
-        let result = self.connection.batch_execute(sql);
-        match self.connection.close() {
-            Ok(_) => println!("Connection to database was closed successfully."),
-            Err(e) => println!("Error while closing database: {e}"),
-        }
+    pub async fn execute_statement(self, sql: &str) {
+        let result = self.connection.batch_execute(sql).await;
         match result {
             Ok(_) => println!("Statement was executed successfully."),
             Err(e) => {
@@ -173,18 +190,14 @@ impl Database {
         }
     }
 
-    pub fn execute_multiple_statements(mut self, sql: Vec<&str>) {
+    pub async fn execute_multiple_statements(self, sql: Vec<&str>) {
         let mut i = 1;
         for statement in sql {
-            match self.connection.batch_execute(statement) {
+            match self.connection.batch_execute(statement).await {
                 Ok(_) => println!("Success for statement {i}"),
                 Err(e) => println!("Error while executing statement: {e}"),
             }
             i += 1;
-        }
-        match self.connection.close() {
-            Ok(_) => println!("Connection to the database was closed successfully."),
-            Err(e) => println!("Error while closing database: {e}"),
         }
     }
 }

@@ -13,7 +13,7 @@ mod events;
 mod users;
 
 #[launch]
-fn rocket() -> _ {
+async fn rocket() -> _ {
     let configuration = match load() {
         Ok(config) => config,
         Err(_) => match write_default_config() {
@@ -25,8 +25,8 @@ fn rocket() -> _ {
         },
     };
 
-    let database = Database::new();
-    match database.setup_database() {
+    let database = Database::new().await;
+    match database.setup_database().await {
         Ok(_) => println!("Tables have been created."),
         Err(e) => {
             println!("{e}");
