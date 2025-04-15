@@ -10,7 +10,11 @@ pub struct UserCreation<'r> {
     password: &'r str,
 }
 
-#[post("/user/create", data = "<body>")]
+fn check_user_existence(email: &str) -> bool {
+    false
+}
+
+#[post("/user/create", format = "application/json", data = "<body>")]
 pub fn create(body: Json<UserCreation<'_>>) -> &'static str {
-    "Hello, World!"
+    "Hello World"
 }

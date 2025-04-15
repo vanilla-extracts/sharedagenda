@@ -1,8 +1,13 @@
 use std::fmt::Display;
 
-use postgres::{Client, NoTls};
+use postgres::{Client, NoTls, Row};
 
-use crate::configuration::{Configuration, DatabaseConfiguration, load};
+use crate::configuration::{Configuration, load};
+
+pub trait QueriedData {
+    fn create_from_row(row: &Row) -> Self;
+    fn len() -> usize;
+}
 
 pub struct Database {
     connection: Client,
@@ -57,6 +62,24 @@ impl Database {
                 std::process::exit(0);
             }
         }
+    }
+
+    pub fn query<T: QueriedData>(mut self, sql: &str) -> Vec<T> {
+        let mut res: Vec<T> = vec![];
+        match self.connection.query(sql, &[]) {
+            Ok(rows) => {
+                for row in rows {
+                    if row.len() < T::len() {
+                        continue;
+                    }
+                    res.push(T::create_from_row(&row))
+                }
+            }
+            Err(e) => {
+                println!("Error while reading database: {e}");
+            }
+        }
+        res
     }
 
     pub fn setup_database(mut self) -> Result<(), DatabaseError<'static>> {
