@@ -13,3 +13,12 @@ Charlotte:
 - documentation of all endpoints and start of creation of corresponding Rust
 files
 - learning more about terraform.
+
+## Session 2: 2025-04-15
+### Planned
+Charlotte:
+- finish the database API and starts implementing the structs for users
+Audrey:
+- she left
+
+### Realised
