@@ -1,4 +1,8 @@
-use rocket::serde::{Deserialize, Serialize, json::Json};
+use rocket::{
+    Data,
+    serde::{Deserialize, Serialize, json::Json},
+};
+use uuid::Uuid;
 
 use crate::database::Database;
 
@@ -26,7 +30,6 @@ async fn check_user_existence(email: &str) -> bool {
     let vec: Vec<User> = db
         .query(&format!("select * from users where email='{email}'"))
         .await;
-    println!("{:#?}", vec);
     !vec.is_empty()
 }
 
@@ -38,6 +41,15 @@ pub async fn create(body: Json<UserCreation<'_>>) -> Json<UserCreationAnswer> {
             answer: "User with the same email exists".to_string(),
         });
     }
+    let db = Database::new().await;
+    db.execute_statement(&format!(
+        "insert into users(uuid,email,name,password) values('{}','{}','{}','{}')",
+        Uuid::new_v4(),
+        body.email,
+        body.name,
+        body.password
+    ))
+    .await;
     Json(UserCreationAnswer {
         code: 200,
         answer: format!("User {} has been created", body.email),
