@@ -4,7 +4,7 @@ extern crate rocket;
 
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-struct UserCreation<'r> {
+pub struct UserCreation<'r> {
     name: &'r str,
     email: &'r str,
     password: &'r str,
