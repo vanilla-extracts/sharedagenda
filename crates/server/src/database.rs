@@ -3,7 +3,7 @@ use std::{fmt::Display, process::exit};
 use rocket::tokio;
 use tokio_postgres::{Client, Connection, NoTls, Row, Socket, tls::NoTlsStream};
 
-use crate::configuration::{Configuration, load};
+use crate::configuration::load;
 
 pub trait QueriedData {
     fn create_from_row(row: &Row) -> Self;
@@ -33,10 +33,7 @@ impl std::error::Error for DatabaseError<'_> {
 
 impl Database {
     async fn database_connect() -> Option<(Client, Connection<Socket, NoTlsStream>)> {
-        let config = match load() {
-            Ok(cfg) => cfg,
-            Err(_) => Configuration::default(),
-        };
+        let config = load().unwrap_or_default();
         let database_configuration = config.database;
         match tokio_postgres::connect(
             &format!(
