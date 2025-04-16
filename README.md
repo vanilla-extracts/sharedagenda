@@ -21,3 +21,10 @@ See the [server's README](crates/server/README.md) for the endpoints and how to
 use the API.
 
 See the [cli's REAMDE](crates/cli/README.md) for the manual.
+
+## Diagram
+
+### V1
+Here is the diagram for the deployed V1.
+
+[![](assets/infrastructure.png)](assets/infrastructure.png)
