@@ -26,7 +26,7 @@ Send the list of event after the specified date
   {
     "name": "{name}",
     "date_start": "{date}",
-    "date_end": {date}",
+    "date_end": "{date}",
     "event_id": "{event_id}",
   }
 ]
