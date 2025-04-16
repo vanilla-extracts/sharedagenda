@@ -1,7 +1,7 @@
 use std::{fmt::Display, process::exit};
 
 use rocket::tokio;
-use tokio_postgres::{Client, Connection, NoTls, Row, Socket, tls::NoTlsStream};
+use tokio_postgres::{Client, Connection, NoTls, Row, Socket, tls::NoTlsStream, types::ToSql};
 
 use crate::configuration::load;
 
@@ -136,8 +136,8 @@ impl Database {
                     id serial primary key,
                     agenda_id int not null references agendas(id),
                     name varchar(255) not null,
-                    date_start date not null,
-                    date_end date not null
+                    date_start timestamp with time zone not null,
+                    date_end timestamp with time zone not null
                 );",
             )
             .await
@@ -157,7 +157,7 @@ impl Database {
                 id serial primary key,
                 token varchar(255) not null,
                 owner varchar(255) not null references users(uuid),
-                expiration_date date not null
+                expiration_date timestamp with time zone not null
             );",
             )
             .await
@@ -185,6 +185,14 @@ impl Database {
             Err(e) => {
                 println!("Error while executing statement: {e}");
             }
+        }
+    }
+
+    pub async fn execute(self, sql: &str, list: &[&(dyn ToSql + Sync)]) {
+        let result = self.connection.execute(sql, list).await;
+        match result {
+            Ok(_) => println!("Statement was executed successfully."),
+            Err(e) => println!("Error while executing statement {e}"),
         }
     }
 
