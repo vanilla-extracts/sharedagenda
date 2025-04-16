@@ -34,3 +34,9 @@ Audrey:
 ### Planned
 
 - finish implementing structs for users.
+
+### Realised
+
+- finished implementing login and token, it was longer than previously thought,
+  although most of the reason _why_ it was so long _should_ allow for the other
+  endpoints to be finished much quicker
