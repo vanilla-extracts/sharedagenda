@@ -27,4 +27,4 @@ See the [cli's REAMDE](crates/cli/README.md) for the manual.
 ### V1
 Here is the diagram for the deployed V1.
 
-[![](assets/infrastructure.png)](assets/infrastructure.png)
+[![](assets/infrastructure_v1.png)](assets/infrastructure_v1.png)
