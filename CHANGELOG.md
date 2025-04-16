@@ -22,3 +22,8 @@ Audrey:
 - she left
 
 ### Realised
+- finished the database API, created a new one for asynchronous usage, implementing the structs creation and login
+
+## Session 3: 2025-04-16
+### Planned
+- finish implementing structs for users.
