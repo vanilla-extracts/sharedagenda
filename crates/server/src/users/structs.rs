@@ -1,5 +1,7 @@
+use chrono::{DateTime, Days, Utc};
 use serde::{Deserialize, Serialize};
 use tokio_postgres::Row;
+use uuid::Uuid;
 
 use crate::database::QueriedData;
 
@@ -24,7 +26,7 @@ pub struct User {
 pub struct Token {
     pub token: String,
     pub owner: String,
-    pub expiration_date: MyDate,
+    pub expiration_date: DateTime<Utc>,
 }
 
 impl QueriedData for User {
@@ -37,6 +39,33 @@ impl QueriedData for User {
             email: row.get(1),
             name: row.get(2),
             password: row.get(3),
+        }
+    }
+}
+
+impl QueriedData for Token {
+    fn len() -> usize {
+        3_usize
+    }
+
+    fn create_from_row(row: &Row) -> Self {
+        Self {
+            token: row.get(0),
+            owner: row.get(1),
+            expiration_date: row.get(2),
+        }
+    }
+}
+
+impl Token {
+    pub fn new(owner: String) -> Self {
+        Self {
+            token: Uuid::new_v4().to_string(),
+            owner,
+            expiration_date: match Utc::now().checked_add_days(Days::new(1)) {
+                Some(date) => date,
+                None => Utc::now(),
+            },
         }
     }
 }
