@@ -38,7 +38,7 @@ pub async fn check_user_existence(email: &str) -> Option<User> {
 pub async fn create(body: Json<UserCreation<'_>>) -> Json<UserCreationAnswer> {
     if check_user_existence(body.email).await.is_some() {
         return Json(UserCreationAnswer {
-            code: 400,
+            code: 403,
             answer: "User with the same email exists".to_string(),
         });
     }

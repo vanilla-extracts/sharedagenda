@@ -78,14 +78,14 @@ pub async fn login(body: Json<UserLogin<'_>>) -> Json<UserLoginAnswer> {
                 })
             } else {
                 Json(UserLoginAnswer {
-                    status: 400,
+                    status: 404,
                     token: "Password does not match".to_string(),
                     expiration: None,
                 })
             }
         }
         None => Json(UserLoginAnswer {
-            status: 400,
+            status: 405,
             token: "User does not exist".to_string(),
             expiration: None,
         }),
