@@ -2,7 +2,7 @@ use std::process::exit;
 
 use configuration::{load, write_default_config};
 use database::Database;
-use users::{creation::create, delete::delete, login::login, logout::logout, modify::modify};
+use users::{create::create, delete::delete, login::login, logout::logout, modify::modify};
 
 #[macro_use]
 extern crate rocket;
