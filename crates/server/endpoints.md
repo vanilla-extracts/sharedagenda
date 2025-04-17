@@ -53,13 +53,12 @@ WITH body
 ```json
 {
   "token": "{token}",
-  "password": "{password hash}",
-  "new_password": "{password hash} -- CAN BE NULL",
+  "password": "{password hash} -- CAN BE NULL",
   "email": "{email} -- CAN BE NULL",
   "name": "{name} -- CAN BE NULL",
 }
 ```
-Checks the token and password, and modifies the password, email, name if filled.
+Checks the token, and modifies the password, email, name if filled.
 
 ### User Deletion
 POST at /user/delete
@@ -68,7 +67,6 @@ WITH body
 ```json
 {
   "token": "{token}",
-  "password": "{password hash}",
 }
 ```
 
