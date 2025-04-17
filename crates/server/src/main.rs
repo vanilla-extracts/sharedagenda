@@ -10,6 +10,7 @@ extern crate rocket;
 pub mod configuration;
 pub mod database;
 mod events;
+pub mod structs;
 mod users;
 
 #[launch]
