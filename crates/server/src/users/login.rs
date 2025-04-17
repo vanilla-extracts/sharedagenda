@@ -6,7 +6,7 @@ use rocket::{
 
 use crate::database::Database;
 
-use super::{creation::check_user_existence, structs::Token};
+use super::{create::check_user_existence, structs::Token};
 extern crate rocket;
 
 #[derive(Serialize, Deserialize)]
