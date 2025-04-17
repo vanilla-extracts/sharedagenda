@@ -3,4 +3,4 @@
 curl --header "Content-Type: application/json" \
   --request POST \
   --data "$1" \
-  http://localhost:8000/"$2"/"$3"
+  http://localhost:8008/"$2"/"$3"
