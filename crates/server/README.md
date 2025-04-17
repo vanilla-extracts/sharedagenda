@@ -32,6 +32,9 @@ Send the list of event after the specified date
 ]
 ```
 
+## Return Codes
+[Go to the codes.md file for the return codes](codes.md)
+
 ## Install
 A Makefile is provided.
 
