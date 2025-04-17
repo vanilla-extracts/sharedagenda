@@ -1,5 +1,8 @@
 use chrono::{DateTime, Utc};
-use rocket::serde::{Deserialize, Serialize, json::Json};
+use rocket::{
+    serde::{Deserialize, Serialize, json::Json},
+    tokio::spawn,
+};
 
 use crate::database::Database;
 
@@ -22,17 +25,23 @@ pub struct UserLoginAnswer {
 }
 
 async fn create_and_insert_new_token(owner: String) -> Token {
-    let db = Database::new().await;
     let token = Token::new(owner);
-    db.execute(
-        &format!(
+    async fn insert_token(token: Token) {
+        let db = Database::new().await;
+        let sql = &format!(
             "insert into token(token,owner,expiration_date) values('{}','{}',$1)",
             token.token, token.owner
-        ),
-        &[&token.expiration_date],
-    )
-    .await;
+        );
+        db.execute(sql, &[&token.expiration_date]).await;
+    }
+    spawn(insert_token(token.clone()));
     token
+}
+
+async fn delete_token(owner: String) {
+    let db = Database::new().await;
+    let sql = &format!("delete from token where owner = '{}'", owner);
+    db.execute_statement(sql).await;
 }
 
 pub async fn create_or_take_token(owner: String) -> Token {
@@ -47,11 +56,8 @@ pub async fn create_or_take_token(owner: String) -> Token {
         create_and_insert_new_token(owner).await
     } else {
         let old_token = vec[0].clone();
-        let new_connection = Database::new().await;
         if old_token.expiration_date < Utc::now() {
-            new_connection
-                .execute_statement(&format!("delete from token where owner='{}'", owner))
-                .await;
+            spawn(delete_token(owner.clone()));
             create_and_insert_new_token(owner).await
         } else {
             old_token
