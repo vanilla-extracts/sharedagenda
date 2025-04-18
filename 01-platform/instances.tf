@@ -39,6 +39,10 @@ module "vm-bastion" {
     }
   ]
   group             = "bastion"
+  additional_bastion_metadata = {
+    group = "bastion",
+    pf_prefixe = "${var.pf_prefixe}"
+  }
 }
 
 module "vm-apis" {
