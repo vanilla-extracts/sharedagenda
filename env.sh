@@ -28,6 +28,7 @@ proxyHost=proxy.infra.dgfip
 proxyPort=3128
 nubo=01
 cloud=${OS_CLOUD:-openstack}
+home_directory=$HOME
 
 function readVars
 {
@@ -136,6 +137,7 @@ pf_prefixe=${pf_prefixe}
 gitlab_project_id=${gitlab_project_id}
 gitlab_username="${gitlab_username}"
 gitlab_apptoken="${gitlab_apptoken}"
+home_directory="${home_directory}"
 EOF
 }
 
@@ -167,6 +169,7 @@ function setupEnv
 
     export platform_id=${platform_id}
     export pf_prefixe=${pf_prefixe}
+    export home_directory=${home_directory}
 
     # Configuration pour openstack
     export OS_CLOUD=${cloud}
@@ -177,6 +180,7 @@ function setupEnv
     export TF_VAR_platform_id="${platform_id}"
     export TF_VAR_pf_prefixe="${pf_prefixe}"
     export TF_VAR_key_pair="${sshPem}.pub"
+    export TF_VAR_home_directory="$home_directory"
 
     export TF_HTTP_USERNAME="${gitlab_username}"
     export TF_HTTP_PASSWORD="${gitlab_apptoken}"
