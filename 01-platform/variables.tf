@@ -26,7 +26,7 @@ locals {
 variable "cloud" { description = "Nom du cloud" }
 variable "platform_id" { description = "Identifiant de la plateforme" }
 variable "pf_prefixe" { description = "Préfixe commun aux ressources de la plateforme" }
-
+variable "home_directory" { description = "Home directory" }
 # Table des IP flottantes (Ne pas modifier).
 variable "fip_map" {
   default = { #   FIP_ADMIN,       FIP_PUBLI
@@ -58,5 +58,5 @@ variable "nubo" { default = "10" }
 variable "phase" { default = "dev" }
 variable "key_pair" {}
 variable "sg_description" { default = "" }
-variable "image_name" { default = "debien12" }
+variable "image_name" { default = "debian12" }
 variable "flavor_name" { default = "CO1.1" }
