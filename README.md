@@ -27,9 +27,9 @@ See the [cli's REAMDE](crates/cli/README.md) for the manual.
 ### V1
 Here is the diagram for the deployed V1 infrastructure.
 
-[![](assets/infrastructure_v1.png)](assets/infrastructure_v1.png)
+[![](assets/infrastructure_v1.svg)](assets/infrastructure_v1.svg)
 
 ### V2
 Here is the diagram for the deployed V2 infrastructure.
 
-[![](assets/infrastructure_v2.png)](assets/infrastructure_v2.png)
+[![](assets/infrastructure_v2.svg)](assets/infrastructure_v2.svg)
