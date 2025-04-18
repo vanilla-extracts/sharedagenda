@@ -1,0 +1,25 @@
+---
+- name: "Create SSH config"
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Delete SSH known_hosts
+      ansible.builtin.file:
+        name: /home/stag/.ssh/known_hosts
+        state: absent
+    - name: Change global SSH config 
+      ansible.builtin.template:
+        src: ssh_config.j2
+        dest: /home/stag/.ssh/config 
+        owner: stag 
+        mode: '600'
+    - name: Create hosts folder
+      ansible.builtin.file:
+        name: /home/stag/.ssh/hosts
+        state: directory
+    - name: Create SSH config
+      ansible.builtin.template:
+        src: dgfip_ssh.conf.j2
+        dest: /home/stag/.ssh/hosts/dgfip_ssh.conf
+        owner: stag
+        mode: '644'
