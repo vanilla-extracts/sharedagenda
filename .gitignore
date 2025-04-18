@@ -1,1 +1,8 @@
+.*
+!.gitignore
+!.terraform
+.*~
 target/
+.Nubo
+clouds.yaml
+secure.yaml
