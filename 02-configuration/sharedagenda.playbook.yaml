@@ -1,0 +1,3 @@
+---
+- name: Create the ssh config
+  ansible.builtin.import_playbook: create_ssh_config.yaml 
