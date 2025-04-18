@@ -1,5 +1,6 @@
 .*
 !.gitignore
+!.terraform
 .*~
 target/
 .Nubo
