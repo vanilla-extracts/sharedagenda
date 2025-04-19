@@ -28,7 +28,7 @@ async fn rocket() -> _ {
 
     let database = Database::new().await;
     match database.setup_database().await {
-        Ok(_) => println!("Tables have been created."),
+        Ok(_) => println!("Tables have been successfully created."),
         Err(e) => {
             println!("{e}");
             exit(1)

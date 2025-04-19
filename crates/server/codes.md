@@ -13,11 +13,10 @@ There are no 30X codes
 Something has gone wrong
 
 ### Code 401: Token is expired
-This code is specifically for expired tokens
+Triggered when an expired token is used
 
 ### Code 402: Token does not exist
-This code signifies that the specified token does not exist (typically an old
-token has been used)
+Triggered when a token which does not exist has been used.
 
 ### Code 403: User with the same email exists
 Triggered when a user creation is tried with an email which already exists
