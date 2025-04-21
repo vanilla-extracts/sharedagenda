@@ -38,8 +38,8 @@ pub async fn modify(body: Json<UserModification<'_>>) -> Json<UserModificationAn
             Some(u) => u,
             None => {
                 return Json(UserModificationAnswer {
-                    code: 405,
-                    body: "User does not exist".to_string(),
+                    code: 408,
+                    body: "Event does not exist".to_string(),
                 });
             }
         };
