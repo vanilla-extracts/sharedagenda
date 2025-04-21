@@ -2,7 +2,7 @@ use std::process::exit;
 
 use configuration::{load, write_default_config};
 use database::Database;
-use users::{login::login, logout::logout, modify::modify};
+use users::{login::login, logout::logout};
 
 #[macro_use]
 extern crate rocket;
@@ -44,10 +44,11 @@ async fn rocket() -> _ {
             users::create::create,
             login,
             logout,
-            modify,
+            users::modify::modify,
             users::delete::delete,
             events::create::create,
             events::delete::delete,
+            events::modify::modify,
         ],
     )
 }
