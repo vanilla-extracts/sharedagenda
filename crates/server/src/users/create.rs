@@ -22,7 +22,7 @@ pub struct UserCreationAnswer {
     answer: String,
 }
 
-pub async fn check_user_existence(email: &str) -> Option<User> {
+pub async fn get_user_from_email(email: &str) -> Option<User> {
     let db = Database::new().await;
     let vec: Vec<User> = db
         .query(&format!("select * from users where email='{email}'"))
@@ -36,7 +36,7 @@ pub async fn check_user_existence(email: &str) -> Option<User> {
 
 #[post("/user/create", format = "application/json", data = "<body>")]
 pub async fn create(body: Json<UserCreation<'_>>) -> Json<UserCreationAnswer> {
-    if check_user_existence(body.email).await.is_some() {
+    if get_user_from_email(body.email).await.is_some() {
         return Json(UserCreationAnswer {
             code: 403,
             answer: "User with the same email exists".to_string(),

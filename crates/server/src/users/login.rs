@@ -6,7 +6,7 @@ use rocket::{
 
 use crate::database::Database;
 
-use super::{create::check_user_existence, structs::Token};
+use super::{create::get_user_from_email, structs::Token};
 extern crate rocket;
 
 #[derive(Serialize, Deserialize)]
@@ -67,7 +67,7 @@ pub async fn create_or_take_token(owner: String) -> Token {
 
 #[post("/user/login", format = "application/json", data = "<body>")]
 pub async fn login(body: Json<UserLogin<'_>>) -> Json<UserLoginAnswer> {
-    match check_user_existence(body.email).await {
+    match get_user_from_email(body.email).await {
         Some(user) => {
             if user.password == body.password {
                 let token = create_or_take_token(user.uuid).await;

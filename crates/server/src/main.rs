@@ -2,7 +2,7 @@ use std::process::exit;
 
 use configuration::{load, write_default_config};
 use database::Database;
-use users::{create::create, delete::delete, login::login, logout::logout, modify::modify};
+use users::{delete::delete, login::login, logout::logout, modify::modify};
 
 #[macro_use]
 extern crate rocket;
@@ -38,5 +38,15 @@ async fn rocket() -> _ {
     let figment = rocket::Config::figment()
         .merge(("port", configuration.listen_port))
         .merge(("address", configuration.listen_address));
-    rocket::custom(figment).mount("/", routes![create, login, logout, modify, delete])
+    rocket::custom(figment).mount(
+        "/",
+        routes![
+            users::create::create,
+            login,
+            logout,
+            modify,
+            delete,
+            events::create::create
+        ],
+    )
 }

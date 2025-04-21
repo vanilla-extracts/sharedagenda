@@ -110,31 +110,13 @@ impl Database {
             }
         };
 
-        let agenda_success = match self
-            .connection
-            .batch_execute(
-                "
-            create table if not exists agendas(
-                id serial primary key,
-                owner varchar(255) not null references users(uuid)
-            );",
-            )
-            .await
-        {
-            Ok(_) => true,
-            Err(e) => {
-                println!("{e}");
-                false
-            }
-        };
-
         let events_success = match self
             .connection
             .batch_execute(
                 "
                 create table if not exists events(
                     id serial primary key,
-                    agenda_id int not null references agendas(id),
+                    owner varchar(255) references users(uuid) not null,
                     name varchar(255) not null,
                     date_start timestamp with time zone not null,
                     date_end timestamp with time zone not null
@@ -169,7 +151,7 @@ impl Database {
             }
         };
 
-        if user_success && agenda_success && events_success && token_success {
+        if user_success && events_success && token_success {
             Ok(())
         } else {
             Err(DatabaseError {
