@@ -34,9 +34,16 @@ pub async fn modify(body: Json<UserModification<'_>>) -> Json<UserModificationAn
             });
         }
 
-        let user = get_user_from_uuid(token.owner)
-            .await
-            .expect("User does not exists");
+        let user = match get_user_from_uuid(token.owner).await {
+            Some(u) => u,
+            None => {
+                return Json(UserModificationAnswer {
+                    code: 405,
+                    body: "User does not exist".to_string(),
+                });
+            }
+        };
+
         let mut pass = user.password;
         let mut email = user.email;
         let mut name = user.name;
