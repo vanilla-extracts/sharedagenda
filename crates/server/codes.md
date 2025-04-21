@@ -42,3 +42,6 @@ Triggered when the interval between two dates is invalid.
 
 The principal example of this error is when a user tries to create an event with
 an end date anterior to the start date.
+
+### Code 408: Event does not exist
+Triggered when trying to modify or delete an event which does not exist.

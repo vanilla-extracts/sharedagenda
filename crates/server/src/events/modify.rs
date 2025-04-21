@@ -53,7 +53,7 @@ pub async fn modify(body: Json<EventModification<'_>>) -> Json<EventModification
             Some(u) => u,
             None => {
                 return Json(EventModificationAnswer {
-                    code: 407,
+                    code: 408,
                     body: "Event does not exist".to_string(),
                 });
             }
