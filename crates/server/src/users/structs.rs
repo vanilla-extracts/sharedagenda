@@ -6,15 +6,6 @@ use uuid::Uuid;
 use crate::database::QueriedData;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MyDate {
-    pub year: i32,
-    pub month: i32,
-    pub day: i32,
-    pub hour: i32,
-    pub minute: i32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub uuid: String,
     pub email: String,

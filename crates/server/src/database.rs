@@ -71,9 +71,9 @@ impl Database {
         Self { connection }
     }
 
-    pub async fn query<T: QueriedData>(self, sql: &str) -> Vec<T> {
+    pub async fn query<T: QueriedData>(self, sql: &str, args: &[&(dyn ToSql + Sync)]) -> Vec<T> {
         let mut res: Vec<T> = vec![];
-        match self.connection.query(sql, &[]).await {
+        match self.connection.query(sql, args).await {
             Ok(rows) => {
                 for row in rows {
                     if row.len() < T::len() {

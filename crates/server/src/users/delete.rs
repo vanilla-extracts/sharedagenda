@@ -11,7 +11,7 @@ extern crate rocket;
 pub async fn get_user_from_uuid(uuid: String) -> Option<User> {
     let db = Database::new().await;
     let user: Vec<User> = db
-        .query(&format!("select * from users where uuid='{}'", uuid))
+        .query(&format!("select * from users where uuid='{}'", uuid), &[])
         .await;
     user.first().cloned()
 }
@@ -32,10 +32,13 @@ pub async fn get_user_from_token(token: Token) -> Option<User> {
 
 pub async fn get_token_struct_from_token(token: String) -> Option<Token> {
     let db = Database::new().await;
-    db.query(&format!(
-        "select token,owner,expiration_date from token where token='{}'",
-        token
-    ))
+    db.query(
+        &format!(
+            "select token,owner,expiration_date from token where token='{}'",
+            token
+        ),
+        &[],
+    )
     .await
     .first()
     .cloned()

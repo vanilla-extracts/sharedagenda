@@ -25,7 +25,7 @@ pub struct UserCreationAnswer {
 pub async fn get_user_from_email(email: &str) -> Option<User> {
     let db = Database::new().await;
     let vec: Vec<User> = db
-        .query(&format!("select * from users where email='{email}'"))
+        .query(&format!("select * from users where email='{email}'"), &[])
         .await;
     if vec.is_empty() {
         None

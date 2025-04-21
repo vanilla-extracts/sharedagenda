@@ -47,10 +47,13 @@ async fn delete_token(owner: String) {
 pub async fn create_or_take_token(owner: String) -> Token {
     let db = Database::new().await;
     let vec: Vec<Token> = db
-        .query(&format!(
-            "select token,owner,expiration_date from token where owner='{}'",
-            owner
-        ))
+        .query(
+            &format!(
+                "select token,owner,expiration_date from token where owner='{}'",
+                owner
+            ),
+            &[],
+        )
         .await;
     if vec.is_empty() {
         create_and_insert_new_token(owner).await
