@@ -40,3 +40,10 @@ Audrey:
 - finished implementing login and token, it was longer than previously thought,
   although most of the reason _why_ it was so long _should_ allow for the other
   endpoints to be finished much quicker
+
+## Session 4: 2025-04-21 (HOME)
+### Planned 
+- finish implementing all routes
+
+### Realised
+- all routes are implemented and tested
