@@ -1,4 +1,8 @@
 # CHANGELOG
+## Server v1.0.0-beta
+All routes are implemented in the server.
+
+# DEVLOG
 Here is the changelog of everything planned and done for each session.
 
 ## Session 1: 2025-04-14
