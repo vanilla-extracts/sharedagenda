@@ -50,3 +50,20 @@
         owner: api-runner
         group: api-runner
         mode: ug=rw,o=r
+    - name: Upload Systemd Unit file
+      become: true
+      ansible.builtin.copy:
+        src: api.service 
+        dest: /etc/systemd/system/api.service 
+        mode: '644'
+    - name: Reload the Systemd daemon and Enable the API Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api.service
+        daemon_reload: true
+        enabled: true
+    - name: Start the API Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api.service 
+        state: started
