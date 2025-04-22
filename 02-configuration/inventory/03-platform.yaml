@@ -51,6 +51,6 @@ groups:
   platform_bdds: >-
     openstack.metadata.group == "bdds"
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_bdd_01: >-
-    openstack.name == deploy.pf_prefixe+"-vm-bdd-01-"+deploy.phase
+  platform_bdds_01: >-
+    openstack.name == deploy.pf_prefixe+"-vm-bdds-01-"+deploy.phase
     and openstack.metadata.pf_prefixe == "shag-01"

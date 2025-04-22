@@ -119,6 +119,7 @@ module "vm-bdds" {
   pf_prefixe       = var.pf_prefixe
   server_count     = local.number_of_database_servers
   flavor_name      = var.bdd_flavor_name
+  image_name       = var.image_name
   key_pair         = openstack_compute_keypair_v2.ssh_keypair.name
   admin_network_id = module.networks.admin_network_id
   data_network_id  = module.networks.data_network_id
