@@ -1,7 +1,5 @@
 ---
 - name: "Install and Configure Postgresql"
-  vars:
-    vm_bdds_01_data_ip: "{{ hostvars[vm_bdds_01]['openstack']['addresses'][network_data_name][0]['addr'] }}"
   hosts: platform_shag_bdds
   gather_facts: no 
   tasks:
