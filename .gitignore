@@ -3,5 +3,6 @@
 .*~
 target/
 .Nubo
+*.log
 clouds.yaml
 secure.yaml

@@ -1,7 +1,7 @@
 network_adm_name: "{{ deploy.pf_prefixe }}-network-adm-{{ deploy.phase }}"
 network_pub_name: "{{ deploy.pf_prefixe }}-network-pub-{{ deploy.phase }}"
 network_data_name: "{{ deploy.pf_prefixe }}-network-data-{{ deploy.phase }}"
-
+ansible_python_interpreter: python3
 vm_bastion: "{{ deploy.pf_prefixe }}-vm-bastion-01-{{ deploy.phase }}"
 vm_api_01: "{{ deploy.pf_prefixe }}-vm-apis-01-{{ deploy.phase }}"
 vm_caddy: "{{ deploy.pf_prefixe }}-vm-caddy-01-{{ deploy.phase }}"
