@@ -115,7 +115,7 @@ module "vm-caddy" {
 
 
 module "vm-bdds" {
-  source           = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/base-de-donn-es/terraform-openstack-bdd.git"
+  source           = "git::https://forge.dgfip.finances.rie.gouv.fr/charlotte-thomas/terraform-openstack-bdd"
   pf_prefixe       = var.pf_prefixe
   server_count     = local.number_of_database_servers
   flavor_name      = var.bdd_flavor_name
