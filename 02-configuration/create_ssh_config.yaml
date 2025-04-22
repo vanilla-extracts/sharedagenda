@@ -5,7 +5,7 @@
   tasks:
     - name: Delete SSH known_hosts
       ansible.builtin.file:
-        name: /home/stag/.ssh/known_hosts
+        name: /home/stag/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
         state: absent
     - name: Change global SSH config 
       ansible.builtin.template:

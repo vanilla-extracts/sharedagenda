@@ -60,3 +60,4 @@ variable "key_pair" {}
 variable "sg_description" { default = "" }
 variable "image_name" { default = "debian12" }
 variable "flavor_name" { default = "CO1.1" }
+variable "bdd_flavor_name" { default = "CO1.2" }

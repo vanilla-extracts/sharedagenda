@@ -1,13 +1,13 @@
 module "vm-bastion" {
-  source            = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/s-curit/terraform-openstack-bastion.git"
-  pf_prefixe        = var.pf_prefixe
-  flavor_name       = var.flavor_name
-  image_name        = var.image_name
-  key_pair          = openstack_compute_keypair_v2.ssh_keypair.name
-  extra_disks       = []
+  source      = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/s-curit/terraform-openstack-bastion.git"
+  pf_prefixe  = var.pf_prefixe
+  flavor_name = var.flavor_name
+  image_name  = var.image_name
+  key_pair    = openstack_compute_keypair_v2.ssh_keypair.name
+  extra_disks = []
 
   admin_network_id = join("", module.networks.*.admin_network_id)
-  admin_fixed_fip  = [ data.openstack_networking_floatingip_v2.fip_admin.address ]
+  admin_fixed_fip  = [data.openstack_networking_floatingip_v2.fip_admin.address]
 
   admin_sg_bastion_rules = [
     {
@@ -38,37 +38,37 @@ module "vm-bastion" {
       remote_group     = ""
     }
   ]
-  group             = "bastion"
+  group = "bastion"
   additional_bastion_metadata = {
-    group = "bastion",
+    group      = "bastion",
     pf_prefixe = "${var.pf_prefixe}"
   }
 }
 
 module "vm-apis" {
-  source            = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/calcul/terraform-openstack-instance.git"
+  source = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/calcul/terraform-openstack-instance.git"
 
-  pf_prefixe        = var.pf_prefixe
-  phase             = var.phase
-  server_type       = "apis"
-  image_name        = var.image_name
-  flavor_name       = var.flavor_name
-  key_pair          = openstack_compute_keypair_v2.ssh_keypair.name
-  server_count      = local.number_of_api_servers
+  pf_prefixe   = var.pf_prefixe
+  phase        = var.phase
+  server_type  = "apis"
+  image_name   = var.image_name
+  flavor_name  = var.flavor_name
+  key_pair     = openstack_compute_keypair_v2.ssh_keypair.name
+  server_count = local.number_of_api_servers
 
   # Les trois id réseaux sont obligatoires
-  admin_network_id  = module.networks.admin_network_id
-  pub_network_id    = module.networks.pub_network_id
-  data_network_id   = module.networks.data_network_id
+  admin_network_id = module.networks.admin_network_id
+  pub_network_id   = module.networks.pub_network_id
+  data_network_id  = module.networks.data_network_id
 
   # Ensuite on gère les connexions nécessaires
-  is_admin_network  = true
-  is_pub_network    = true
-  is_data_network   = true
+  is_admin_network = true
+  is_pub_network   = true
+  is_data_network  = true
 
-  admin_secgroup_id = [ module.sg-admin.secgroup_id ]
-  pub_secgroup_id   = [ module.sg-api.secgroup_id ]
-  data_secgroup_id  = [ ]
+  admin_secgroup_id = [module.sg-admin.secgroup_id]
+  pub_secgroup_id   = [module.sg-api.secgroup_id]
+  data_secgroup_id  = []
 
   metadata = {
     pf_prefixe = var.pf_prefixe
@@ -78,32 +78,32 @@ module "vm-apis" {
 }
 
 module "vm-caddy" {
-  source                         = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/calcul/terraform-openstack-instance.git"
+  source = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/calcul/terraform-openstack-instance.git"
 
-  pf_prefixe        = var.pf_prefixe
-  phase             = var.phase
-  server_type       = "caddy"
-  image_name        = var.image_name
-  flavor_name       = var.flavor_name
-  key_pair          = openstack_compute_keypair_v2.ssh_keypair.name
-  server_count      = local.number_of_caddy_servers
+  pf_prefixe   = var.pf_prefixe
+  phase        = var.phase
+  server_type  = "caddy"
+  image_name   = var.image_name
+  flavor_name  = var.flavor_name
+  key_pair     = openstack_compute_keypair_v2.ssh_keypair.name
+  server_count = local.number_of_caddy_servers
 
   # Les trois id réseaux sont obligatoires
-  admin_network_id  = module.networks.admin_network_id
-  pub_network_id    = module.networks.pub_network_id
-  data_network_id   = module.networks.data_network_id
+  admin_network_id = module.networks.admin_network_id
+  pub_network_id   = module.networks.pub_network_id
+  data_network_id  = module.networks.data_network_id
 
   # Ensuite on gère les connexions nécessaires
-  is_admin_network  = true
-  is_pub_network    = true
-  is_data_network   = false
+  is_admin_network = true
+  is_pub_network   = true
+  is_data_network  = false
 
-  admin_secgroup_id = [ module.sg-admin.secgroup_id ]
-  pub_secgroup_id   = [ module.sg-api.secgroup_id ]
-  data_secgroup_id  = [ ]
+  admin_secgroup_id = [module.sg-admin.secgroup_id]
+  pub_secgroup_id   = [module.sg-api.secgroup_id]
+  data_secgroup_id  = []
 
   # Ajouté pour connecter la FIP Publication au HAProxy
-  publication_fixed_fip = [ data.openstack_networking_floatingip_v2.fip_publi.address ]
+  publication_fixed_fip          = [data.openstack_networking_floatingip_v2.fip_publi.address]
   assign_publication_floating_ip = true
 
   metadata = {
@@ -113,32 +113,19 @@ module "vm-caddy" {
   }
 }
 
-module "vm-bdd" {
-  source            = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/calcul/terraform-openstack-instance.git"
 
-  pf_prefixe        = var.pf_prefixe
-  phase             = var.phase
-  server_type       = "bdd"
-  image_name        = var.image_name
-  flavor_name       = var.flavor_name
-  key_pair          = openstack_compute_keypair_v2.ssh_keypair.name
-  server_count      = local.number_of_database_servers
-
-  # Les trois id réseaux sont obligatoires
-  admin_network_id  = module.networks.admin_network_id
-  pub_network_id    = module.networks.pub_network_id
-  data_network_id   = module.networks.data_network_id
-
-  # Ensuite on gère les connexions nécessaires
-  is_admin_network  = true
-  is_pub_network    = false
-  is_data_network   = true
-
-  admin_secgroup_id = [ module.sg-admin.secgroup_id ]
-  pub_secgroup_id   = [ ]
-  data_secgroup_id  = [ module.sg-bdd.secgroup_id ]
-
-  metadata = {
+module "vm-bdds" {
+  source           = "git::https://forge.dgfip.finances.rie.gouv.fr/charlotte-thomas/terraform-openstack-bdd"
+  pf_prefixe       = var.pf_prefixe
+  server_count     = local.number_of_database_servers
+  flavor_name      = var.bdd_flavor_name
+  image_name       = var.image_name
+  key_pair         = openstack_compute_keypair_v2.ssh_keypair.name
+  admin_network_id = module.networks.admin_network_id
+  data_network_id  = module.networks.data_network_id
+  phase            = var.phase
+  group            = "bdds"
+  additional_bdd_metadata = {
     pf_prefixe = var.pf_prefixe
     group      = "bdds"
     phase      = var.phase
