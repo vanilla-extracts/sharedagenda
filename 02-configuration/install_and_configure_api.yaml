@@ -1,0 +1,69 @@
+---
+- name: "Install and configure the API"
+  hosts: platform_shag_apis
+  gather_facts: no 
+  tasks:
+    - name: install prerequisites
+      become: true
+      apt: name={{ item }} state=latest
+      with_items:
+        - acl
+      tags:
+        - packages
+    - name: Create group of user to run the API
+      become: true
+      ansible.builtin.group:
+        name: api-runner
+        state: present
+    - name: Create user to run the API
+      become: true
+      ansible.builtin.user:
+        name: api-runner
+        comment: API Runner User
+        group: api-runner
+    - name: Upload release API executable
+      become: true
+      ansible.builtin.copy:
+        src: server
+        dest: /home/api-runner/server
+        owner: api-runner
+        group: api-runner
+        mode: u=rwx,go=r 
+    - name: Make the config folder
+      become: true
+      become_user: api-runner
+      ansible.builtin.file:
+        name: /home/api-runner/.config 
+        state: directory
+    - name: Make the server config folder
+      become: true
+      become_user: api-runner
+      ansible.builtin.file:
+        name: /home/api-runner/.config/sharedagenda
+        state: directory
+    - name: Upload the API configuration file
+      become: true
+      become_user: api-runner
+      ansible.builtin.template:
+        src: config.toml.j2
+        dest: /home/api-runner/.config/sharedagenda/config.toml
+        owner: api-runner
+        group: api-runner
+        mode: ug=rw,o=r
+    - name: Upload Systemd Unit file
+      become: true
+      ansible.builtin.copy:
+        src: api.service 
+        dest: /etc/systemd/system/api.service 
+        mode: '644'
+    - name: Reload the Systemd daemon and Enable the API Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api.service
+        daemon_reload: true
+        enabled: true
+    - name: Start the API Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api.service 
+        state: started
