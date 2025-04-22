@@ -11,6 +11,7 @@
       with_items:
         - libpq-dev
         - python3-psycopg2
+        - acl
       tags:
         - packages
     - name: "Install postgresql-common package"
@@ -23,41 +24,39 @@
       ansible.builtin.apt:
         name: postgresql
         state: present
-    # - name: "Set listen address if none are configured"
-    #   become: true
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/postgresql/15/main/postgresql.conf 
-    #     regexp: '^#listen'
-    #     line: 'listen_addresses = 0.0.0.0'
-    # - name: "Set correct listen address if configured"
-    #   become: true
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/postgresql/15/main/postgresql.conf 
-    #     regexp: '^listen'
-    #     line: "listen_adresses = 'localhost,{{ vm_bdds_01_data_ip }}'"
-    # - name: "Authorise connection from data subnetwork"
-    #   become: true
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/postgresql/15/main/pg_hba.conf 
-    #     line: "host agenda  agenda  172.14.0.0/24 scram-sha-256"
-    #     create: yes
+    - name: "Set postgresql listen adresses"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_set:
+        name: listen_addresses
+        value: "localhost, {{ vm_bdds_01_data_ip }}"
+    - name: Grant remote access for database agenda by user agenda 
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_pg_hba:
+        dest: /etc/postgresql/15/main/pg_hba.conf
+        contype: host
+        users: agenda
+        source: "172.14.0.0/24"
+        databases: agenda
+        method: scram-sha-256
+        create: true
+    - name: Create agenda user, password agenda, with CREATEDB and LOGIN as flags
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_user:
+        name: agenda
+        password: agenda
+        role_attr_flags: createdb,login
+        expires: 'infinity'
+    - name: Create agenda database owned by agenda role
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_db:
+        name: agenda
+        owner: agenda
     - name: "Restart Postgresql"
       become: true
       ansible.builtin.systemd_service:
         name: postgresql
         state: restarted
-    # - name: "Set password for postgres database user"
-    #   become: true
-    #   ansible.builtin.command:
-    # - name: Create agenda user, password agenda, with CREATEDB and LOGIN as flags
-    #   community.postgresql.postgresql_user:
-    #     name: agenda
-    #     password: agenda
-    #     role_attr_flags: createdb,login
-    #     expires: 'infinity'
-    #     login_host: 'localhost'
-    #     login_password: ''
-    # - name: Create agenda database owned by agenda role
-    #   community.postgresql.postgresql_db:
-    #     name: agenda
-    #     owner: agenda
