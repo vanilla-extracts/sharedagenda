@@ -30,11 +30,11 @@ Host {{ hostvars[vm_api_01]['openstack']['description'] }} {{ hostvars[vm_api_01
    UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
 
 {# Serveur BDD #}
-Host {{ hostvars[vm_bdd_01]['openstack']['description'] }} {{ hostvars[vm_bdd_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+Host {{ hostvars[vm_bdds_01]['openstack']['description'] }} {{ hostvars[vm_bdds_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
    IdentityFile "~/.ssh/id_sharedagenda" 
    IdentitiesOnly yes 
    User {{ ansible_user }}
-   Hostname  {{ hostvars[vm_bdd_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   Hostname  {{ hostvars[vm_bdds_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
    ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
    ServerAliveInterval 120
    StrictHostKeyChecking no  
