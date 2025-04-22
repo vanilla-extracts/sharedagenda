@@ -36,21 +36,21 @@ groups:
   protected_nodes: >-
     openstack.metadata.group != "bastion" 
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_bastion: >-
+  platform_shag_bastion: >-
     openstack.metadata.group == "bastion"
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_caddy: >-
+  platform_shag_caddy: >-
     openstack.metadata.group == "caddy"
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_apis: >-
+  platform_shag_apis: >-
     openstack.metadata.group == "apis"
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_api_01: >-
+  platform_shag_api_01: >-
     openstack.name == deploy.pf_prefixe+"-vm-apis-01-"+deploy.phase
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_bdds: >-
+  platform_shag_bdds: >-
     openstack.metadata.group == "bdds"
     and openstack.metadata.pf_prefixe == "shag-01"
-  platform_bdds_01: >-
+  platform_shag_bdds_01: >-
     openstack.name == deploy.pf_prefixe+"-vm-bdds-01-"+deploy.phase
     and openstack.metadata.pf_prefixe == "shag-01"
