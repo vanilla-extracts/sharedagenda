@@ -11,3 +11,4 @@ atty = "0.2.14"
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0.192", features = ["derive"] }
+chrono = { version="0.4.40", features = ["serde"] }

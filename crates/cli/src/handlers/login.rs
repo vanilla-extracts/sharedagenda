@@ -1,7 +1,8 @@
+use chrono::{DateTime, Utc};
 use reqwest::Client;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
-use crate::API_URL;
+use crate::{API_URL, TOKEN};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LoginPost<'r> {
@@ -11,9 +12,9 @@ pub struct LoginPost<'r> {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LoginAnswer {
-    code: i32,
+    status: i64,
     token: String,
-    expiration: String,
+    expiration: Option<DateTime<Utc>>,
 }
 
 pub trait Answer {
@@ -23,10 +24,14 @@ pub trait Answer {
 
 impl Answer for LoginAnswer {
     fn code(&self) -> i32 {
-        self.code
+        self.status as i32
     }
     fn answer(&self) -> String {
-        format!("Token {}", self.token)
+        format!(
+            "Login successfull, token is {} expiration is {}",
+            self.token,
+            self.expiration.unwrap()
+        )
     }
 }
 
@@ -43,20 +48,25 @@ pub async fn call<U: Serialize, V: DeserializeOwned + Answer>(
         .send()
         .await
     {
-        Ok(e) => {
-            let answer: V = e.json().await.unwrap();
-            if answer.code() != 200 {
-                println!(
-                    "Error while sending the request \n Code: {} \n Message: {} ",
-                    answer.code(),
-                    answer.answer()
-                );
-                Some(answer)
-            } else {
-                println!("{}", answer.answer());
-                Some(answer)
+        Ok(e) => match e.json::<V>().await {
+            Ok(answer) => {
+                if answer.code() != 200 {
+                    println!(
+                        "Error while sending the request \nCode: {} \nMessage: {} ",
+                        answer.code(),
+                        answer.answer()
+                    );
+                    Some(answer)
+                } else {
+                    println!("{}", answer.answer());
+                    Some(answer)
+                }
             }
-        }
+            Err(e) => {
+                println!("Error while sending the request: {e}");
+                None
+            }
+        },
         Err(e) => {
             println!("Error while sending the resquest: {e}");
             None
@@ -80,8 +90,9 @@ pub async fn login(line: &str) {
     };
     let url = API_URL.with(|f| f.take());
     let log = call::<LoginPost<'_>, LoginAnswer>(url, &data, "user", "login").await;
-    match log {
-        Some(answer) => println!("{}", answer.token),
-        None => println!("Error"),
-    }
+    TOKEN.with(|f| {
+        if let Some(answer) = log {
+            *f.borrow_mut() = answer.token;
+        }
+    });
 }
