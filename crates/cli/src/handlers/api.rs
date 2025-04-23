@@ -9,9 +9,7 @@ pub fn api(url: &str) {
     match write_config(&config) {
         Ok(_) => {
             println!("Configuration has been updated with new URL: {}", url);
-            API_URL.with(|f| {
-                *f.borrow_mut() = url.to_string();
-            });
+            *API_URL.lock().unwrap() = url.to_string();
         }
         Err(_) => {
             println!("Error while updating configuration")
