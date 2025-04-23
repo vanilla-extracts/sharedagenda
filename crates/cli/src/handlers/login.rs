@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, format};
 use reqwest::Client;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
@@ -29,11 +29,15 @@ impl Answer for LoginAnswer {
         self.status as i32
     }
     fn answer(&self) -> String {
-        format!(
-            "Login successfull, token is {} expiration is {}",
-            self.token,
-            self.expiration.unwrap()
-        )
+        if self.status == 200 {
+            format!(
+                "Login is successfull, token is {} which expires at {}",
+                self.token,
+                self.expiration.unwrap()
+            )
+        } else {
+            format!("{}", self.token)
+        }
     }
 }
 

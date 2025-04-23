@@ -73,6 +73,9 @@ pub async fn delete(body: Json<UserDeletion<'_>>) -> Json<UserDeletionAnswer> {
             let db1 = Database::new().await;
             let sql1 = &format!("delete from token where owner='{}'", uuid);
             db1.execute_statement(sql1).await;
+            let db2 = Database::new().await;
+            let sql2 = &format!("delete from events where owner='{}'", uuid);
+            db2.execute_statement(sql2).await;
             let db = Database::new().await;
             let sql = &format!("delete from users where uuid='{}'", uuid);
             db.execute_statement(sql).await;

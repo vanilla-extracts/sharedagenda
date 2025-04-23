@@ -8,7 +8,7 @@ use std::{
 use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
-use handlers::{login::login, logout::logout, register::register};
+use handlers::{delete::delete, login::login, logout::logout, register::register};
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
@@ -125,6 +125,12 @@ async fn main() {
                     "> login <email> <password>                              > login with your account"
                 );
                 println!(
+                    "> logout                                                > logout of your account"
+                );
+                println!(
+                    "> delete                                                > delete your account"
+                );
+                println!(
                     "> new|create <name> <date_start> <date_end> [invitees]  > create a new event"
                 );
                 println!(
@@ -158,6 +164,7 @@ async fn main() {
                 _ => println!("Usage: login <email> <password>"),
             },
             str if str.starts_with("logout") => logout().await,
+            str if str.starts_with("delete") => delete().await,
             _ => println!("SOON"),
         }
         interface.add_history_unique(line);
