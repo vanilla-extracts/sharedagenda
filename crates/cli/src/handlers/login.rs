@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use chrono::{DateTime, Utc, format};
+use chrono::{DateTime, Utc};
 use reqwest::Client;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 

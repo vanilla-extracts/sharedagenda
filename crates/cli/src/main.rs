@@ -1,12 +1,6 @@
-use std::{
-    env::{self, Args},
-    io::{self, BufRead},
-    process::exit,
-    sync::Mutex,
-};
+use std::{process::exit, sync::Mutex};
 
 use crate::handlers::api::api;
-use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{delete::delete, login::login, logout::logout, register::register};
 use lazy_static::lazy_static;
@@ -25,49 +19,6 @@ mod handlers;
 
 #[tokio::main]
 async fn main() {
-    let mut args: Args = env::args();
-    if args.len() > 1 || !atty::is(Stream::Stdin) {
-        let mut a: Vec<String> = vec![];
-
-        if !atty::is(Stream::Stdin) {
-            let stdin = io::stdin();
-            for line in stdin.lock().lines() {
-                a.push(line.unwrap());
-            }
-        } else {
-            let _ = args.next();
-            args.for_each(|f| a.push(f));
-        }
-
-        match a.first().unwrap().as_str() {
-            "-h" | "--help" => {
-                println!("-----SharedAgenda CLI Help-----");
-                println!("sharedagenda              > launch the REPL");
-                println!("sharedagenda --help|-h    > show the help");
-                println!("sharedagenda --conf|-c    > prints the configuration file path");
-                println!("sharedagenda --version|-v > prints the version");
-                println!("sharedagenda api [url]    > set the URL for which API to use");
-                println!("sharedagenda register     > register a new account for sharedagenda");
-                println!("sharedagenda login        > login with your account");
-                println!("sharedagenda new|create   > create a new event");
-                println!("sharedagenda list <date>  > prints out the list of events");
-                println!("sharedagenda change       > change user information");
-                println!("sharedagenda modify       > modify event information");
-                println!("sharedagenda pretty       > pretty print the list of events");
-                println!("-----SharedAgenda CLI Help-----");
-            }
-            "-v" | "--version" => {
-                println!("SharedAgenda CLI {VERSION}");
-            }
-            "-c" | "--conf" => {
-                println!("$HOME/.config/sharedagenda/cli.toml");
-            }
-            _ => {
-                println!("SOON");
-            }
-        }
-    }
-
     let config = match load() {
         Ok(config) => config,
         Err(_) => {
