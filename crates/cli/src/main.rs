@@ -8,6 +8,7 @@ use std::{
 use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
+use handlers::register::register;
 use linefeed::{Interface, ReadResult};
 
 static VERSION: &str = "v0.1.0";
@@ -16,7 +17,8 @@ thread_local! {static API_URL: RefCell<String> = const {RefCell::new(String::new
 mod configuration;
 mod handlers;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut args: Args = env::args();
     if args.len() > 1 || !atty::is(Stream::Stdin) {
         let mut a: Vec<String> = vec![];
@@ -100,19 +102,39 @@ fn main() {
             "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
             "exit" => break,
             "help" => {
-                println!("-----SharedAgenda CLI Help-----");
-                println!("help          > show the help");
-                println!("config        > prints the configuration file path");
-                println!("version       > prints the version");
-                println!("api [url]     > set the URL for which API to use");
-                println!("register      > register a new account for sharedagenda");
-                println!("login         > login with your account");
-                println!("new|create    > create a new event");
-                println!("list <date>   > prints out the list of events");
-                println!("change        > change user information");
-                println!("modify        > modify event information");
-                println!("pretty <date> > pretty print the list of events");
-                println!("-----SharedAgenda CLI Help-----");
+                println!("-----SharedAgenda CLI REPL Help-----");
+                println!("> help                                                  > show the help");
+                println!(
+                    "> config                                                > prints the configuration file path"
+                );
+                println!(
+                    "> version                                               > prints the version"
+                );
+                println!(
+                    "> api [url]                                             > set the URL for which API to use"
+                );
+                println!(
+                    "> register <name> <email> <password>                    > register a new account for sharedagenda"
+                );
+                println!(
+                    "> login <email> <password>                              > login with your account"
+                );
+                println!(
+                    "> new|create <name> <date_start> <date_end> [invitees]  > create a new event"
+                );
+                println!(
+                    "> list <date>                                           > prints out the list of events"
+                );
+                println!(
+                    "> change <name> <email> <password>                      > change user information"
+                );
+                println!(
+                    "> modify <name> <date_start> <date_end>                 > modify event information"
+                );
+                println!(
+                    "> pretty <date>                                         > pretty print the list of events"
+                );
+                println!("-----SharedAgenda CLI REPL Help-----");
             }
             str if str.starts_with("api") => match str.strip_prefix("api") {
                 Some(str) if str.trim() != "" => {
@@ -121,6 +143,10 @@ fn main() {
                 _ => {
                     API_URL.with(|f| println!("Current API URL: {}", f.borrow()));
                 }
+            },
+            str if str.starts_with("register") => match str.strip_prefix("register") {
+                Some(reg) if reg.trim() != "" => register(reg.trim()).await,
+                _ => println!("Usage: register <name> <email> <password>"),
             },
             _ => println!("SOON"),
         }
