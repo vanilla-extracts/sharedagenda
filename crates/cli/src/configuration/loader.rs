@@ -26,7 +26,6 @@ pub struct Configuration {
 pub struct Loaded<'a> {
     pub api_link: String,
     pub greeting_message: ANSIGenericString<'a, str>,
-    pub greeting_colour: Color,
     pub prompt_message: String,
     pub prompt_colour: Color,
 }
@@ -141,7 +140,6 @@ pub fn replace_variable(str: String) -> String {
 
 pub fn load_config<'a>(config: Configuration) -> Loaded<'a> {
     Loaded {
-        greeting_colour: load_color(config.clone().greeting.greeting_colour),
         greeting_message: load_color(config.greeting.greeting_colour)
             .paint(replace_variable(config.greeting.greeting_message)),
         prompt_message: config.prompt.prompt_message,
