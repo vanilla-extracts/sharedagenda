@@ -1,7 +1,8 @@
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 use crate::API_URL;
+
+use super::login::{Answer, call};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct RegisterPost<'r> {
@@ -16,28 +17,12 @@ pub struct RegisterAnswer {
     answer: String,
 }
 
-async fn call(url: String, data: &RegisterPost<'_>) {
-    let client = Client::new();
-    match client
-        .post(format!("{}/user/create", url))
-        .json(data)
-        .send()
-        .await
-    {
-        Ok(e) => {
-            let answer: RegisterAnswer = e.json().await.unwrap();
-            if answer.code != 200 {
-                println!(
-                    "Error while sending the request \n Code: {} \n Message: {} ",
-                    answer.code, answer.answer
-                );
-            } else {
-                println!("{}", answer.answer);
-            }
-        }
-        Err(e) => {
-            println!("Error while sending the resquest: {e}")
-        }
+impl Answer for RegisterAnswer {
+    fn code(&self) -> i32 {
+        self.code
+    }
+    fn answer(&self) -> String {
+        self.answer.clone()
     }
 }
 
@@ -57,5 +42,5 @@ pub async fn register(line: &str) {
         password: vec[2],
     };
     let url = API_URL.with(|f| f.take());
-    call(url, &data).await;
+    call::<RegisterPost<'_>, RegisterAnswer>(url, &data, "user", "create").await;
 }

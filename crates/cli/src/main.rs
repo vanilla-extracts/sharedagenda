@@ -8,7 +8,7 @@ use std::{
 use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
-use handlers::register::register;
+use handlers::{login::login, register::register};
 use linefeed::{Interface, ReadResult};
 
 static VERSION: &str = "v0.1.0";
@@ -147,6 +147,10 @@ async fn main() {
             str if str.starts_with("register") => match str.strip_prefix("register") {
                 Some(reg) if reg.trim() != "" => register(reg.trim()).await,
                 _ => println!("Usage: register <name> <email> <password>"),
+            },
+            str if str.starts_with("login") => match str.strip_prefix("login") {
+                Some(log) if log.trim() != "" => login(log.trim()).await,
+                _ => println!("Usage: login <email> <password>"),
             },
             _ => println!("SOON"),
         }
