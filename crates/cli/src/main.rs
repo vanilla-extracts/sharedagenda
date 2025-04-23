@@ -13,6 +13,7 @@ use linefeed::{Interface, ReadResult};
 
 static VERSION: &str = "v0.1.0";
 thread_local! {static API_URL: RefCell<String> = const {RefCell::new(String::new())}}
+thread_local! {static TOKEN: RefCell<String> = const {RefCell::new(String::new())}}
 
 mod configuration;
 mod handlers;
@@ -154,5 +155,6 @@ async fn main() {
             },
             _ => println!("SOON"),
         }
+        interface.add_history_unique(line);
     }
 }
