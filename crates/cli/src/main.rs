@@ -1,19 +1,24 @@
 use std::{
-    cell::RefCell,
     env::{self, Args},
     io::{self, BufRead},
     process::exit,
+    sync::Mutex,
 };
 
 use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
-use handlers::{login::login, register::register};
+use handlers::{login::login, logout::logout, register::register};
+use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
 static VERSION: &str = "v0.1.0";
-thread_local! {static API_URL: RefCell<String> = const {RefCell::new(String::new())}}
-thread_local! {static TOKEN: RefCell<String> = const {RefCell::new(String::new())}}
+lazy_static! {
+    static ref TOKEN: Mutex<String> = Mutex::new(String::new());
+}
+lazy_static! {
+    static ref API_URL: Mutex<String> = Mutex::new(String::new());
+}
 
 mod configuration;
 mod handlers;
@@ -81,9 +86,7 @@ async fn main() {
 
     println!("{}", loaded.greeting_message);
 
-    API_URL.with(|f| {
-        *f.borrow_mut() = loaded.api_link;
-    });
+    *API_URL.lock().unwrap() = loaded.api_link;
 
     let interface = Interface::new("sharedagenda").unwrap();
     let style = &loaded.prompt_colour;
@@ -101,6 +104,7 @@ async fn main() {
         match line.as_str().trim() {
             "version" => println!("SharedAgenda CLI REPL {VERSION}"),
             "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
+            "token" => println!("Current Token is: {}", TOKEN.lock().unwrap()),
             "exit" => break,
             "help" => {
                 println!("-----SharedAgenda CLI REPL Help-----");
@@ -142,7 +146,7 @@ async fn main() {
                     api(str.trim());
                 }
                 _ => {
-                    API_URL.with(|f| println!("Current API URL: {}", f.borrow()));
+                    println!("Current API URL: {}", API_URL.lock().unwrap())
                 }
             },
             str if str.starts_with("register") => match str.strip_prefix("register") {
@@ -153,6 +157,7 @@ async fn main() {
                 Some(log) if log.trim() != "" => login(log.trim()).await,
                 _ => println!("Usage: login <email> <password>"),
             },
+            str if str.starts_with("logout") => logout().await,
             _ => println!("SOON"),
         }
         interface.add_history_unique(line);

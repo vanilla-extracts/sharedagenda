@@ -41,6 +41,6 @@ pub async fn register(line: &str) {
         email: vec[1],
         password: vec[2],
     };
-    let url = API_URL.with(|f| f.take());
+    let url = API_URL.lock().unwrap().to_string();
     call::<RegisterPost<'_>, RegisterAnswer>(url, &data, "user", "create").await;
 }

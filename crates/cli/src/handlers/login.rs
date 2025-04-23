@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use chrono::{DateTime, Utc};
 use reqwest::Client;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
@@ -35,7 +37,7 @@ impl Answer for LoginAnswer {
     }
 }
 
-pub async fn call<U: Serialize, V: DeserializeOwned + Answer>(
+pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
     url: String,
     data: &U,
     first_route: &str,
@@ -63,7 +65,7 @@ pub async fn call<U: Serialize, V: DeserializeOwned + Answer>(
                 }
             }
             Err(e) => {
-                println!("Error while sending the request: {e}");
+                println!("Error while matching the answer: {e}");
                 None
             }
         },
@@ -88,11 +90,9 @@ pub async fn login(line: &str) {
         email: vec[0],
         password: vec[1],
     };
-    let url = API_URL.with(|f| f.take());
+    let url = API_URL.lock().unwrap().to_string();
     let log = call::<LoginPost<'_>, LoginAnswer>(url, &data, "user", "login").await;
-    TOKEN.with(|f| {
-        if let Some(answer) = log {
-            *f.borrow_mut() = answer.token;
-        }
-    });
+    if let Some(answer) = log {
+        *TOKEN.lock().unwrap() = answer.token;
+    }
 }
