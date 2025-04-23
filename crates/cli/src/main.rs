@@ -1,17 +1,20 @@
 use std::{
+    cell::RefCell,
     env::{self, Args},
     io::{self, BufRead},
     process::exit,
 };
 
-use ansi_term::Color;
+use crate::handlers::api::api;
 use atty::Stream;
-use configuration::loader::{Configuration, load, load_config, write_default_config};
+use configuration::loader::{load, load_config, write_default_config};
 use linefeed::{Interface, ReadResult};
 
 static VERSION: &str = "v0.1.0";
+thread_local! {static API_URL: RefCell<String> = const {RefCell::new(String::new())}}
 
 mod configuration;
+mod handlers;
 
 fn main() {
     let mut args: Args = env::args();
@@ -31,7 +34,6 @@ fn main() {
         match a.first().unwrap().as_str() {
             "-h" | "--help" => {
                 println!("-----SharedAgenda CLI Help-----");
-                println!("");
                 println!("sharedagenda              > launch the REPL");
                 println!("sharedagenda --help|-h    > show the help");
                 println!("sharedagenda --conf|-c    > prints the configuration file path");
@@ -44,7 +46,6 @@ fn main() {
                 println!("sharedagenda change       > change user information");
                 println!("sharedagenda modify       > modify event information");
                 println!("sharedagenda pretty       > pretty print the list of events");
-                println!("");
                 println!("-----SharedAgenda CLI Help-----");
             }
             "-v" | "--version" => {
@@ -77,6 +78,10 @@ fn main() {
 
     println!("{}", loaded.greeting_message);
 
+    API_URL.with(|f| {
+        *f.borrow_mut() = loaded.api_link;
+    });
+
     let interface = Interface::new("sharedagenda").unwrap();
     let style = &loaded.prompt_colour;
     let prompt = &loaded.prompt_message;
@@ -96,7 +101,6 @@ fn main() {
             "exit" => break,
             "help" => {
                 println!("-----SharedAgenda CLI Help-----");
-                println!("");
                 println!("help          > show the help");
                 println!("config        > prints the configuration file path");
                 println!("version       > prints the version");
@@ -108,9 +112,16 @@ fn main() {
                 println!("change        > change user information");
                 println!("modify        > modify event information");
                 println!("pretty <date> > pretty print the list of events");
-                println!("");
                 println!("-----SharedAgenda CLI Help-----");
             }
+            str if str.starts_with("api") => match str.strip_prefix("api") {
+                Some(str) if str.trim() != "" => {
+                    api(str.trim());
+                }
+                _ => {
+                    API_URL.with(|f| println!("Current API URL: {}", f.borrow()));
+                }
+            },
             _ => println!("SOON"),
         }
     }
