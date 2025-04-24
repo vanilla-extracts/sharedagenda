@@ -3,8 +3,8 @@ use std::{process::exit, sync::Mutex};
 use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    change::change, create::create, delete::delete, event_deletion::remove, list::list,
-    login::login, logout::logout, register::register, whoami::whoami,
+    create::create, delete::delete, event_deletion::remove, list::list, login::login,
+    logout::logout, modify::modify, register::register, whoami::whoami,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -101,13 +101,7 @@ async fn main() {
                 );
 
                 println!(
-                    "> change <name>%<email>%<password>                      > changes user information"
-                );
-                println!(
-                    "> modify <name>%<date_start>%<date_end>                 > modifies event information"
-                );
-                println!(
-                    "> pretty <date>                                         > pretty prints the list of events"
+                    "> modify <name>%<email>%<password>                      > modifies user information"
                 );
                 println!("-----SharedAgenda CLI REPL Help-----");
             }
@@ -123,9 +117,9 @@ async fn main() {
                 Some(reg) if reg.trim() != "" => register(reg.trim()).await,
                 _ => println!("Usage: register <name>%<email>%<password>"),
             },
-            str if str.starts_with("change") => match str.strip_prefix("change") {
-                Some(reg) if reg.trim() != "" => change(reg.trim()).await,
-                _ => println!("Usage: change <name>%<email>%<password>"),
+            str if str.starts_with("modify") => match str.strip_prefix("modify") {
+                Some(reg) if reg.trim() != "" => modify(reg.trim()).await,
+                _ => println!("Usage: modify <name>%<email>%<password>"),
             },
             str if str.starts_with("login") => match str.strip_prefix("login") {
                 Some(log) if log.trim() != "" => login(log.trim()).await,

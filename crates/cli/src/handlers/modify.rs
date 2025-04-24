@@ -27,7 +27,7 @@ impl Answer for UserModifyAnswer {
     }
 }
 
-pub async fn change(line: &str) {
+pub async fn modify(line: &str) {
     let args = line.split("%");
     let mut vec = vec![];
     for arg in args {
