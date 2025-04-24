@@ -15,7 +15,7 @@ pub struct UserModifyPost<'r> {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserModifyAnswer {
     code: i32,
-    answer: String,
+    body: String,
 }
 
 impl Answer for UserModifyAnswer {
@@ -23,7 +23,7 @@ impl Answer for UserModifyAnswer {
         self.code
     }
     fn answer(&self) -> String {
-        self.answer.clone()
+        self.body.clone()
     }
 }
 
