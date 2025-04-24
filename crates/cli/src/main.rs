@@ -3,13 +3,13 @@ use std::{process::exit, sync::Mutex};
 use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, register::register,
+    change::change, create::create, delete::delete, event_deletion::remove, list::list,
+    login::login, logout::logout, register::register,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v1.0.0-alpha";
+static VERSION: &str = "v1.0.0-beta";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
@@ -86,7 +86,7 @@ async fn main() {
                     "> delete                                                > delete your account"
                 );
                 println!(
-                    "> remove                                                > delete your account"
+                    "> remove <id>                                           > remove an event"
                 );
                 println!(
                     "> new|create <name>%<date_start>%<date_end>%[invitees]  > create a new event"
@@ -116,6 +116,10 @@ async fn main() {
             str if str.starts_with("register") => match str.strip_prefix("register") {
                 Some(reg) if reg.trim() != "" => register(reg.trim()).await,
                 _ => println!("Usage: register <name>%<email>%<password>"),
+            },
+            str if str.starts_with("change") => match str.strip_prefix("change") {
+                Some(reg) if reg.trim() != "" => change(reg.trim()).await,
+                _ => println!("Usage: change <name>%<email>%<password>"),
             },
             str if str.starts_with("login") => match str.strip_prefix("login") {
                 Some(log) if log.trim() != "" => login(log.trim()).await,
