@@ -1,0 +1,22 @@
+
+postgresql_use_ssl: false
+postgresql_db_name: "agenda"
+postgresql_db_username: "agenda"
+postgresql_db_password: "agenda"
+postgresql_data_directory: "/pgdata/{{ postgresql_db_name }}/data"
+
+postgresql_databases:
+  - name: "{{ postgresql_db_name }}"
+    owner: "{{ postgresql_db_username }}"
+postgresql_users:
+  - name: "{{ postgresql_db_username }}"
+    password: "{{ postgresql_db_password }}"
+
+postgresql_default_config:
+  wal_level: "replica"
+  hot_standby: "on"
+  wal_log_hints: "off"
+  track_commit_timestamp: "off"
+  log_rotation_size: "100MB"
+  port: "5432"
+  listen_addresses: "'localhost','{{ vm_bdds_01_data_ip }}'"

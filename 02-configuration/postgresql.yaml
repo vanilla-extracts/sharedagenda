@@ -1,0 +1,6 @@
+- name: "Install postgresql"
+  hosts: platform_shag_bdds
+  vars_files:
+    - vars/postgresql.yaml
+  roles:
+    - postgresql
