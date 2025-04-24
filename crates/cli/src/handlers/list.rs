@@ -32,7 +32,7 @@ impl Answer for ListAnswer {
         self.code as i32
     }
     fn answer(&self) -> String {
-        String::new()
+        self.body.clone()
     }
 }
 
