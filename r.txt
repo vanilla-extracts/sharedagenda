@@ -1,0 +1,5 @@
+wheel
+ansible
+openstacksdk
+ansible-lint
+passlib

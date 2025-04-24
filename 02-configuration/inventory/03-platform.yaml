@@ -1,0 +1,56 @@
+---
+plugin: constructed
+strict: false
+compose:
+  deploy:
+    pf_prefixe: "shag-01"
+    phase: "dev"
+    phase_legacy: "dev"
+    cloud_name: "shag-01"
+    nubo: "NUBP01"
+    nubo_zone: "NUBP01_PRIV"
+    platform_name: "shag"
+# Récupération de la bonne IP pour les bastion et les autres instances pour la connexion SSH
+# Si absent ansible ansible essaye de se connecter via la FIP pour l'instance HAPROXY
+  ansible_host: >-
+    openstack['accessIPv4']
+    if openstack.metadata.group == "bastion"
+    else
+    openstack['addresses']["shag-01-network-adm-dev"][0]['addr']
+# Récupération de la bonne IP pour les bastion et les autres instances pour la connexion SSH
+  ansible_ssh_host: >-
+    openstack['accessIPv4']
+    if openstack.metadata.group == "bastion"
+    else
+    openstack['addresses']["shag-01-network-adm-dev"][0]['addr']
+keyed_groups:
+  - key: >-
+      openstack.metadata.group
+      if (openstack.metadata.pf_prefixe == "shag-01")
+    prefix: 'platform'
+    parent_group: "platform"	
+# Génération dynamique des groupes de l'inventaire 
+groups:
+  platform_shag: >-
+    openstack.metadata.pf_prefixe == "shag-01"
+  protected_nodes: >-
+    openstack.metadata.group != "bastion" 
+    and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_bastion: >-
+    openstack.metadata.group == "bastion"
+    and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_caddy: >-
+    openstack.metadata.group == "caddy"
+    and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_apis: >-
+    openstack.metadata.group == "apis"
+    and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_api_01: >-
+    openstack.name == deploy.pf_prefixe+"-vm-apis-01-"+deploy.phase
+    and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_bdds: >-
+    openstack.metadata.group == "bdds"
+    and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_bdds_01: >-
+    openstack.name == deploy.pf_prefixe+"-vm-bdds-01-"+deploy.phase
+    and openstack.metadata.pf_prefixe == "shag-01"

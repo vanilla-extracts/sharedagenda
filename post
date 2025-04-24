@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data "$1" \
+  http://www-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr/"$2"/"$3"

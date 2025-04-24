@@ -1,0 +1,41 @@
+{# Bastion #}
+Host {{ hostvars[vm_bastion]['openstack']['description'] }} {{ hostvars[vm_bastion]['ansible_host'] }}  
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_bastion]['ansible_host'] }}
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }} 
+
+{# Serveur Caddy #}
+Host {{ hostvars[vm_caddy]['openstack']['description'] }} {{ hostvars[vm_caddy]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes 
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_caddy]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
+   ServerAliveInterval 120
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+
+{# Serveur API 01 #}
+Host {{ hostvars[vm_api_01]['openstack']['description'] }} {{ hostvars[vm_api_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes 
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_api_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
+   ServerAliveInterval 120
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+
+{# Serveur BDD #}
+Host {{ hostvars[vm_bdds_01]['openstack']['description'] }} {{ hostvars[vm_bdds_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes 
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_bdds_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
+   ServerAliveInterval 120
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
