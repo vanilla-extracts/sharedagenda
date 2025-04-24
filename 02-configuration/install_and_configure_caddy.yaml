@@ -1,0 +1,22 @@
+- name: "Install and configure caddy"
+  hosts: platform_shag_caddy
+  gather_facts: no 
+  tasks:
+    - name: install prerequisites
+      become: true
+      apt: name={{ item }} state=latest
+      with_items:
+        - acl
+        - caddy
+      tags:
+        - packages
+    - name: Copy Caddyfile
+      become: true
+      ansible.builtin.template:
+        src: Caddyfile.j2
+        dest: /etc/caddy/Caddyfile
+    - name: Restart Caddy
+      become: true
+      ansible.builtin.systemd_service:
+        name: caddy
+        state: restarted

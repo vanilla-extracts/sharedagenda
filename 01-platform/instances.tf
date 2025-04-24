@@ -99,7 +99,7 @@ module "vm-caddy" {
   is_data_network  = false
 
   admin_secgroup_id = [module.sg-admin.secgroup_id]
-  pub_secgroup_id   = [module.sg-api.secgroup_id]
+  pub_secgroup_id   = [module.sg-api.secgroup_id,module.sg-caddy.secgroup_id]
   data_secgroup_id  = []
 
   # Ajouté pour connecter la FIP Publication au HAProxy

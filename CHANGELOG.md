@@ -51,3 +51,21 @@ Audrey:
 
 ### Realised
 - all routes are implemented and tested
+
+## Session 5: 2025-04-22 
+### Planned
+- deployment of database
+
+### Realised
+- deployment of database, api and start of caddy
+
+## Session 6: 2025-04-23 
+### Planned
+- Client development
+
+### Realised
+- Client can login, register, logout, delete users
+
+## Session 7: 2025-04-24 
+### Planned
+- Caddy deployment and finishing client
