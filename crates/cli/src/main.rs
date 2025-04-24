@@ -2,11 +2,11 @@ use std::{process::exit, sync::Mutex};
 
 use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
-use handlers::{delete::delete, login::login, logout::logout, register::register};
+use handlers::{delete::delete, list::list, login::login, logout::logout, register::register};
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v0.1.0";
+static VERSION: &str = "v1.0.0-alpha";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
@@ -38,6 +38,7 @@ async fn main() {
     println!("{}", loaded.greeting_message);
 
     *API_URL.lock().unwrap() = loaded.api_link;
+    *TOKEN.lock().unwrap() = loaded.token;
 
     let interface = Interface::new("sharedagenda").unwrap();
     let style = &loaded.prompt_colour;
@@ -116,6 +117,10 @@ async fn main() {
             },
             str if str.starts_with("logout") => logout().await,
             str if str.starts_with("delete") => delete().await,
+            str if str.starts_with("list") => match str.strip_prefix("list") {
+                Some(time) => list(time.trim().to_string()).await,
+                _ => list("".to_string()).await,
+            },
             _ => println!("SOON"),
         }
         interface.add_history_unique(line);

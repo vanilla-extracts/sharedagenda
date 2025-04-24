@@ -18,6 +18,7 @@ pub struct Prompt {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Configuration {
     pub api_link: String,
+    pub token: String,
     pub greeting: Greeting,
     pub prompt: Prompt,
 }
@@ -25,6 +26,7 @@ pub struct Configuration {
 #[derive(Clone)]
 pub struct Loaded<'a> {
     pub api_link: String,
+    pub token: String,
     pub greeting_message: ANSIGenericString<'a, str>,
     pub prompt_message: String,
     pub prompt_colour: Color,
@@ -54,6 +56,7 @@ impl Default for Configuration {
         Self {
             api_link: "http://localhost:8000".to_string(),
             prompt: Prompt::default(),
+            token: String::new(),
             greeting: Greeting::default(),
         }
     }
@@ -140,6 +143,7 @@ pub fn replace_variable(str: String) -> String {
 
 pub fn load_config<'a>(config: Configuration) -> Loaded<'a> {
     Loaded {
+        token: config.token,
         greeting_message: load_color(config.greeting.greeting_colour)
             .paint(replace_variable(config.greeting.greeting_message)),
         prompt_message: config.prompt.prompt_message,
