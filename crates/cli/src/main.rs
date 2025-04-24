@@ -2,7 +2,9 @@ use std::{process::exit, sync::Mutex};
 
 use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
-use handlers::{delete::delete, list::list, login::login, logout::logout, register::register};
+use handlers::{
+    create::create, delete::delete, list::list, login::login, logout::logout, register::register,
+};
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
@@ -71,10 +73,10 @@ async fn main() {
                     "> api [url]                                             > set the URL for which API to use"
                 );
                 println!(
-                    "> register <name> <email> <password>                    > register a new account for sharedagenda"
+                    "> register <name>%<email>%<password>                    > register a new account for sharedagenda"
                 );
                 println!(
-                    "> login <email> <password>                              > login with your account"
+                    "> login <email>%<password>                              > login with your account"
                 );
                 println!(
                     "> logout                                                > logout of your account"
@@ -83,16 +85,16 @@ async fn main() {
                     "> delete                                                > delete your account"
                 );
                 println!(
-                    "> new|create <name> <date_start> <date_end> [invitees]  > create a new event"
+                    "> new|create <name>%<date_start>%<date_end>%[invitees]  > create a new event"
                 );
                 println!(
                     "> list <date>                                           > prints out the list of events"
                 );
                 println!(
-                    "> change <name> <email> <password>                      > change user information"
+                    "> change <name>%<email>%<password>                      > change user information"
                 );
                 println!(
-                    "> modify <name> <date_start> <date_end>                 > modify event information"
+                    "> modify <name>%<date_start>%<date_end>                 > modify event information"
                 );
                 println!(
                     "> pretty <date>                                         > pretty print the list of events"
@@ -109,17 +111,21 @@ async fn main() {
             },
             str if str.starts_with("register") => match str.strip_prefix("register") {
                 Some(reg) if reg.trim() != "" => register(reg.trim()).await,
-                _ => println!("Usage: register <name> <email> <password>"),
+                _ => println!("Usage: register <name>%<email>%<password>"),
             },
             str if str.starts_with("login") => match str.strip_prefix("login") {
                 Some(log) if log.trim() != "" => login(log.trim()).await,
-                _ => println!("Usage: login <email> <password>"),
+                _ => println!("Usage: login <email>%<password>"),
             },
             str if str.starts_with("logout") => logout().await,
             str if str.starts_with("delete") => delete().await,
             str if str.starts_with("list") => match str.strip_prefix("list") {
                 Some(time) => list(time.trim().to_string()).await,
                 _ => list("".to_string()).await,
+            },
+            str if str.starts_with("create") => match str.strip_prefix("create") {
+                Some(s) if s.trim() != "" => create(s).await,
+                _ => println!("Usage: create <name>%<date_start>%<date_end>%[invitees]"),
             },
             _ => println!("SOON"),
         }
