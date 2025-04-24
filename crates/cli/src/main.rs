@@ -4,7 +4,7 @@ use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
     change::change, create::create, delete::delete, event_deletion::remove, list::list,
-    login::login, logout::logout, register::register,
+    login::login, logout::logout, register::register, whoami::whoami,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -63,7 +63,9 @@ async fn main() {
             "exit" => break,
             "help" => {
                 println!("-----SharedAgenda CLI REPL Help-----");
-                println!("> help                                                  > show the help");
+                println!(
+                    "> help                                                  > shows the help"
+                );
                 println!(
                     "> config                                                > prints the configuration file path"
                 );
@@ -71,10 +73,10 @@ async fn main() {
                     "> version                                               > prints the version"
                 );
                 println!(
-                    "> api [url]                                             > set the URL for which API to use"
+                    "> api [url]                                             > sets the URL for which API to use"
                 );
                 println!(
-                    "> register <name>%<email>%<password>                    > register a new account for sharedagenda"
+                    "> register <name>%<email>%<password>                    > registers a new account for sharedagenda"
                 );
                 println!(
                     "> login <email>%<password>                              > login with your account"
@@ -83,25 +85,29 @@ async fn main() {
                     "> logout                                                > logout of your account"
                 );
                 println!(
-                    "> delete                                                > delete your account"
+                    "> delete                                                > deletes your account"
                 );
                 println!(
-                    "> remove <id>                                           > remove an event"
+                    "> remove <id>                                           > removes an event"
                 );
                 println!(
-                    "> new|create <name>%<date_start>%<date_end>%[invitees]  > create a new event"
+                    "> new|create <name>%<date_start>%<date_end>%[invitees]  > creates a new event"
                 );
                 println!(
                     "> list <date>                                           > prints out the list of events"
                 );
                 println!(
-                    "> change <name>%<email>%<password>                      > change user information"
+                    "> whoami                                                > prints user informations"
+                );
+
+                println!(
+                    "> change <name>%<email>%<password>                      > changes user information"
                 );
                 println!(
-                    "> modify <name>%<date_start>%<date_end>                 > modify event information"
+                    "> modify <name>%<date_start>%<date_end>                 > modifies event information"
                 );
                 println!(
-                    "> pretty <date>                                         > pretty print the list of events"
+                    "> pretty <date>                                         > pretty prints the list of events"
                 );
                 println!("-----SharedAgenda CLI REPL Help-----");
             }
@@ -126,6 +132,7 @@ async fn main() {
                 _ => println!("Usage: login <email>%<password>"),
             },
             str if str.starts_with("logout") => logout().await,
+            str if str.starts_with("whoami") => whoami().await,
             str if str.starts_with("delete") => delete().await,
             str if str.starts_with("list") => match str.strip_prefix("list") {
                 Some(time) => list(time.trim().to_string()).await,
