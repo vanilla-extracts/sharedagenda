@@ -4,7 +4,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::database::Database;
 
-use super::delete::{get_token_struct_from_token, get_user_from_uuid};
+use super::{
+    create::get_user_from_email,
+    delete::{get_token_struct_from_token, get_user_from_uuid},
+};
 
 extern crate rocket;
 
@@ -48,13 +51,21 @@ pub async fn modify(body: Json<UserModification<'_>>) -> Json<UserModificationAn
         let mut email = user.email;
         let mut name = user.name;
         if let Some(pswd) = body.password {
-            pass = pswd.to_string();
+            if pswd.trim() != "" {
+                pass = pswd.trim().to_string();
+            }
         }
         if let Some(mail) = body.email {
-            email = mail.to_string();
+            if mail.trim() != "" {
+                if get_user_from_email(mail.trim()).await.is_none() {
+                    email = mail.trim().to_string();
+                }
+            }
         }
         if let Some(nm) = body.name {
-            name = nm.to_string();
+            if nm.trim() != "" {
+                name = nm.trim().to_string();
+            }
         }
 
         let db = Database::new().await;

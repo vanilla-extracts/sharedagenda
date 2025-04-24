@@ -46,6 +46,28 @@ WITH body
 ```
 Deletes the token in the database, effectively loging out the user
 
+### User whoami
+POST at /user/whoami
+
+WITH body
+```json
+{
+  "token": "{token}"
+}
+```
+Returns the whole user informations:
+```json
+{
+  "code": "{code}",
+  "user": {
+    "uuid": "{uuid}",
+    "name": "{name}",
+    "email": "{email}",
+    "password": "{password}"
+  }
+}
+```
+
 ### User Modification
 POST at /user/modify
 
