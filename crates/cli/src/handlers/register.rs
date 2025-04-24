@@ -27,13 +27,13 @@ impl Answer for RegisterAnswer {
 }
 
 pub async fn register(line: &str) {
-    let args = line.split_whitespace();
+    let args = line.split("%");
     let mut vec = vec![];
     for arg in args {
-        vec.push(arg);
+        vec.push(arg.trim());
     }
     if vec.len() < 3 {
-        println!("Usage: register <name> <email> <password>");
+        println!("Usage: register <name>%<email>%<password>");
         return;
     }
     let data = RegisterPost {

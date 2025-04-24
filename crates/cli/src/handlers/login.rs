@@ -88,13 +88,13 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
 }
 
 pub async fn login(line: &str) {
-    let args = line.split_whitespace();
+    let args = line.split("%");
     let mut vec = vec![];
     for arg in args {
-        vec.push(arg);
+        vec.push(arg.trim());
     }
     if vec.len() < 2 {
-        println!("Usage: login <email> <password>");
+        println!("Usage: login <email>%<password>");
         return;
     }
     let data = LoginPost {

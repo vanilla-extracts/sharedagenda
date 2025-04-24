@@ -39,7 +39,7 @@ impl Answer for ListAnswer {
 
 pub async fn list(line: String) {
     let token = TOKEN.lock().unwrap().to_string();
-    let mut date = line.clone();
+    let mut date = line.trim().to_string().clone();
     if line.trim() == "" {
         date = Local::now().format("%Y-%m-%d %H:%M %z").to_string();
     }
@@ -48,13 +48,14 @@ pub async fn list(line: String) {
         date_start: date,
     };
     let url = API_URL.lock().unwrap().to_string();
-    let res = match call::<ListPost<'_>, ListAnswer>(url, &data, "event", "list").await {
+    let mut res = match call::<ListPost<'_>, ListAnswer>(url, &data, "event", "list").await {
         Some(result) => result,
         _ => {
             println!("Error while reading result");
             return;
         }
     };
+    res.events.sort_by_key(|f| f.date_start);
     for event in res.events {
         println!("------");
         println!("Event: {}", event.id);
