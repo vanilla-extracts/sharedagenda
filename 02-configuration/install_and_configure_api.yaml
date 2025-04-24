@@ -66,4 +66,4 @@
       become: true
       ansible.builtin.systemd_service:
         name: api.service 
-        state: started
+        state: restarted
