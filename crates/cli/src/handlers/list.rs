@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset, Local};
+use chrono::{DateTime, FixedOffset, Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, TOKEN};
@@ -32,7 +32,6 @@ impl Answer for ListAnswer {
         self.code as i32
     }
     fn answer(&self) -> String {
-        *TOKEN.lock().unwrap() = "".to_string();
         String::new()
     }
 }
@@ -42,6 +41,17 @@ pub async fn list(line: String) {
     let mut date = line.trim().to_string().clone();
     if line.trim() == "" {
         date = Local::now().format("%Y-%m-%d %H:%M %z").to_string();
+    } else {
+        date = match NaiveDateTime::parse_from_str(&date, "%Y-%m-%d %H:%M") {
+            Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
+            Err(e) => {
+                println!("Error while parsing time, format must be %Y-%m-%d %H:%M, {e}");
+                return;
+            }
+        }
+        .unwrap()
+        .format("%Y-%m-%d %H:%M %z")
+        .to_string();
     }
     let data = ListPost {
         token: &token,
