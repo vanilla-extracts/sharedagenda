@@ -3,7 +3,8 @@ use std::{process::exit, sync::Mutex};
 use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    create::create, delete::delete, list::list, login::login, logout::logout, register::register,
+    create::create, delete::delete, event_deletion::remove, list::list, login::login,
+    logout::logout, register::register,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -85,6 +86,9 @@ async fn main() {
                     "> delete                                                > delete your account"
                 );
                 println!(
+                    "> remove                                                > delete your account"
+                );
+                println!(
                     "> new|create <name>%<date_start>%<date_end>%[invitees]  > create a new event"
                 );
                 println!(
@@ -126,6 +130,14 @@ async fn main() {
             str if str.starts_with("create") => match str.strip_prefix("create") {
                 Some(s) if s.trim() != "" => create(s).await,
                 _ => println!("Usage: create <name>%<date_start>%<date_end>%[invitees]"),
+            },
+            str if str.starts_with("new") => match str.strip_prefix("new") {
+                Some(s) if s.trim() != "" => create(s).await,
+                _ => println!("Usage: new <name>%<date_start>%<date_end>%[invitees]"),
+            },
+            str if str.starts_with("remove") => match str.strip_prefix("remove") {
+                Some(s) if s.trim() != "" => remove(s).await,
+                _ => println!("Usage: remove <id>"),
             },
             _ => println!("SOON"),
         }
