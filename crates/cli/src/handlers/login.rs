@@ -4,7 +4,10 @@ use chrono::{DateTime, Utc};
 use reqwest::Client;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
-use crate::{API_URL, TOKEN};
+use crate::{
+    API_URL, TOKEN,
+    configuration::loader::{load, write_config},
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LoginPost<'r> {
@@ -54,25 +57,29 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
         .send()
         .await
     {
-        Ok(e) => match e.json::<V>().await {
-            Ok(answer) => {
-                if answer.code() != 200 {
-                    println!(
-                        "Error while sending the request \nCode: {} \nMessage: {} ",
-                        answer.code(),
-                        answer.answer()
-                    );
-                    Some(answer)
-                } else {
-                    println!("{}", answer.answer());
-                    Some(answer)
+        Ok(e) => {
+            // println!("{}", e.text().await.unwrap());
+            // None
+            match e.json::<V>().await {
+                Ok(answer) => {
+                    if answer.code() != 200 {
+                        println!(
+                            "Error while sending the request \nCode: {} \nMessage: {} ",
+                            answer.code(),
+                            answer.answer()
+                        );
+                        Some(answer)
+                    } else {
+                        println!("{}", answer.answer());
+                        Some(answer)
+                    }
+                }
+                Err(e) => {
+                    println!("Error while matching the answer: {e}");
+                    None
                 }
             }
-            Err(e) => {
-                println!("Error while matching the answer: {e}");
-                None
-            }
-        },
+        }
         Err(e) => {
             println!("Error while sending the resquest: {e}");
             None
@@ -97,6 +104,17 @@ pub async fn login(line: &str) {
     let url = API_URL.lock().unwrap().to_string();
     let log = call::<LoginPost<'_>, LoginAnswer>(url, &data, "user", "login").await;
     if let Some(answer) = log {
-        *TOKEN.lock().unwrap() = answer.token;
+        *TOKEN.lock().unwrap() = answer.clone().token;
+        let mut config = load().unwrap_or_default();
+        config.token = answer.clone().token;
+
+        match write_config(&config) {
+            Ok(_) => {
+                println!("Configuration has been updated")
+            }
+            Err(_) => {
+                println!("Error while updating configuration")
+            }
+        }
     }
 }

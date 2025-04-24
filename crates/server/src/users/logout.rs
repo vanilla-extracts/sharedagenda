@@ -14,7 +14,7 @@ pub struct UserLogout {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(crate = "rocket::serde")]
 pub struct UserLogoutAnswer {
-    code: i32
+    code: i32,
 }
 
 async fn delete_token(token: String) {

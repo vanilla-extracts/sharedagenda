@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
+use crate::{
+    API_URL, TOKEN,
+    configuration::loader::{load, write_config},
+};
 
 use super::login::{Answer, call};
 
@@ -21,7 +24,20 @@ impl Answer for DeleteAnswer {
     }
     fn answer(&self) -> String {
         *TOKEN.lock().unwrap() = "".to_string();
-        self.body.clone()
+
+        *TOKEN.lock().unwrap() = "".to_string();
+
+        let mut config = load().unwrap_or_default();
+        config.token = "".to_string();
+
+        match write_config(&config) {
+            Ok(_) => {
+                format!("{}", self.body)
+            }
+            Err(_) => {
+                format!("Error while updating configuration")
+            }
+        }
     }
 }
 

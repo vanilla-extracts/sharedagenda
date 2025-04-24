@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
+use crate::{
+    API_URL, TOKEN,
+    configuration::loader::{load, write_config},
+};
 
 use super::login::{Answer, call};
 
@@ -20,7 +23,18 @@ impl Answer for LogoutAnswer {
     }
     fn answer(&self) -> String {
         *TOKEN.lock().unwrap() = "".to_string();
-        format!("You have been successfully log out.")
+
+        let mut config = load().unwrap_or_default();
+        config.token = "".to_string();
+
+        match write_config(&config) {
+            Ok(_) => {
+                format!("You have been successfully log out.")
+            }
+            Err(_) => {
+                format!("Error while updating configuration")
+            }
+        }
     }
 }
 

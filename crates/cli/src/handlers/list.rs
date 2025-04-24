@@ -1,0 +1,66 @@
+use chrono::{DateTime, FixedOffset, Local};
+use serde::{Deserialize, Serialize};
+
+use crate::{API_URL, TOKEN};
+
+use super::login::{Answer, call};
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ListPost<'r> {
+    token: &'r str,
+    date_start: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Event {
+    pub id: i32,
+    pub name: String,
+    pub owner: String,
+    pub date_start: DateTime<FixedOffset>,
+    pub date_end: DateTime<FixedOffset>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ListAnswer {
+    code: u16,
+    body: String,
+    events: Vec<Event>,
+}
+
+impl Answer for ListAnswer {
+    fn code(&self) -> i32 {
+        self.code as i32
+    }
+    fn answer(&self) -> String {
+        *TOKEN.lock().unwrap() = "".to_string();
+        String::new()
+    }
+}
+
+pub async fn list(line: String) {
+    let token = TOKEN.lock().unwrap().to_string();
+    let mut date = line.clone();
+    if line.trim() == "" {
+        date = Local::now().format("%Y-%m-%d %H:%M %z").to_string();
+    }
+    let data = ListPost {
+        token: &token,
+        date_start: date,
+    };
+    let url = API_URL.lock().unwrap().to_string();
+    let res = match call::<ListPost<'_>, ListAnswer>(url, &data, "event", "list").await {
+        Some(result) => result,
+        _ => {
+            println!("Error while reading result");
+            return;
+        }
+    };
+    for event in res.events {
+        println!("------");
+        println!("Event: {}", event.id);
+        println!("Name: {}", event.name);
+        println!("Start: {}", event.date_start.format("%Y-%m-%d %H:%M %z"));
+        println!("End: {}", event.date_end.format("%Y-%m-%d %H:%M %z"));
+        println!("------");
+    }
+}
