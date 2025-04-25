@@ -1,5 +1,5 @@
+---
 plugin: openstack.cloud.openstack
-
 all_projects: false
 expand_hostvars: true
 only_clouds:
