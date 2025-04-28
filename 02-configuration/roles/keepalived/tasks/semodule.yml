@@ -1,0 +1,26 @@
+---
+- name: Apply SELinux automatically
+  when: keepalived_selinux_automatic| bool 
+  block:
+
+    - name: "Generate semodule from audit  for {{ item }}"
+      ansible.builtin.shell: "ausearch -c {{ item }} --raw | audit2allow -M {{ item }}"
+      args:
+        chdir: /var/tmp
+      become: true
+      register: result
+      changed_when: result.rc != 0
+      retries: "{{ keepalived_selinux_retries | default('12') }}"  # 15 * 12 seconds --> 3 minutes by default
+      delay: "{{ keepalived_selinux_delay | default('15') }}" # Every 15 seconds by defaulkt
+
+    - name: "Check whether pp file exists for {{ item }}"
+      ansible.builtin.stat:
+        path: "/var/tmp/{{ item }}.pp"
+      register: ppfile
+
+    - name: Install SELinux policy module if pp file has been found
+      ansible.builtin.command: "semodule -X 300 -i /var/tmp/{{ item }}.pp"
+      become: true
+      register: result
+      changed_when: result.rc != 0
+      when: ppfile.stat.exists

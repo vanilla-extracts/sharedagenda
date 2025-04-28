@@ -1,0 +1,17 @@
+---
+
+- name: "SELINUX temp helper conf {{ keepalived_selinux_module }}"
+  ansible.builtin.template:
+    src: selinux.te.j2
+    dest: "/var/tmp/{{ keepalived_selinux_module }}.te"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: "Compile SELinux rule with {{ keepalived_selinux_module }}"
+  ansible.builtin.shell: "checkmodule -M -m -o {{ keepalived_selinux_module }} /var/tmp/{{ keepalived_selinux_module }}.te && semodule_package -o /var/tmp/{{ keepalived_selinux_module }}.pp -m {{ keepalived_selinux_module}}" 
+  changed_when: false
+
+- name: "Reload SELinux rule according to {{ keepalived_selinux_module }}"
+  ansible.builtin.command: "semodule -X 300 -i   /var/tmp/{{ keepalived_selinux_module }}.pp"
+  changed_when: false

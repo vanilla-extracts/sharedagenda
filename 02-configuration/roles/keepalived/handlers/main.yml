@@ -1,0 +1,17 @@
+---
+- name: Restart keepalived
+  ansible.builtin.systemd:
+    name: "{{ keepalived_service_name }}"
+    state: "restarted"
+  register: _servicerestart
+  when:
+    - _servicestart is not changed
+
+- name: Reload keepalived
+  ansible.builtin.systemd:
+    name: "{{ keepalived_service_name }}"
+    state: "reloaded"
+  register: _servicereload
+  when:
+    - _servicestart is not changed
+    - _servicerestart is not defined
