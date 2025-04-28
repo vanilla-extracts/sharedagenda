@@ -7,7 +7,7 @@
       community.postgresql.postgresql_user:
         name: repl
         password: replication
-        role_attr_flags: replication,login
+        role_attr_flags: replication,login,superuser
         expires: 'infinity'
     - name: Create tables
       become_user: postgres
@@ -18,9 +18,9 @@
     - name: Execute PSQL file
       become_user: postgres
       ansible.builtin.command: psql -d agenda -a -f /var/lib/postgresql/tables.sql
-    - name: Grant subscription right to repl
-      become_user: postgres
-      ansible.builtin.command: psql -c "grant pg_create_subscription to repl;" agenda
+    # - name: Grant subscription right to repl
+    #   become_user: postgres
+    #   ansible.builtin.command: psql -c "grant pg_create_subscription to repl;" agenda
     - name: Grant schema permissions for repl
       become_user: postgres
       community.postgresql.postgresql_privs:
@@ -66,7 +66,7 @@
         name: agenda
         state: present
         publications: pub_agenda
-        owner: agenda
+        owner: repl
         connparams:
           host: "{{ vm_bdds_01_data_ip }}"
           port: 5432
