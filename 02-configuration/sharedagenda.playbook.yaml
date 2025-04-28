@@ -11,6 +11,8 @@
   ansible.builtin.import_playbook: postgresql.yaml
 - name: Replication
   ansible.builtin.import_playbook: replication.yaml
+- name: Postgresql Keepalived
+  ansible.builtin.import_playbook: keepalived.yaml
 - name: Install and configure the API
   ansible.builtin.import_playbook: install_and_configure_api.yaml
 - name: Install and configure Caddy
