@@ -29,7 +29,7 @@
         privs: ALL
         type: schema
         objs: public,agenda
-        role: repl
+        role: repl,agenda
     - name: Grant table permissions for repl
       become_user: postgres
       community.postgresql.postgresql_privs:
@@ -39,7 +39,7 @@
         type: table
         objs: users,token,events
         schema: agenda
-        roles: repl
+        roles: repl,agenda
         grant_option: true
 - name: "Create publication on primary database"
   hosts: platform_shag_bdds_01

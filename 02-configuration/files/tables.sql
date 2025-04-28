@@ -7,7 +7,7 @@ create table if not exists agenda.users(
 
 create table if not exists agenda.events(
 	id serial primary key,
-        owner varchar(255) references users(uuid) not null,
+        owner varchar(255) references agenda.users(uuid) not null,
         name varchar(255) not null,
         date_start timestamp with time zone not null,
         date_end timestamp with time zone not null
@@ -17,7 +17,7 @@ create table if not exists agenda.events(
 create table if not exists agenda.token(
 	id serial primary key,
         token varchar(255) not null,
-        owner varchar(255) not null references users(uuid),
+        owner varchar(255) not null references agenda.users(uuid),
         expiration_date timestamp with time zone not null
 );
 

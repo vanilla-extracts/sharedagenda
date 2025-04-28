@@ -3,7 +3,7 @@ postgresql_db_name: "agenda"
 postgresql_db_username: "agenda"
 postgresql_db_password: "agenda"
 postgresql_root_password: "agenda"
-postgresql_version: 16
+postgresql_version: 15
 postgresql_data_directory: "/pgdata/{{ postgresql_db_name }}/data"
 postgresql_hba_entries:
   - { type: local, database: all, user: all, auth_method: peer }
@@ -20,7 +20,9 @@ postgresql_users:
 
 postgresql_users_no_log: false
 postgresql_custom_config:
+  hot_standby: "on"
+  wal_level: "logical"
   port: "5432"
   listen_addresses: "*"
   max_worker_processes: "4"
-  max_logical_replication_worker: "4"
+  max_logical_replication_workers: "4"

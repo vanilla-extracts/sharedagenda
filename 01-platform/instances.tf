@@ -113,21 +113,20 @@ module "vm-caddy" {
   }
 }
 
-
 module "vm-bdds" {
-  source           = "git::https://forge.dgfip.finances.rie.gouv.fr/charlotte-thomas/terraform-openstack-bdd"
-  pf_prefixe       = var.pf_prefixe
-  server_count     = local.number_of_database_servers
-  flavor_name      = var.bdd_flavor_name
-  image_name       = var.image_name
-  key_pair         = openstack_compute_keypair_v2.ssh_keypair.name
-  admin_network_id = module.networks.admin_network_id
-  data_network_id  = module.networks.data_network_id
-  phase            = var.phase
-  group            = "bdds"
+  source              = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/base-de-donn-es/terraform-openstack-bdd-ha.git"
+  pf_prefixe          = var.pf_prefixe
+  bdd_server_count    = local.number_of_database_servers
+  bdd_flavor_name     = var.bdd_flavor_name
+  key_pair            = openstack_compute_keypair_v2.ssh_keypair.name
+  admin_network_id    = module.networks.admin_network_id
+  data_network_id     = module.networks.data_network_id
+  etcd_server_count   = 0
+  bdd_image_name      = var.image_name
   additional_bdd_metadata = {
-    pf_prefixe = var.pf_prefixe
-    group      = "bdds"
-    phase      = var.phase
-  }
+      pf_prefixe = var.pf_prefixe
+      group = "bdds"
+      phase = var.phase
+    }
 }
+

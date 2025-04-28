@@ -1,2 +1,0 @@
-postgresql_custom_conf:
-  wal_level: "logical"
