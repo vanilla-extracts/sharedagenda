@@ -1,0 +1,4 @@
+roles:
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/base-de-donnees/postgresql
+    version: v2.1.7
+    name: postgresql

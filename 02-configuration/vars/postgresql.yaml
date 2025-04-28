@@ -10,6 +10,7 @@ postgresql_hba_entries:
   - { type: "{{ (postgresql_use_ssl == true) | ternary('hostssl', 'host') }}",
       database: replication, user: all, address: all, auth_method: "{{ postgresql_auth_method }}"}
   - { type: host, database: "{{ postgresql_db_name }}", user: "{{ postgresql_db_username }}", address: "172.14.0.1/24" , auth_method: scram-sha-256 }
+  - { type: host, database: "all", user: "postgres", address: "localhost", auth_method: scram-sha-256 }
 postgresql_databases:
   - name: "{{ postgresql_db_name }}"
     owner: "{{ postgresql_db_username }}"
@@ -20,26 +21,5 @@ postgresql_users_no_log: false
 postgresql_custom_config:
   wal_level: "replica"
   hot_standby: "on"
-  wal_log_hints: "off"
-  track_commit_timestamp: "off"
-  log_rotation_size: "100MB"
   port: "5432"
   listen_addresses: "*"
-  data_directory: "{{ postgresql_data_directory }}"
-  hba_file: "{{ postgresql_conf_directory }}/pg_hba.conf"
-  ident_file: "{{ postgresql_conf_directory }}/pg_ident.conf"
-  external_pid_file: "/var/run/postgresql/pgsql.{{ postgresql_version }}.pid"
-  unix_socket_directories: "/var/run/postgresql"
-  log_directory: "/var/log/postgresql"
-  autovacuum_max_workers: "3"
-  huge_pages: "try"
-  shared_buffers: "{{ ((ansible_memtotal_mb / 4) | round | int) }}MB"
-  temp_file_limit: "10GB"
-  maintenance_work_mem: "{{ ((ansible_memtotal_mb * 0.25) | round | int) }}MB"
-  min_wal_size: "512MB"
-  max_wal_size: "2GB"
-  max_worker_processes: "{{ ansible_processor_nproc }}"
-  max_parallel_workers: "{{ ansible_processor_nproc }}"
-  effective_cache_size: "{{ (((ansible_memtotal_mb / 1000) * (2 / 3)) | round | int) }}GB"
-  random_page_cost: "4"
-  checkpoint_flush_after: "256kB"
