@@ -19,7 +19,7 @@ postgresql_users:
     password: "{{ postgresql_db_password }}"
 postgresql_users_no_log: false
 postgresql_custom_config:
-  wal_level: "replica"
+  wal_level: "logical"
   hot_standby: "on"
   port: "5432"
   listen_addresses: "*"
