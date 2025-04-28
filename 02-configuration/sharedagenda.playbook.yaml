@@ -1,8 +1,18 @@
 ---
 - name: Create the ssh config
   ansible.builtin.import_playbook: create_ssh_config.yaml
-- name: Install and configure postgresql
-  ansible.builtin.import_playbook: install_and_configure_postgresql.yaml
+- name: Install prerequisites
+  hosts: platform_shag
+  become: true
+  roles:
+    - prerequis
+    - hosts-aliases 
+- name: Postgres
+  ansible.builtin.import_playbook: postgresql.yaml
+- name: Replication
+  ansible.builtin.import_playbook: replication.yaml
+- name: Postgresql Keepalived
+  ansible.builtin.import_playbook: keepalived.yaml
 - name: Install and configure the API
   ansible.builtin.import_playbook: install_and_configure_api.yaml
 - name: Install and configure Caddy

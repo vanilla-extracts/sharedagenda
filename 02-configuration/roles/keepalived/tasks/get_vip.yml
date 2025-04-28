@@ -1,0 +1,41 @@
+---
+- name: Check that the mandatory variables are defined
+  ansible.builtin.assert:
+    that:
+      - item is defined
+      - item != ''
+      - item != None
+    quiet: true
+  with_items:
+    - keepalived_vip_name
+    - cloud
+
+- name: "Retrieve VIP address within OpenStack according to vip_port / set the given VIP address with name --> {{ keepalived_vip_name }}"
+  openstack.cloud.port_info:
+    cloud: "{{ cloud }}"
+    filters:
+      name: "{{ keepalived_vip_name }}"
+  register: vip
+  delegate_to: localhost
+
+- name: Stop processing when VIP address is not recovered
+  ansible.builtin.fail:
+    msg: "The address of the VIP is mandatory to continue ... Please check the name of the vip"
+  when:
+    - (vip.openstack_ports is not defined) and (vip.ports is not defined)
+
+- name: Set the keepalived VIP (legacy Openstack Cloud collection 1.*)
+  ansible.builtin.set_fact:
+    keepalived_vip: "{{ vip.openstack_ports[0].fixed_ips[0].ip_address }}"
+  when:
+    - vip.openstack_ports is defined
+
+- name: Set the keepalived VIP (Openstack Cloud collection 2.*)
+  ansible.builtin.set_fact:
+    keepalived_vip: "{{ vip.ports[0].fixed_ips[0].ip_address }}"
+  when:
+    - vip.ports is defined
+
+- name: Display the keepalived VIP
+  ansible.builtin.debug:
+    msg: "Keepalived VIP IP Address is {{ keepalived_vip }}"

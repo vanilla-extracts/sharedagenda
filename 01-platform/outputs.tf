@@ -36,15 +36,3 @@ output "caddy_ip_admin" {
 output "caddy_ip_publi" {
     value = module.vm-caddy.instance_pub_ip
 }
-
-# Bases de données
-# ================
-
-# Affichage des ip admin des bdd
-output "bdd_ip_admin" {
-    value = module.vm-bdds.instance_admin_ip
-}
-
-output "bdd_ip_data" {
-    value = module.vm-bdds.instance_data_ip
-}

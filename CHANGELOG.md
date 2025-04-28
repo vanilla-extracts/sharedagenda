@@ -69,3 +69,13 @@ Audrey:
 ## Session 7: 2025-04-24 
 ### Planned
 - Caddy deployment and finishing client
+
+### Finished
+- finished deployment 
+
+## Session X: 2025-04-28
+### Planned
+- Database stuff
+
+### Finished
+- WIP Database stuff

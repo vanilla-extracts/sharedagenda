@@ -1,0 +1,28 @@
+postgresql_use_ssl: false
+postgresql_db_name: "agenda"
+postgresql_db_username: "agenda"
+postgresql_db_password: "agenda"
+postgresql_root_password: "agenda"
+postgresql_version: 15
+postgresql_data_directory: "/pgdata/{{ postgresql_db_name }}/data"
+postgresql_hba_entries:
+  - { type: local, database: all, user: all, auth_method: peer }
+  - { type: "{{ (postgresql_use_ssl == true) | ternary('hostssl', 'host') }}",
+      database: all, user: repl, address: all, auth_method: "{{ postgresql_auth_method }}"}
+  - { type: host, database: "{{ postgresql_db_name }}", user: "{{ postgresql_db_username }}", address: "172.14.0.1/24" , auth_method: scram-sha-256 }
+  - { type: host, database: "all", user: "all", address: "localhost", auth_method: scram-sha-256 }
+postgresql_databases:
+  - name: "{{ postgresql_db_name }}"
+    owner: "{{ postgresql_db_username }}"
+postgresql_users:
+  - name: "{{ postgresql_db_username }}"
+    password: "{{ postgresql_db_password }}"
+
+postgresql_users_no_log: false
+postgresql_custom_config:
+  hot_standby: "on"
+  wal_level: "logical"
+  port: "5432"
+  listen_addresses: "*"
+  max_worker_processes: "4"
+  max_logical_replication_workers: "4"
