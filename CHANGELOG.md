@@ -73,9 +73,11 @@ Audrey:
 ### Finished
 - finished deployment 
 
-## Session X: 2025-04-28
+## Session 8: 2025-05-25
+
+## Session 9: 2025-04-28
 ### Planned
-- Database stuff
+- Redundant database (two databases, logical replication, VIP)
 
 ### Finished
-- WIP Database stuff
+- Done
