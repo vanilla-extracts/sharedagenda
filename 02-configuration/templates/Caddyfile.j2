@@ -1,5 +1,5 @@
 www-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr:80 {	
-	reverse_proxy http://{{ vm_apis_01_pub_ip }}:8000 http://{{ vm_apis_02_pub_ip }}:8000 http://{{ vm_apis_03_pub_ip }} {
+	reverse_proxy http://{{ vm_apis_01_pub_ip }}:8000 http://{{ vm_apis_02_pub_ip }}:8000 http://{{ vm_apis_03_pub_ip }}:8000 {
 		lb_policy random 
 	}
 }
