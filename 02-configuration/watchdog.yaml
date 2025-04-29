@@ -30,8 +30,26 @@
       apt:
         name: watchdog
         state: latest
-    - name: Edit watchdog config file
+    - name: Edit watchdog config file {{ item.name }}
       ansible.builtin.lineinfile:
         path: /etc/watchdog.conf
-        regexp: "^#watchdog-device"
-        line: "watchdog-device = /dev/watchdog"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - regexp: "^#watchdog-device"
+          line: "watchdog-device = /dev/watchdog"
+          name: device
+        - regexp: "^#watchdog-timeout"
+          line: "watchdog-timeout = 15"
+          name: timeout
+    - name: Reload the Systemd daemon and Enable Watchdog
+      become: true
+      ansible.builtin.systemd_service:
+        name: watchdog
+        daemon_reload: true
+        enabled: true
+    - name: Start the API Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: watchdog 
+        state: started
