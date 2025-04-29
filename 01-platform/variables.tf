@@ -4,7 +4,7 @@ locals {
   # cloud      = var.cloud
   # pf_prefixe = var.pf_prefixe
 
-  number_of_api_servers = 1 
+  number_of_api_servers = 2 
   number_of_database_servers = 2 
   number_of_caddy_servers = 1 
   number_of_bastion = 1 
