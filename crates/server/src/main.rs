@@ -21,6 +21,8 @@ async fn rocket() -> _ {
             if let Err(e) = notify(false, [(STATE_WATCHDOG, "1")].iter()) {
                 println!("Error while sending the keepalive: {e}");
                 exit(1);
+            }else{
+                println!("Keepalived sent");
             }
             sleep(Duration::from_secs(5));
         }
