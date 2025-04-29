@@ -1,0 +1,1 @@
+KERNEL=="watchdog", OWNER="api-runner", GROUP="root", MODE="0600"

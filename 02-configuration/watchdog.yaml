@@ -1,0 +1,37 @@
+- name: "API Watchdog"
+  hosts: platform_shag_apis
+  become: true
+  tasks:
+    - name: Create watchdog rule
+      ansible.builtin.copy:
+        src: 60-watchdog.rules
+        dest: /etc/udev/rules.d/60-watchdog.rules
+        owner: root
+        group: root
+        mode: '600'
+    - name: Use softdog kernel module
+      ansible.builtin.copy: 
+        src: watchdog.conf
+        dest: /etc/modules-load.d/watchdog.conf
+        owner: root
+        group: root
+        mode: '600'
+    - name: Reload systemd modules
+      ansible.builtin.systemd_service:
+        name: systemd-modules-load
+        state: restarted
+    - name: Get watchdog information
+      ansible.builtin.shell: ls -l /dev/watch*
+      register: result
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        msg: "{{ result }}"
+    - name: Install watchdog package
+      apt:
+        name: watchdog
+        state: latest
+    - name: Edit watchdog config file
+      ansible.builtin.lineinfile:
+        path: /etc/watchdog.conf
+        regexp: "^#watchdog-device"
+        line: "watchdog-device = /dev/watchdog"
