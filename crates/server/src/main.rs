@@ -3,7 +3,7 @@ use std::{process::exit, thread::sleep, time::Duration};
 use configuration::{load, write_default_config};
 use database::Database;
 use rocket::tokio;
-use watchdog_device::Watchdog;
+use systemd::daemon::{STATE_WATCHDOG, notify};
 
 #[macro_use]
 extern crate rocket;
@@ -16,19 +16,17 @@ mod users;
 
 #[launch]
 async fn rocket() -> _ {
-    let wd: Watchdog = Watchdog::new().expect("Impossible to start watchdog");
-    async fn poke_keep_alive(mut wd: Watchdog) {
+    async fn keep_alive() {
         loop {
-            if let Err(e) = wd.keep_alive() {
-                println!("Error with keepalive : {e}")
-            } else {
-                println!("Keepalived sent!")
+            if let Err(e) = notify(false, [(STATE_WATCHDOG, "1")].iter()) {
+                println!("Error while sending the keepalive: {e}");
+                exit(1);
             }
-            sleep(Duration::from_millis(100));
+            sleep(Duration::from_secs(5));
         }
     }
 
-    tokio::spawn(poke_keep_alive(wd));
+    tokio::spawn(keep_alive());
 
     let configuration = match load() {
         Ok(config) => config,
