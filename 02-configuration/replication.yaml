@@ -18,9 +18,6 @@
     - name: Execute PSQL file
       become_user: postgres
       ansible.builtin.command: psql -d agenda -a -f /var/lib/postgresql/tables.sql
-    # - name: Grant subscription right to repl
-    #   become_user: postgres
-    #   ansible.builtin.command: psql -c "grant pg_create_subscription to repl;" agenda
     - name: Grant schema permissions for repl
       become_user: postgres
       community.postgresql.postgresql_privs:
@@ -37,8 +34,19 @@
         state: present
         privs: SELECT,INSERT,UPDATE,DELETE
         type: table
-        objs: users,token,events
+        objs: ALL_IN_SCHEMA
         schema: agenda
+        roles: repl,agenda
+        grant_option: true
+    - name: Grant sequence permissions for repl
+      become_user: postgres
+      community.postgresql.postgresql_privs:
+        login_db: agenda
+        state: present
+        privs: SELECT
+        type: sequence
+        schema: agenda
+        objs: ALL_IN_SCHEMA
         roles: repl,agenda
         grant_option: true
 - name: "Create publication on primary database"
