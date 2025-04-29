@@ -48,6 +48,9 @@ groups:
   platform_shag_api_01: >-
     openstack.name == deploy.pf_prefixe+"-vm-apis-01-"+deploy.phase
     and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_api_02: >-
+    openstack.name == deploy.pf_prefixe+"-vm-apis-02-"+deploy.phase
+    and openstack.metadata.pf_prefixe == "shag-01"
   platform_shag_bdds: >-
     openstack.metadata.group == "bdd"
     and openstack.metadata.pf_prefixe == "shag-01"

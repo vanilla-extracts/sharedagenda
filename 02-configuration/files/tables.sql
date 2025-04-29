@@ -20,4 +20,3 @@ create table if not exists agenda.token(
         owner varchar(255) not null references agenda.users(uuid),
         expiration_date timestamp with time zone not null
 );
-

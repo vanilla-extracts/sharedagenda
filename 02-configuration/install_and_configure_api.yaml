@@ -3,6 +3,16 @@
   hosts: platform_shag_apis
   gather_facts: no 
   tasks:
+    - name: create dictionary of ips
+      set_fact:
+        apis_pub_ips: >- 
+          "{{ inventory_hostname }}": "{{ hostvars[inventory_hostname]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
+    - name: from yaml
+      set_fact: 
+        apis_pub_ips: "{{ apis_pub_ips | from_yaml }}"
+    - name: echo dictionary
+      debug:
+        msg: "{{ apis_pub_ips }}"
     - name: install prerequisites
       become: true
       apt: name={{ item }} state=latest
