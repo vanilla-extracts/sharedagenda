@@ -1,6 +1,6 @@
 [package]
 name = "server"
-version = "1.0.0-prod"
+version = "2.0.0-dev"
 edition = "2024"
 
 [dependencies]
@@ -8,6 +8,7 @@ chrono = { version="0.4.40", features = ["serde"] }
 tokio-postgres = { version = "0.7.13", features = ["with-chrono-0_4"] }
 uuid = { version = "1.16.0", features = ["v4"] }
 confy = "0.6.1"
+watchdog-device = "0.2.0"
 rocket = { version = "0.5.1", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 
