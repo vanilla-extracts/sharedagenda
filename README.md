@@ -18,11 +18,16 @@ podman build -t rust-builder -f Containerfile
 
 Use the script `cargo-podman` to compile the server.
 
+### All
+```sh
+make all
+```
+
 ### Server
 ```sh
 cargo podman build --release --bin server
 #OR 
-make podman_server
+make server
 ```
 
 ### Client
