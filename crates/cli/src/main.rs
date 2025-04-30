@@ -1,4 +1,4 @@
-use std::{process::exit, sync::Mutex};
+use std::{process::exit, str::Chars, sync::Mutex};
 
 use crate::handlers::api::api;
 use configuration::loader::{load, load_config, write_default_config};
@@ -9,7 +9,7 @@ use handlers::{
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v1.0.0-prod";
+static VERSION: &str = "v2.0.0-dev";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
@@ -19,6 +19,48 @@ lazy_static! {
 
 mod configuration;
 mod handlers;
+
+pub fn parse_line_into_arguments(line: &str) -> Vec<String> {
+    let mut args = vec![];
+    //"Mon Nom" email@test.fr tortue => ["Mon Nom", "email@test.fr", "tortue"]
+
+    fn parse_string(mut acc: Vec<String>, chars: &mut Chars) -> String {
+        for char in chars.by_ref() {
+            match char {
+                '"' => {
+                    break;
+                }
+                s => acc.push(s.to_string()),
+            }
+        }
+        acc.join("")
+    }
+
+    let mut chars = line.chars();
+    let mut acc: Vec<String> = vec![];
+    while let Some(char) = chars.next() {
+        match char {
+            '"' => {
+                let word: String = parse_string(vec![], &mut chars);
+                args.push(word);
+            }
+            ' ' => {
+                let word = acc.join("");
+                if word.trim() != "" {
+                    args.push(word);
+                    acc = vec![]
+                }
+            }
+            e => {
+                acc.push(e.to_string());
+            }
+        }
+    }
+    if !acc.is_empty() {
+        args.push(acc.join(""));
+    }
+    args
+}
 
 #[tokio::main]
 async fn main() {
@@ -37,7 +79,6 @@ async fn main() {
     };
 
     let loaded = load_config(config);
-
     println!("{}", loaded.greeting_message);
 
     *API_URL.lock().unwrap() = loaded.api_link;
@@ -76,10 +117,10 @@ async fn main() {
                     "> api [url]                                             > sets the URL for which API to use"
                 );
                 println!(
-                    "> register <name>%<email>%<password>                    > registers a new account for sharedagenda"
+                    "> register <name> <email> <password>                    > registers a new account for sharedagenda"
                 );
                 println!(
-                    "> login <email>%<password>                              > login with your account"
+                    "> login <email> <password>                              > login with your account"
                 );
                 println!(
                     "> logout                                                > logout of your account"
@@ -91,7 +132,7 @@ async fn main() {
                     "> remove <id>                                           > removes an event"
                 );
                 println!(
-                    "> new|create <name>%<date_start>%<date_end>%[invitees]  > creates a new event"
+                    "> new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
                 );
                 println!(
                     "> list <date>                                           > prints out the list of events"
@@ -101,7 +142,7 @@ async fn main() {
                 );
 
                 println!(
-                    "> modify <name>%<email>%<password>                      > modifies user information"
+                    "> modify <name> <email> <password>                      > modifies user information"
                 );
                 println!("-----SharedAgenda CLI REPL Help-----");
             }
@@ -115,15 +156,15 @@ async fn main() {
             },
             str if str.starts_with("register") => match str.strip_prefix("register") {
                 Some(reg) if reg.trim() != "" => register(reg.trim()).await,
-                _ => println!("Usage: register <name>%<email>%<password>"),
+                _ => println!("Usage: register <name> <email> <password>"),
             },
             str if str.starts_with("modify") => match str.strip_prefix("modify") {
                 Some(reg) if reg.trim() != "" => modify(reg.trim()).await,
-                _ => println!("Usage: modify <name>%<email>%<password>"),
+                _ => println!("Usage: modify <name> <email> <password>"),
             },
             str if str.starts_with("login") => match str.strip_prefix("login") {
                 Some(log) if log.trim() != "" => login(log.trim()).await,
-                _ => println!("Usage: login <email>%<password>"),
+                _ => println!("Usage: login <email> <password>"),
             },
             str if str.starts_with("logout") => logout().await,
             str if str.starts_with("whoami") => whoami().await,
@@ -134,11 +175,11 @@ async fn main() {
             },
             str if str.starts_with("create") => match str.strip_prefix("create") {
                 Some(s) if s.trim() != "" => create(s).await,
-                _ => println!("Usage: create <name>%<date_start>%<date_end>%[invitees]"),
+                _ => println!("Usage: create <name> <date_start> <date_end> [invitees]"),
             },
             str if str.starts_with("new") => match str.strip_prefix("new") {
                 Some(s) if s.trim() != "" => create(s).await,
-                _ => println!("Usage: new <name>%<date_start>%<date_end>%[invitees]"),
+                _ => println!("Usage: new <name> <date_start> <date_end> [invitees]"),
             },
             str if str.starts_with("remove") => match str.strip_prefix("remove") {
                 Some(s) if s.trim() != "" => remove(s).await,
@@ -147,5 +188,22 @@ async fn main() {
             _ => println!("SOON"),
         }
         interface.add_history_unique(line);
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::parse_line_into_arguments;
+
+    #[test]
+    fn test_parse_line() {
+        let expected = vec![
+            "Mon Nom".to_string(),
+            "email@tortue.fr".to_string(),
+            "tortue".to_string(),
+        ];
+        let value = parse_line_into_arguments("\"Mon Nom\" email@tortue.fr tortue");
+        println!("{:#?}", value);
+        assert_eq!(expected, value);
     }
 }
