@@ -1,7 +1,7 @@
 use chrono::{Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
+use crate::{API_URL, TOKEN, parse_line_into_arguments};
 
 use super::login::{Answer, call};
 
@@ -30,13 +30,9 @@ impl Answer for EventCreateAnswer {
 }
 
 pub async fn create(line: &str) {
-    let args = line.split("%");
-    let mut vec = vec![];
-    for arg in args {
-        vec.push(arg.trim());
-    }
+    let vec = parse_line_into_arguments(line);
     if vec.len() < 3 {
-        println!("Usage: create <name>%<date_start>%<date_end>%[invitees]");
+        println!("Usage: create <name> <date_start> <date_end> [invitees]");
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
@@ -46,7 +42,7 @@ pub async fn create(line: &str) {
             invitees.push(invitee);
         }
     }
-    let date_start = match NaiveDateTime::parse_from_str(vec[1], "%Y-%m-%d %H:%M") {
+    let date_start = match NaiveDateTime::parse_from_str(&vec[1], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
             println!(
@@ -59,7 +55,7 @@ pub async fn create(line: &str) {
     .format("%Y-%m-%d %H:%M %z")
     .to_string();
 
-    let date_end = match NaiveDateTime::parse_from_str(vec[2], "%Y-%m-%d %H:%M") {
+    let date_end = match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
             println!(
@@ -73,7 +69,7 @@ pub async fn create(line: &str) {
     .to_string();
 
     let data = EventCreatePost {
-        name: vec[0],
+        name: &vec[0],
         token: &token,
         date_start: &date_start,
         date_end: &date_end,
