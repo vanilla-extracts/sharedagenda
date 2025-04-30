@@ -1,4 +1,7 @@
 # CHANGELOG
+## Server, CLI, Infra v2.0.0-prod
+Everything is implemented
+
 ## Server v1.0.0-beta
 All routes are implemented in the server.
 
@@ -69,3 +72,15 @@ Audrey:
 ## Session 7: 2025-04-24 
 ### Planned
 - Caddy deployment and finishing client
+
+### Finished
+- finished deployment 
+
+## Session 8: 2025-05-25
+
+## Session 9: 2025-04-28
+### Planned
+- Redundant database (two databases, logical replication, VIP)
+
+### Finished
+- Done

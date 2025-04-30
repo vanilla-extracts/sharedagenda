@@ -3,6 +3,16 @@
   hosts: platform_shag_apis
   gather_facts: no 
   tasks:
+    - name: create dictionary of ips
+      set_fact:
+        apis_pub_ips: >- 
+          "{{ inventory_hostname }}": "{{ hostvars[inventory_hostname]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
+    - name: from yaml
+      set_fact: 
+        apis_pub_ips: "{{ apis_pub_ips | from_yaml }}"
+    - name: echo dictionary
+      debug:
+        msg: "{{ apis_pub_ips }}"
     - name: install prerequisites
       become: true
       apt: name={{ item }} state=latest
@@ -19,6 +29,7 @@
       become: true
       ansible.builtin.user:
         name: api-runner
+        shell: /bin/bash
         comment: API Runner User
         group: api-runner
     - name: Upload release API executable
@@ -66,4 +77,40 @@
       become: true
       ansible.builtin.systemd_service:
         name: api.service 
+        state: started
+    - name: Retart the API Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api.service 
+        state: restarted
+    - name: Upload the Watchdog script
+      become: true
+      become_user: api-runner
+      ansible.builtin.template:
+        src: api_watchdog.sh.j2
+        dest: /home/api-runner/api_watchdog.sh
+        owner: api-runner
+        group: api-runner
+        mode: ug=rwx,o=r
+    - name: Upload Systemd Unit file
+      become: true
+      ansible.builtin.copy:
+        src: api_watchdog.service
+        dest: /etc/systemd/system/api_watchdog.service 
+        mode: '644'
+    - name: Reload the Systemd daemon and Enable the API Watchdog Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api_watchdog.service
+        daemon_reload: true
+        enabled: true
+    - name: Start the API Watchdog Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api_watchdog.service 
+        state: started
+    - name: Retart the API Watchdog Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api_watchdog.service 
         state: restarted

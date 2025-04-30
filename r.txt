@@ -3,3 +3,4 @@ ansible
 openstacksdk
 ansible-lint
 passlib
+netaddr

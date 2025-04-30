@@ -1,0 +1,13 @@
+[Unit]
+Description=API Watchdog
+After=network.target
+
+[Service]
+Type=simple
+StandardOutput=journal
+Restart=always
+User=root
+ExecStart=bash /home/api-runner/api_watchdog.sh
+
+[Install]
+WantedBy=default.target

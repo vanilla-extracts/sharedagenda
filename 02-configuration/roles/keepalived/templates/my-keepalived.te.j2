@@ -1,0 +1,15 @@
+module my-keepalived 1.0;
+
+require {
+	type var_log_t;
+	type bin_t;
+	type keepalived_t;
+	class sock_file write;
+	class file setattr;
+	class capability dac_override;
+}
+
+#============= keepalived_t ==============
+allow keepalived_t bin_t:file setattr;
+allow keepalived_t self:capability dac_override;
+allow keepalived_t var_log_t:sock_file write;

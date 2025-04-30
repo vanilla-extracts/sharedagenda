@@ -1,0 +1,150 @@
+---
+
+keepalived_show_ansible_managed: false
+
+keepalived_package_state: "{{ ((keepalived_use_latest_stable | default(true)) | bool) | ternary('latest', 'present') }}"
+# Keepalived scripts may rely upon additional packages.
+keepalived_scripts_packages: []
+
+# Keepalived check binaries to be allowed in SElinux policies
+# Example:
+# keepalived_check_binaries: ["curl"]
+keepalived_check_binaries: []
+
+# This is the expiration time of your package manager cache.
+# When expired, this role will require to update the package manger cache.
+# This variable will be removed when the ansible upstream bugs will be fixed.
+cache_timeout: 600
+
+# Add this bloc in your playbook configuration
+# #############################################
+# keepalived_instances:
+#   internal:
+#     interface: "{{ keepalived_vrrp_net_interface }}"
+#     state: "{{(play_hosts.index(inventory_hostname) == 0) | ternary('MASTER','BACKUP')}}"
+#     virtual_router_id: 42
+#     priority: "{{(play_hosts.index(inventory_hostname) == 0) | ternary('100','99')}}"
+#     vips:
+#       - "{{ keepalived_vip }}/24 dev {{ keepalived_vrrp_net_interface }} label {{ keepalived_vrrp_net_interface }}:1"
+#     #In case of check script/command
+#     # track_scripts:
+#     #   - check_primary_script
+#     #In case of track process
+#     # track_process:
+#     #   - haproxy_track_process
+# #############################################
+
+# In case of check script/command
+# #############################################
+# keepalived_check_primary_script: "/bin/killall -0 haproxy" In Case of command
+# keepalived_check_primary_script: "{{ keepalived_check_primary_script_file.path }}/{{ keepalived_check_primary_script_file.filename }}" In Case of script  
+# keepalived_scripts:
+#   check_primary_script:
+#     # Here is an example with a command instead of a script.
+#     # Add src_check_script if you want to run a script instead of a command
+#     # and upload it from your deploy host
+#     check_script: "{{ keepalived_check_primary_script }}"
+#     interval: 2
+#     weight: 2
+#     timeout: 2
+#
+##################################################
+# keepalived_check_primary_script_file:
+#   user: "postgres"
+#   group: "postgres"
+#   path: "/usr/local/bin"
+#   filename: "check_primaty_script.sh"
+#   content: | # exemple script de check avant bascule
+#     #!/bin/bash
+#
+#     # Connexion à la base de données et vérification du mode lecture seule
+#     IS_READONLY=$(/usr/bin/psql -tAc "SHOW default_transaction_read_only;")
+#     #SHOW default_transaction_read_only retourne 'on' pour si la base est en lecture seule
+#     #SHOW default_transaction_read_only retourne 'off' pour si la base n'est pas en lecture seule
+#     if [ "$IS_READONLY" = "off" ]; then
+#         echo "Database is writable."
+#         exit 0  # Tout va bien, Keepalived ne basculera pas
+#     else
+#         echo "Database is read only or error (psql not installed)."
+#         exit 1 # Bascule
+#     fi
+
+# #############################################
+
+# In case of track process
+# #############################################
+# keepalived_track_process: "haproxy"
+# keepalived_track_processes:
+#   haproxy_track_process:
+#     track_process: "{{ keepalived_track_process }}"
+#     delay: 2
+#     weight: 2
+# #############################################
+
+keepalived_sync_groups: {}
+keepalived_bind_on_non_local: false
+
+# In case of VIP failover some applications might stuck on retrying to send
+# data without updating ARP. This variable defines amount of retries kernel
+# will send before consider connection as dead. It will influence on VIP
+# failover speed directly. Default sysctl value is 15 which result in
+# ~13 minutes of recovery. 8 retires is minimum according to RFC 1122 and
+# results in 100 seconds for timeout. Oracle suggest a value of 3 for a RAC
+# configuration which might be too agressive for some scenarios.
+keepalived_sysctl_tcp_retries: 8
+
+# This list of strings will appear in the global_defs section of the
+# keepalived configuration file.
+# Example:
+keepalived_global_defs:
+  - router_id {{ ansible_hostname }}
+  - enable_script_security
+  - script_user cloudadm
+
+# Whether to add systemd overrides for keepalived:
+# Wants=network-online.target
+# After=network-online.target
+keepalived_systemd_overrides: true
+
+# Whether to add systemd option Restart=always
+# It depends on bool keepalived_systemd_overrides, so to add both must be True
+keepalived_systemd_override_service_restart: false
+
+# Set location of keepalived daemon options file path
+# For Debian based systems it's usually /etc/default/keepalived
+# For RedHat based systems it's usually /etc/sysconfig/keepalived
+keepalived_daemon_options_file_path: "{{ _keepalived_daemon_options_file_path }}"
+
+# Overriding keepalived daemon extra arguments, which will be applied inside of
+# the keepalived_daemon_options_file_path variable.
+# Example:
+# keepalived_daemon_default_options_overrides:
+#  - "DAEMON_ARGS='--snmp'"
+keepalived_daemon_default_options_overrides: []
+
+keepalived_debian_prereq_packages: ["psmisc"] # List of prerequisite packages for scripts (here brings killall, by default)
+
+# SELinux tweaks
+keepalived_selinux_retries: 12
+keepalived_selinux_delay: 15
+keepalived_selinux_automatic: true # active la configuration SELinux à partir de ausearch et audit2allow # if false, please feed 2 newt vars
+keepalived_selinux_module: "" # nom du module
+keepalived_selinux_content: "" # .te file content
+# exemple keepalived_selinux_content
+# keepalived_selinux_content: |
+#   module psql 1.0;
+#   require {
+#     type keepalived_t;
+#     type postgresql_var_run_t;
+#     type postgresql_db_t;
+#     type postgresql_etc_t;
+#     class dir search;
+#     class file { getattr open read };
+#     class sock_file write;
+#   }
+#   #============= keepalived_t ==============
+#   allow keepalived_t postgresql_db_t:dir search;
+#   allow keepalived_t postgresql_db_t:file open;
+#   allow keepalived_t postgresql_db_t:file { getattr read };
+#   allow keepalived_t postgresql_etc_t:dir search;
+#   allow keepalived_t postgresql_var_run_t:sock_file write; 

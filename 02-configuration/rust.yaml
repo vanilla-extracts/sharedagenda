@@ -1,0 +1,37 @@
+- name: Install Rust on VM 
+  hosts: platform_shag_apis
+  become: true
+  tasks:
+    - name: Install package
+      ansible.builtin.apt: name={{ item }} state=latest
+      loop:
+        - libsystemd-dev 
+        - git
+        - pkg-config
+    - name: Connect to HTTP Proxy, install rust
+      become_user: api-runner
+      ansible.builtin.shell: |
+        export http_proxy=proxy-appli.infra.dgfip:8080
+        export https_proxy=proxy-appli.infra.dgfip:8080
+        export no_proxy='dgfip','rie.gouv.fr'
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+      args:
+        executable: /bin/bash
+    - name: Clone and compile rust
+      become_user: api-runner
+      ansible.builtin.shell: |
+        export no_proxy='dgfip','rie.gouv.fr'
+        export PATH="$HOME/.cargo/bin:$PATH"
+        cd $HOME
+        git clone https://forge.dgfip.finances.rie.gouv.fr/charlotte-thomas/sharedagenda
+        cd sharedagenda
+        git switch {{ branch }}
+        cd crates/server
+        cargo build --release
+      args:
+        executable: /bin/bash
+      register: cargo_success
+    - name: Debug the success
+      become_user: api-runner
+      debug:
+        msg: "{{ cargo_success }}"
