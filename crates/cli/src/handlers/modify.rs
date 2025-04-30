@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
+use crate::{API_URL, TOKEN, parse_line_into_arguments};
 
 use super::login::{Answer, call};
 
@@ -28,21 +28,17 @@ impl Answer for UserModifyAnswer {
 }
 
 pub async fn modify(line: &str) {
-    let args = line.split("%");
-    let mut vec = vec![];
-    for arg in args {
-        vec.push(arg.trim());
-    }
+    let vec = parse_line_into_arguments(line);
     if vec.len() < 3 {
-        println!("Usage: change <name>%<email>%<password>");
+        println!("Usage: change <name> <email> <password>");
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
     let data = UserModifyPost {
         token: &token,
-        name: vec[0],
-        email: vec[1],
-        password: vec[2],
+        name: &vec[0],
+        email: &vec[1],
+        password: &vec[2],
     };
     let url = API_URL.lock().unwrap().to_string();
     call::<UserModifyPost<'_>, UserModifyAnswer>(url, &data, "user", "modify").await;
