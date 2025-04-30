@@ -7,13 +7,53 @@ It has two different main components, the [server](crates/server) and the
 
 See their different README for more information and documentation.
 
+## Build
+To build SharedAgenda you first need to install `podman` on your machine. 
+Then, use this command to create a podman container suitable for compiling the
+server.
+
+```sh 
+podman build -t rust-builder -f Containerfile
+```
+
+Use the script `cargo-podman` to compile the server.
+
+### Server
+```sh
+cargo podman build --release --bin server
+#OR 
+make podman_server
+```
+
+### Client
+```sh
+cargo build --release --bin cli
+#OR 
+make cli
+```
+
+Alternatively you can use the pre-compiled binaries
+- `server` is in `02-configuration/files/server`
+- `cli` is in `assets/cli`
+
 ## Deployment
 SharedAgenda is hosted on NUBO, it uses _terraform_ for the creation of the VMs
 and _ansible_ for the configuration. 
 
 ### Deployment on NUBO
+You need to place `clouds.yaml` and `secure.yaml` in `01-platform` and sim link
+them in `02-configuration`
 
-### Configuration
+```sh 
+. env.sh #do the steps
+python3 -m pip install -r r.txt #install the components
+
+cd 01-platform
+tf apply #deploy the infrastructure
+
+cd ../02-configuration
+ansible-playbook -i inventory sharedagenda.playbook.yaml #configure servers
+```
 
 ## Documentation
 

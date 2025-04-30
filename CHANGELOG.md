@@ -1,4 +1,7 @@
 # CHANGELOG
+## Server, CLI, Infra v2.0.0-prod
+Everything is implemented
+
 ## Server v1.0.0-beta
 All routes are implemented in the server.
 
