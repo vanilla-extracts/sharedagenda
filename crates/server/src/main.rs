@@ -1,8 +1,7 @@
-use std::{process::exit, thread::sleep, time::Duration};
+use std::process::exit;
 
 use configuration::{load, write_default_config};
 use database::Database;
-use rocket::tokio;
 
 #[macro_use]
 extern crate rocket;
@@ -12,6 +11,11 @@ pub mod database;
 mod events;
 pub mod structs;
 mod users;
+
+#[get("/")]
+fn hello_world() -> &'static str {
+    "Hello World"
+}
 
 #[launch]
 async fn rocket() -> _ {
@@ -51,6 +55,7 @@ async fn rocket() -> _ {
             events::delete::delete,
             events::modify::modify,
             events::list::list,
+            hello_world,
         ],
     )
 }
