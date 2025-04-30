@@ -2,6 +2,8 @@
 SharedAgenda is our project for the end of our year as probationary civil
 servants in ENFiP Toulouse as Inspectrices PSE.
 
+The deployed version of SharedAgenda is v2.0.0. See the diagrams below.
+
 It has two different main components, the [server](crates/server) and the
 [cli](crates/cli).
 
@@ -65,7 +67,7 @@ ansible-playbook -i inventory sharedagenda.playbook.yaml #configure servers
 See the [server's README](crates/server/README.md) for the endpoints and how to
 use the API.
 
-See the [cli's REAMDE](crates/cli/README.md) for the manual.
+See the [cli's REAMDE](crates/cli/README.md) for how to use the CLI/REPL.
 
 ## Diagram
 
