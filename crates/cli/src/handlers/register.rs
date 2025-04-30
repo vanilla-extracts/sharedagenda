@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::API_URL;
+use crate::{API_URL, parse_line_into_arguments};
 
 use super::login::{Answer, call};
 
@@ -27,19 +27,15 @@ impl Answer for RegisterAnswer {
 }
 
 pub async fn register(line: &str) {
-    let args = line.split("%");
-    let mut vec = vec![];
-    for arg in args {
-        vec.push(arg.trim());
-    }
+    let vec = parse_line_into_arguments(line);
     if vec.len() < 3 {
-        println!("Usage: register <name>%<email>%<password>");
+        println!("Usage: register <name> <email> <password>");
         return;
     }
     let data = RegisterPost {
-        name: vec[0],
-        email: vec[1],
-        password: vec[2],
+        name: &vec[0],
+        email: &vec[1],
+        password: &vec[2],
     };
     let url = API_URL.lock().unwrap().to_string();
     call::<RegisterPost<'_>, RegisterAnswer>(url, &data, "user", "create").await;
