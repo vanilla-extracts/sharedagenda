@@ -78,8 +78,39 @@
       ansible.builtin.systemd_service:
         name: api.service 
         state: started
-    - name: Restart the API Systemd Unit
+    - name: Retart the API Systemd Unit
       become: true
       ansible.builtin.systemd_service:
         name: api.service 
+        state: restarted
+    - name: Upload the Watchdog script
+      become: true
+      become_user: api-runner
+      ansible.builtin.template:
+        src: api_watchdog.sh.j2
+        dest: /home/api-runner/api_watchdog.sh
+        owner: api-runner
+        group: api-runner
+        mode: ug=rwx,o=r
+    - name: Upload Systemd Unit file
+      become: true
+      ansible.builtin.copy:
+        src: api_watchdog.service
+        dest: /etc/systemd/system/api_watchdog.service 
+        mode: '644'
+    - name: Reload the Systemd daemon and Enable the API Watchdog Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api_watchdog.service
+        daemon_reload: true
+        enabled: true
+    - name: Start the API Watchdog Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api_watchdog.service 
+        state: started
+    - name: Retart the API Watchdog Systemd Unit
+      become: true
+      ansible.builtin.systemd_service:
+        name: api_watchdog.service 
         state: restarted
