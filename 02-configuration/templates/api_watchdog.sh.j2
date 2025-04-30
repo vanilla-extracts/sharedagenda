@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+while true 
+do 
+	echo "Verify the API is still up"
+	curl http://{{ apis_pub_ips[inventory_hostname] }}:8000/
+	if [[ ! $? == "0" ]]; then 
+		echo "API is down"
+		systemctl start api
+	fi
+	sleep 1m
+done

@@ -49,6 +49,7 @@
         objs: ALL_IN_SCHEMA
         roles: repl,agenda
         grant_option: true
+
 - name: "Create publication on primary database"
   hosts: platform_shag_bdds_01
   become: true
