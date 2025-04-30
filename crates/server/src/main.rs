@@ -3,7 +3,6 @@ use std::{process::exit, thread::sleep, time::Duration};
 use configuration::{load, write_default_config};
 use database::Database;
 use rocket::tokio;
-use systemd::daemon::{STATE_WATCHDOG, notify};
 
 #[macro_use]
 extern crate rocket;
@@ -16,20 +15,6 @@ mod users;
 
 #[launch]
 async fn rocket() -> _ {
-    async fn keep_alive() {
-        loop {
-            if let Err(e) = notify(false, [(STATE_WATCHDOG, "1")].iter()) {
-                println!("Error while sending the keepalive: {e}");
-                exit(1);
-            }else{
-                println!("Keepalived sent");
-            }
-            sleep(Duration::from_secs(5));
-        }
-    }
-
-    tokio::spawn(keep_alive());
-
     let configuration = match load() {
         Ok(config) => config,
         Err(_) => match write_default_config() {
