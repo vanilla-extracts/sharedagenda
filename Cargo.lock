@@ -243,7 +243,7 @@ dependencies = [
 
 [[package]]
 name = "cli"
-version = "2.0.0-dev"
+version = "2.0.0-prod"
 dependencies = [
  "ansi_term",
  "chrono",
