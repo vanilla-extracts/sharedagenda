@@ -32,13 +32,14 @@
         shell: /bin/bash
         comment: API Runner User
         group: api-runner
-#
-# - name: Install Rust
-#   ansible.builtin.import_playbook: rust.yaml
-#
-- name: Create the API
-  hosts: platform_shag_apis
-  tasks:
+    - name: Upload release API executable
+      become: true
+      ansible.builtin.copy:
+        src: server
+        dest: /home/api-runner/server
+        owner: api-runner
+        group: api-runner
+        mode: u=rwx,go=r 
     - name: Make the config folder
       become: true
       become_user: api-runner
