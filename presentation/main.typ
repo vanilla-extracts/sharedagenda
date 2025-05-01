@@ -1,4 +1,5 @@
 #import "@preview/touying:0.6.1": *
+#import "@preview/numbly:0.1.0": numbly
 #import themes.simple: *
 
 #let france_red = "e1000f"
@@ -9,6 +10,7 @@
 #let palette_secondary_01 = "FFE552"
 #let palette_secondary_02 = "C8AA39"
 #let palette_secondary_03 = "716043"
+
 
 #show: simple-theme.with(
   header: self => [
@@ -64,7 +66,7 @@
   ),
   config-methods(
     init: (self: none, body) => {
-      set text(fill: self.colors.primary, size: 25pt, font: "Marianne")
+      set text(fill: self.colors.primary, size: 20pt, font: "Marianne")
       show footnote.entry: set text(size: .6em)
       show strong: self.methods.alert.with(self: self)
       show heading.where(level: self.slide-level + 1): set text(1.4em)
@@ -78,7 +80,7 @@
       top: 4em,
       right: 2em,
       left: 2em,
-      bottom: 2em,
+      bottom: 3em,
     ),
   ),
   aspect-ratio: "16-9",
@@ -90,7 +92,7 @@
       top: 6em,
       right: 2em,
       left: 2em,
-      bottom: 2em,
+      bottom: 3em,
     ),
     header: [
       #box(
@@ -111,10 +113,42 @@
   = SharedAgenda
   == Votre agenda dans le Cloud!
 ]
-== Test
-Test Test
-== Second
-I am the best
-SSSS
-== S
-ssss
+== Introduction
+=== But
+
+---
+
+=== Solution
+
+---
+
+=== Architecture
+
+---
+
+=== Infrastructure (V1)
+
+---
+
+=== Infrastructure (V2)
+== API REST
+=== Choix Techniques
+
+---
+
+=== Implémentation
+
+---
+
+=== Difficultées Rencontrées
+
+== Client (CLI/REPL)
+=== Choix Techniques
+
+---
+
+=== Implémentation
+
+---
+
+=== Démonstration
