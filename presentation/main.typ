@@ -77,7 +77,7 @@
   config-common(datetime-format: "[day]/[month]/[year]"),
   config-page(
     margin: (
-      top: 4em,
+      top: 5.5em,
       right: 2em,
       left: 2em,
       bottom: 3em,
@@ -89,7 +89,7 @@
 #title-slide[
   #set page(
     margin: (
-      top: 6em,
+      top: 8em,
       right: 2em,
       left: 2em,
       bottom: 3em,
@@ -102,9 +102,9 @@
         radius: 0.5cm,
         stack(
           dir: ltr,
-          image("republique_française.png", height: 3em),
+          image("republique_française.png", height: 4em),
           h(1fr),
-          image("dgfip.svg", height: 3em),
+          image("dgfip.svg", height: 4em),
         ),
       )
     ],
