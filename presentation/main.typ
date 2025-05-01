@@ -14,7 +14,7 @@
 
 #show: simple-theme.with(
   header: self => [
-    #set text(fill: self.colors.secondary-dark, size: 12pt, font: "Spectral")
+    #set text(fill: self.colors.neutral-darkest, size: 12pt, font: "Spectral")
     #v(2em)
 
     #box(
@@ -26,7 +26,7 @@
     )
   ],
   footer: self => [
-    #set text(fill: self.colors.secondary-dark, size: 12pt, font: "Spectral")
+    #set text(fill: self.colors.neutral-darkest, size: 12pt, font: "Spectral")
     #box(
       height: auto,
       width: auto,
@@ -66,7 +66,7 @@
   ),
   config-methods(
     init: (self: none, body) => {
-      set text(fill: self.colors.primary, size: 20pt, font: "Marianne")
+      set text(fill: self.colors.primary-dark, size: 20pt, font: "Marianne")
       show footnote.entry: set text(size: .6em)
       show strong: self.methods.alert.with(self: self)
       show heading.where(level: self.slide-level + 1): set text(1.4em)
