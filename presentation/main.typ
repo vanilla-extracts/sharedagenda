@@ -1,7 +1,7 @@
 #import "@preview/touying:0.6.1": *
 #import "template.typ": *
 
-#show: simple-theme.with(aspect-ratio: "16-9")
+#show: dgfip-theme.with(aspect-ratio: "16-9")
 
 #let france_red           = "e1000f"
 #let france_blue          = "000091"
