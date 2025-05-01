@@ -22,7 +22,12 @@
       width: auto,
       inset: 0.5em,
       radius: 0.5cm,
-      stack(dir: ltr, image("republique_française.png", height: 4.5em), h(1fr), utils.display-current-short-heading()),
+      align(top)[#stack(
+          dir: ltr,
+          image("republique_française.png", height: 4.5em),
+          h(1fr),
+          utils.display-current-short-heading(),
+        )],
     )
   ],
   footer: self => [
@@ -43,8 +48,8 @@
           context utils.slide-counter.display(),
           h(1em),
           datetime.today().display(self.datetime-format),
-        )
-      )
+        ),
+      ),
     )
   ],
   footer-right: none,
@@ -100,12 +105,14 @@
         width: auto,
         inset: 0.5em,
         radius: 0.5cm,
-        stack(
-          dir: ltr,
-          image("republique_française.png", height: 4em),
-          h(1fr),
-          image("dgfip.svg", height: 4em),
-        ),
+        align(top)[
+          #stack(
+            dir: ltr,
+            image("republique_française.png", height: 4em),
+            h(1fr),
+            image("dgfip.svg", height: 3em),
+          )
+        ],
       )
     ],
   )
