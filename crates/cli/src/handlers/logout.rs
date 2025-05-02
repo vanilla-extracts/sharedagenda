@@ -34,7 +34,7 @@ impl Answer for LogoutAnswer {
         let mut config = load().unwrap_or_default();
         config.token = "".to_string();
 
-        if let Err(_) = write_config(&config) {
+        if write_config(&config).is_err() {
             println!("Error while updating configuration");
         }
     }

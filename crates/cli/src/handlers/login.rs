@@ -41,7 +41,7 @@ impl Answer for LoginAnswer {
                 self.expiration.unwrap()
             )
         } else {
-            format!("{}", self.token)
+            self.token.to_string()
         }
     }
 
