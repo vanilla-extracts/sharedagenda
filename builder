@@ -11,11 +11,4 @@ run_podman() {
         rust-builder cargo "$@"
 }
 
-# Check if the first argument is "podman"
-if [ "$1" = "podman" ]; then
-    shift  # Remove "podman" from the arguments
-    run_podman "$@"
-else
-    echo "Usage: cargo podman <cargo-command>"
-    exit 1
-fi
+run_podman "$@"

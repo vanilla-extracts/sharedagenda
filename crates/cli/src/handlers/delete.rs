@@ -23,8 +23,13 @@ impl Answer for DeleteAnswer {
         self.code as i32
     }
     fn answer(&self) -> String {
-        *TOKEN.lock().unwrap() = "".to_string();
-
+        if self.code == 200 {
+            "Your account has been deleted".to_string()
+        } else {
+            "Error while deleting your account".to_string()
+        }
+    }
+    fn process(&mut self) {
         *TOKEN.lock().unwrap() = "".to_string();
 
         let mut config = load().unwrap_or_default();
@@ -32,10 +37,10 @@ impl Answer for DeleteAnswer {
 
         match write_config(&config) {
             Ok(_) => {
-                format!("{}", self.body)
+                println!("{}", self.body);
             }
             Err(_) => {
-                format!("Error while updating configuration")
+                println!("Error while updating configuration");
             }
         }
     }

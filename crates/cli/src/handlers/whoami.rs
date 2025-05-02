@@ -36,15 +36,8 @@ impl Answer for WhoamiAnswer {
             format!("{}", self.code)
         }
     }
-}
-
-pub async fn whoami() {
-    let token = TOKEN.lock().unwrap().to_string();
-    let data = WhoamiPost { token: &token };
-    let url = API_URL.lock().unwrap().to_string();
-    let log = call::<WhoamiPost<'_>, WhoamiAnswer>(url, &data, "user", "whoami").await;
-    if let Some(answer) = log {
-        match answer.user {
+    fn process(&mut self) {
+        match &self.user {
             Some(usr) => {
                 println!("---- User Information ----");
                 println!("UUID: {}", usr.uuid);
@@ -54,8 +47,15 @@ pub async fn whoami() {
                 println!("---- User Information ----");
             }
             None => {
-                println!("No user found for {}", &token);
+                println!("No user found");
             }
         }
     }
+}
+
+pub async fn whoami() {
+    let token = TOKEN.lock().unwrap().to_string();
+    let data = WhoamiPost { token: &token };
+    let url = API_URL.lock().unwrap().to_string();
+    call::<WhoamiPost<'_>, WhoamiAnswer>(url, &data, "user", "whoami").await;
 }

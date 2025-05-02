@@ -27,6 +27,7 @@ impl Answer for EventCreateAnswer {
     fn answer(&self) -> String {
         self.answer.clone()
     }
+    fn process(&mut self) {}
 }
 
 pub async fn create(line: &str) {
