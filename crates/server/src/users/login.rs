@@ -1,4 +1,6 @@
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use chrono::{DateTime, Utc};
+use password_hash::errors;
 use rocket::{
     serde::{Deserialize, Serialize, json::Json},
     tokio::spawn,
@@ -72,7 +74,37 @@ pub async fn create_or_take_token(owner: String) -> Token {
 pub async fn login(body: Json<UserLogin<'_>>) -> Json<UserLoginAnswer> {
     match get_user_from_email(body.email).await {
         Some(user) => {
-            if user.password == body.password {
+            let password_hash = match PasswordHash::new(&user.password) {
+                Ok(e) => e,
+                Err(e) => {
+                    println!("Error while parsing hash for user {}\n{e}", user.uuid);
+                    return Json(UserLoginAnswer {
+                        status: 409,
+                        token:
+                            "Error while parsing password hash, please contact the administrator."
+                                .to_string(),
+                        expiration: None,
+                    });
+                }
+            };
+            let matched =
+                match Argon2::default().verify_password(body.password.as_bytes(), &password_hash) {
+                    Ok(_) => true,
+                    Err(errors::Error::Password) => false,
+                    Err(e) => {
+                        println!(
+                            "Error while verifiying password for user {}\n{e}",
+                            user.uuid.clone()
+                        );
+                        return Json(UserLoginAnswer {
+                            status: 410,
+                            token: "Error while verifying your password, please retry later."
+                                .to_string(),
+                            expiration: None,
+                        });
+                    }
+                };
+            if matched {
                 let token = create_or_take_token(user.uuid).await;
                 Json(UserLoginAnswer {
                     status: 200,

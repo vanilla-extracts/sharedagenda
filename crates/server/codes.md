@@ -45,3 +45,6 @@ an end date anterior to the start date.
 
 ### Code 408: Event does not exist
 Triggered when trying to modify or delete an event which does not exist.
+
+### Code 409: Hasher error
+Triggered when there is an error with the password hasher verification.
