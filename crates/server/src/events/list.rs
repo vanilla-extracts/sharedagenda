@@ -61,9 +61,8 @@ pub async fn list(body: Json<EventList<'_>>) -> Json<EventListAnswer> {
             }
         }
     }
-    let date_start;
-    match DateTime::parse_from_str(&body.date_start, "%Y-%m-%d %H:%M %z") {
-        Ok(date) => date_start = date,
+    let date_start = match DateTime::parse_from_str(&body.date_start, "%Y-%m-%d %H:%M %z") {
+        Ok(date) => date,
         Err(e) => {
             println!("{e}");
             return Json(EventListAnswer {
@@ -74,7 +73,7 @@ pub async fn list(body: Json<EventList<'_>>) -> Json<EventListAnswer> {
             events: vec![]
         });
         }
-    }
+    };
 
     Json(lists(body.token.to_string(), date_start).await)
 }

@@ -1,4 +1,6 @@
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use chrono::{DateTime, Utc};
+use password_hash::errors;
 use rocket::{
     serde::{Deserialize, Serialize, json::Json},
     tokio::spawn,
@@ -19,7 +21,7 @@ pub struct UserLogin<'r> {
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct UserLoginAnswer {
-    status: i64,
+    code: i64,
     token: String,
     expiration: Option<DateTime<Utc>>,
 }
@@ -72,23 +74,53 @@ pub async fn create_or_take_token(owner: String) -> Token {
 pub async fn login(body: Json<UserLogin<'_>>) -> Json<UserLoginAnswer> {
     match get_user_from_email(body.email).await {
         Some(user) => {
-            if user.password == body.password {
+            let password_hash = match PasswordHash::new(&user.password) {
+                Ok(e) => e,
+                Err(e) => {
+                    println!("Error while parsing hash for user {}\n{e}", user.uuid);
+                    return Json(UserLoginAnswer {
+                        code: 409,
+                        token:
+                            "Error while parsing password hash, please contact the administrator."
+                                .to_string(),
+                        expiration: None,
+                    });
+                }
+            };
+            let matched =
+                match Argon2::default().verify_password(body.password.as_bytes(), &password_hash) {
+                    Ok(_) => true,
+                    Err(errors::Error::Password) => false,
+                    Err(e) => {
+                        println!(
+                            "Error while verifiying password for user {}\n{e}",
+                            user.uuid.clone()
+                        );
+                        return Json(UserLoginAnswer {
+                            code: 410,
+                            token: "Error while verifying your password, please retry later."
+                                .to_string(),
+                            expiration: None,
+                        });
+                    }
+                };
+            if matched {
                 let token = create_or_take_token(user.uuid).await;
                 Json(UserLoginAnswer {
-                    status: 200,
+                    code: 200,
                     token: token.token,
                     expiration: Some(token.expiration_date),
                 })
             } else {
                 Json(UserLoginAnswer {
-                    status: 404,
+                    code: 404,
                     token: "Password does not match".to_string(),
                     expiration: None,
                 })
             }
         }
         None => Json(UserLoginAnswer {
-            status: 405,
+            code: 405,
             token: "User does not exist".to_string(),
             expiration: None,
         }),

@@ -98,7 +98,7 @@ impl Database {
                 uuid varchar(255) primary key,
                 email varchar(50) not null,
                 name varchar(50) not null,
-                password varchar(50) not null
+                password varchar(255) not null
             );",
             )
             .await

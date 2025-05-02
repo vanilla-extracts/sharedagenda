@@ -34,6 +34,17 @@ impl Answer for ListAnswer {
     fn answer(&self) -> String {
         self.body.clone()
     }
+    fn process(&mut self) {
+        self.events.sort_by_key(|f| f.date_start);
+        for event in self.events.clone() {
+            println!("------");
+            println!("Event: {}", event.id);
+            println!("Name: {}", event.name);
+            println!("Start: {}", event.date_start.format("%Y-%m-%d %H:%M %z"));
+            println!("End: {}", event.date_end.format("%Y-%m-%d %H:%M %z"));
+            println!("------");
+        }
+    }
 }
 
 pub async fn list(line: String) {
@@ -58,20 +69,5 @@ pub async fn list(line: String) {
         date_start: date,
     };
     let url = API_URL.lock().unwrap().to_string();
-    let mut res = match call::<ListPost<'_>, ListAnswer>(url, &data, "event", "list").await {
-        Some(result) => result,
-        _ => {
-            println!("Error while reading result");
-            return;
-        }
-    };
-    res.events.sort_by_key(|f| f.date_start);
-    for event in res.events {
-        println!("------");
-        println!("Event: {}", event.id);
-        println!("Name: {}", event.name);
-        println!("Start: {}", event.date_start.format("%Y-%m-%d %H:%M %z"));
-        println!("End: {}", event.date_end.format("%Y-%m-%d %H:%M %z"));
-        println!("------");
-    }
+    call::<ListPost<'_>, ListAnswer>(url, &data, "event", "list").await
 }

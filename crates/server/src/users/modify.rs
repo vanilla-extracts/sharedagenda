@@ -56,10 +56,8 @@ pub async fn modify(body: Json<UserModification<'_>>) -> Json<UserModificationAn
             }
         }
         if let Some(mail) = body.email {
-            if mail.trim() != "" {
-                if get_user_from_email(mail.trim()).await.is_none() {
-                    email = mail.trim().to_string();
-                }
+            if mail.trim() != "" && get_user_from_email(mail.trim()).await.is_none() {
+                email = mail.trim().to_string();
             }
         }
         if let Some(nm) = body.name {
