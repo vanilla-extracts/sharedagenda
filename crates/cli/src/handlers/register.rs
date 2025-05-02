@@ -1,3 +1,5 @@
+use argon2::{Argon2, PasswordHasher};
+use password_hash::{SaltString, rand_core::OsRng};
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, parse_line_into_arguments};
@@ -32,10 +34,21 @@ pub async fn register(line: &str) {
         println!("Usage: register <name> <email> <password>");
         return;
     }
+
+    let salt = SaltString::generate(&mut OsRng);
+    let argon = Argon2::default();
+    let password_hashed = match argon.hash_password(vec[2].as_bytes(), &salt) {
+        Ok(e) => e.to_string(),
+        Err(e) => {
+            println!("Error, aborting registration of user.\n{e}");
+            return;
+        }
+    };
+
     let data = RegisterPost {
         name: &vec[0],
         email: &vec[1],
-        password: &vec[2],
+        password: &password_hashed,
     };
     let url = API_URL.lock().unwrap().to_string();
     call::<RegisterPost<'_>, RegisterAnswer>(url, &data, "user", "create").await;

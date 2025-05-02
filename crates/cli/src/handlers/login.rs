@@ -1,6 +1,8 @@
 use std::fmt::Debug;
 
+use argon2::{Argon2, PasswordHasher};
 use chrono::{DateTime, Utc};
+use password_hash::{SaltString, rand_core::OsRng};
 use reqwest::Client;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
@@ -94,9 +96,20 @@ pub async fn login(line: &str) {
         println!("Usage: login <email> <password>");
         return;
     }
+
+    let salt = SaltString::generate(&mut OsRng);
+    let argon = Argon2::default();
+    let password_hashed = match argon.hash_password(vec[1].as_bytes(), &salt) {
+        Ok(e) => e.to_string(),
+        Err(e) => {
+            println!("Error, aborting registration of user.\n{e}");
+            return;
+        }
+    };
+
     let data = LoginPost {
         email: &vec[0],
-        password: &vec[1],
+        password: &password_hashed,
     };
     let url = API_URL.lock().unwrap().to_string();
     let log = call::<LoginPost<'_>, LoginAnswer>(url, &data, "user", "login").await;
