@@ -29,7 +29,7 @@ WITH body
 The server checks and if successful return the following object
 ```json
 {
-  "status": "200 OK"
+  "code": "200 OK"
   "token": "{token}"
 }
 ```
