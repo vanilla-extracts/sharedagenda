@@ -48,3 +48,7 @@ Triggered when trying to modify or delete an event which does not exist.
 
 ### Code 409: Hasher error
 Triggered when there is an error with the password hasher verification.
+
+### Code 410: Hash parsing error
+Triggered when the parser failed to parse the stored password, possible database
+corruption
