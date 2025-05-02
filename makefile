@@ -2,6 +2,6 @@ all:
 	make server
 	make cli
 server:
-	cargo podman build --release --bin server
+	./builder build --release --bin server
 cli:
-	cargo build --release --bin cli
+	./builder build --release --bin cli

@@ -14,6 +14,10 @@ To build SharedAgenda you first need to install `podman` on your machine.
 Then, use this command to create a podman container suitable for compiling the
 server.
 
+The script `builder` is here if you don't have a rust toolchain installed on
+your machine. It uses the podman container to compile without need to install
+the toolchain.
+
 ```sh 
 podman build -t rust-builder -f Containerfile
 ```
@@ -27,14 +31,18 @@ make all
 
 ### Server
 ```sh
-cargo podman build --release --bin server
+./builder build --release --bin server
+#OR 
+cargo podman build --release --bin server #with the rust toolchain installed
 #OR 
 make server
 ```
 
 ### Client
 ```sh
-cargo build --release --bin cli
+./builder build --release --bin cli
+#OR
+cargo podman build --release --bin cli #with the rust toolchain installed
 #OR 
 make cli
 ```
