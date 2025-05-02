@@ -124,7 +124,9 @@
     dir: ltr,
     h(1fr),
     image("rust-logo-blk.svg", width: 20%),
+    h(10%),
     image("rest-api-icon.svg", width: 20%),
+    h(10%),
     image("rocket-svgrepo-com.svg", width: 20%),
     h(1fr),
   )
