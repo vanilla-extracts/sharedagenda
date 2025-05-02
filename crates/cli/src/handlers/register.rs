@@ -26,6 +26,7 @@ impl Answer for RegisterAnswer {
     fn answer(&self) -> String {
         self.answer.clone()
     }
+    fn process(&mut self) {}
 }
 
 pub async fn register(line: &str) {

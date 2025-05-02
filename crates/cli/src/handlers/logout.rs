@@ -22,18 +22,20 @@ impl Answer for LogoutAnswer {
         self.code
     }
     fn answer(&self) -> String {
+        if self.code != 200 {
+            "Error while login in".to_string()
+        } else {
+            "You have successfully logout".to_string()
+        }
+    }
+    fn process(&mut self) {
         *TOKEN.lock().unwrap() = "".to_string();
 
         let mut config = load().unwrap_or_default();
         config.token = "".to_string();
 
-        match write_config(&config) {
-            Ok(_) => {
-                format!("You have been successfully log out.")
-            }
-            Err(_) => {
-                format!("Error while updating configuration")
-            }
+        if let Err(_) = write_config(&config) {
+            println!("Error while updating configuration");
         }
     }
 }

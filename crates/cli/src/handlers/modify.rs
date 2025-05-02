@@ -27,6 +27,7 @@ impl Answer for UserModifyAnswer {
     fn answer(&self) -> String {
         self.body.clone()
     }
+    fn process(&mut self) {}
 }
 
 pub async fn modify(line: &str) {
