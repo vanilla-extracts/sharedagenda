@@ -18,7 +18,7 @@ pub struct LoginPost<'r> {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LoginAnswer {
-    status: i64,
+    code: i64,
     token: String,
     expiration: Option<DateTime<Utc>>,
 }
@@ -31,10 +31,10 @@ pub trait Answer {
 
 impl Answer for LoginAnswer {
     fn code(&self) -> i32 {
-        self.status as i32
+        self.code as i32
     }
     fn answer(&self) -> String {
-        if self.status == 200 {
+        if self.code == 200 {
             format!(
                 "Login is successfull, token is {} which expires at {}",
                 self.token,
