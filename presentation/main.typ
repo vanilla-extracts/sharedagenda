@@ -122,13 +122,15 @@
 #box(inset: 0.5em, radius: 0.5cm, width: auto, height: auto, align(center)[
   #stack(
     dir: ltr,
-    h(1fr),
+    h(10%),
+    pause,
     image("rust-logo-blk.svg", width: 20%),
+    pause,
     h(10%),
     image("rest-api-icon.svg", width: 20%),
+    pause,
     h(10%),
     image("rocket-svgrepo-com.svg", width: 20%),
-    h(1fr),
   )
 ])
 ---
