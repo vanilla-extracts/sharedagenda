@@ -88,7 +88,7 @@ pub fn load_rgb_color(str: &str) -> (u8, u8, u8) {
     let gd = u8::from_str_radix(second, 16);
     let bd = u8::from_str_radix(last, 16);
 
-    let r = rd.unwrap_or(0xFF); 
+    let r = rd.unwrap_or(0xFF);
     let g = gd.unwrap_or(0xFF);
     let b = bd.unwrap_or(0xFF);
 
