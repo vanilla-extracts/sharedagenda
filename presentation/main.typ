@@ -67,7 +67,7 @@
     show strong: self.methods.alert.with(self: self)
     show heading.where(level: self.slide-level + 1): set text(1.4em)
     show: codly-init.with()
-    show raw: set text(size: 7pt)
+    show raw: set text(size: 13pt)
     codly(languages: codly-languages)
     set par(justify: true)
     body
@@ -207,28 +207,25 @@
         match self.connection.query(sql, args).await {
             Ok(rows) => {
                 for row in rows {
-                    if row.len() < T::len() {
-                        continue;
-                    }
+                    /*[...]*/
                     res.push(T::create_from_row(&row))
-                }
-            }
-            Err(e) => {
-                println!("Error while reading database: {e}");
-            }
-        }
-        res
-    }
 ```
 
-
 == Client (CLI/REPL)
-=== Choix Techniques
-
----
-
 === Implémentation
-
+#pause
+- Rust
+#pause
+- Appel API
+---
+- Programmation par contrat
+```rust
+pub trait Answer {
+    fn code(&self) -> i32;
+    fn answer(&self) -> String;
+    fn process(&mut self);
+}
+```
 ---
 
 === Démonstration
