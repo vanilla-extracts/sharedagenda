@@ -2,7 +2,8 @@
 #import "@preview/numbly:0.1.0": numbly
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.8": *
-
+#import "@preview/cetz:0.3.2"
+#import "@preview/fletcher:0.5.5" as fletcher: edge, node
 #import themes.simple: *
 
 #let france_red = "e1000f"
@@ -14,6 +15,14 @@
 #let palette_secondary_02 = "C8AA39"
 #let palette_secondary_03 = "716043"
 
+#let cetz-canvas = touying-reducer.with(
+  reduce: cetz.canvas,
+  cover: cetz.draw.hide.with(bounds: true),
+)
+#let fletcher-diagram = touying-reducer.with(
+  reduce: fletcher.diagram,
+  cover: fletcher.hide,
+)
 #show: simple-theme.with(
   header: self => [
     #set text(fill: self.colors.neutral-darkest, size: 12pt, font: "Spectral")
@@ -156,12 +165,15 @@
 ])
 
 ---
-
-=== Infrastructure (V1)
-
+#align(center)[
+  #image("assets/infrastructure_v1.png")
+]
 ---
 
-=== Infrastructure (V2)
+#align(center)[
+  #image("assets/infrastructure_v2.png")
+]
+
 == Serveur
 === Choix Techniques
 #box(
