@@ -1,19 +1,11 @@
-use std::{env, io::BufRead, ops::Deref, process::exit, str::Chars, sync::Mutex};
+use std::{env, io::BufRead, process::exit, str::Chars, sync::Mutex};
 
 use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    api,
-    create::create,
-    delete::delete,
-    event_deletion::remove,
-    list::list,
-    login::login,
-    logout::logout,
-    modify::{self, modify},
-    register::register,
-    whoami::{self, whoami},
+    create::create, delete::delete, event_deletion::remove, list::list, login::login,
+    logout::logout, modify::modify, register::register, whoami::whoami,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
