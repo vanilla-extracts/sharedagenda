@@ -1,11 +1,19 @@
-use std::{env, io::BufRead, process::exit, str::Chars, sync::Mutex};
+use std::{env, io::BufRead, ops::Deref, process::exit, str::Chars, sync::Mutex};
 
 use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, modify::modify, register::register, whoami::whoami,
+    api,
+    create::create,
+    delete::delete,
+    event_deletion::remove,
+    list::list,
+    login::login,
+    logout::logout,
+    modify::{self, modify},
+    register::register,
+    whoami::{self, whoami},
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -97,56 +105,22 @@ async fn main() {
             args.nth(0);
             a = parse_line_into_arguments(&args.collect::<Vec<String>>().join(" "));
         }
-        let first = match a.get(0) {
-            Some(a) => a,
-            _ => {
-                println!("-----SharedAgenda CLI Help-----");
-                println!(
-                    "sharedagenda help                                                  > shows the help"
-                );
-                println!(
-                    "sharedagenda config                                                > prints the configuration file path"
-                );
-                println!(
-                    "sharedagenda version                                               > prints the version"
-                );
-                println!(
-                    "sharedagenda api [url]                                             > sets the URL for which API to use"
-                );
-                println!(
-                    "sharedagenda register <name> <email> <password>                    > registers a new account for sharedagenda"
-                );
-                println!(
-                    "sharedagenda login <email> <password>                              > login with your account"
-                );
-                println!(
-                    "sharedagenda logout                                                > logout of your account"
-                );
-                println!(
-                    "sharedagenda delete                                                > deletes your account"
-                );
-                println!(
-                    "sharedagenda remove <id>                                           > removes an event"
-                );
-                println!(
-                    "sharedagenda new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
-                );
-                println!(
-                    "sharedagenda list <date>                                           > prints out the list of events"
-                );
-                println!(
-                    "sharedagenda whoami                                                > prints user informations"
-                );
+        let first = a.remove(0);
 
-                println!(
-                    "sharedagenda modify <name> <email> <password>                      > modifies user information"
-                );
-                println!("-----SharedAgenda CLI REPL Help-----");
-                exit(0);
-            }
-        };
         match first.as_str() {
             "-v" | "--version" => println!("SharedAgenda CLI {VERSION}"),
+            "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
+            "token" => println!("Current Token is: {}", TOKEN.lock().unwrap()),
+            "api" => api(&a.join("")),
+            "register" => register(a).await,
+            "login" => login(a).await,
+            "logout" => logout().await,
+            "delete" => delete().await,
+            "remove" => remove(&a.join("")).await,
+            "new" | "create" => create(a).await,
+            "list" => list(a.join("")).await,
+            "whoami" => whoami().await,
+            "modify" => modify(a).await,
             _ => {
                 println!("-----SharedAgenda CLI Help-----");
                 println!(
