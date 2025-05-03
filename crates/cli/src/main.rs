@@ -1,6 +1,7 @@
-use std::{process::exit, str::Chars, sync::Mutex};
+use std::{env, io::BufRead, process::exit, str::Chars, sync::Mutex};
 
 use crate::handlers::api::api;
+use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
     create::create, delete::delete, event_deletion::remove, list::list, login::login,
@@ -83,6 +84,116 @@ async fn main() {
 
     *API_URL.lock().unwrap() = loaded.api_link;
     *TOKEN.lock().unwrap() = loaded.token;
+
+    let mut args = env::args();
+    if args.len() > 1 || !atty::is(Stream::Stdin) {
+        let mut a = vec![];
+        if !atty::is(Stream::Stdin) {
+            let stdin = std::io::stdin();
+            for line in stdin.lock().lines() {
+                a.push(line.unwrap());
+            }
+        } else {
+            args.nth(0);
+            a = parse_line_into_arguments(&args.collect::<Vec<String>>().join(" "));
+        }
+        let first = match a.get(0) {
+            Some(a) => a,
+            _ => {
+                println!("-----SharedAgenda CLI Help-----");
+                println!(
+                    "sharedagenda help                                                  > shows the help"
+                );
+                println!(
+                    "sharedagenda config                                                > prints the configuration file path"
+                );
+                println!(
+                    "sharedagenda version                                               > prints the version"
+                );
+                println!(
+                    "sharedagenda api [url]                                             > sets the URL for which API to use"
+                );
+                println!(
+                    "sharedagenda register <name> <email> <password>                    > registers a new account for sharedagenda"
+                );
+                println!(
+                    "sharedagenda login <email> <password>                              > login with your account"
+                );
+                println!(
+                    "sharedagenda logout                                                > logout of your account"
+                );
+                println!(
+                    "sharedagenda delete                                                > deletes your account"
+                );
+                println!(
+                    "sharedagenda remove <id>                                           > removes an event"
+                );
+                println!(
+                    "sharedagenda new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "sharedagenda list <date>                                           > prints out the list of events"
+                );
+                println!(
+                    "sharedagenda whoami                                                > prints user informations"
+                );
+
+                println!(
+                    "sharedagenda modify <name> <email> <password>                      > modifies user information"
+                );
+                println!("-----SharedAgenda CLI REPL Help-----");
+                exit(0);
+            }
+        };
+        match first.as_str() {
+            "-v" | "--version" => println!("SharedAgenda CLI {VERSION}"),
+            _ => {
+                println!("-----SharedAgenda CLI Help-----");
+                println!(
+                    "sharedagenda help                                                  > shows the help"
+                );
+                println!(
+                    "sharedagenda config                                                > prints the configuration file path"
+                );
+                println!(
+                    "sharedagenda version                                               > prints the version"
+                );
+                println!(
+                    "sharedagenda api [url]                                             > sets the URL for which API to use"
+                );
+                println!(
+                    "sharedagenda register <name> <email> <password>                    > registers a new account for sharedagenda"
+                );
+                println!(
+                    "sharedagenda login <email> <password>                              > login with your account"
+                );
+                println!(
+                    "sharedagenda logout                                                > logout of your account"
+                );
+                println!(
+                    "sharedagenda delete                                                > deletes your account"
+                );
+                println!(
+                    "sharedagenda remove <id>                                           > removes an event"
+                );
+                println!(
+                    "sharedagenda new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "sharedagenda list <date>                                           > prints out the list of events"
+                );
+                println!(
+                    "sharedagenda whoami                                                > prints user informations"
+                );
+
+                println!(
+                    "sharedagenda modify <name> <email> <password>                      > modifies user information"
+                );
+                println!("-----SharedAgenda CLI REPL Help-----");
+            }
+        }
+        exit(0);
+    }
 
     let interface = Interface::new("sharedagenda").unwrap();
     let style = &loaded.prompt_colour;
