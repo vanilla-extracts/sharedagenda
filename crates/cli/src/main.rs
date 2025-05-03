@@ -266,15 +266,19 @@ async fn main() {
                 }
             },
             str if str.starts_with("register") => match str.strip_prefix("register") {
-                Some(reg) if reg.trim() != "" => register(reg.trim()).await,
+                Some(reg) if reg.trim() != "" => {
+                    register(parse_line_into_arguments(reg.trim())).await
+                }
                 _ => println!("Usage: register <name> <email> <password>"),
             },
             str if str.starts_with("modify") => match str.strip_prefix("modify") {
-                Some(reg) if reg.trim() != "" => modify(reg.trim()).await,
+                Some(reg) if reg.trim() != "" => {
+                    modify(parse_line_into_arguments(reg.trim())).await
+                }
                 _ => println!("Usage: modify <name> <email> <password>"),
             },
             str if str.starts_with("login") => match str.strip_prefix("login") {
-                Some(log) if log.trim() != "" => login(log.trim()).await,
+                Some(log) if log.trim() != "" => login(parse_line_into_arguments(log.trim())).await,
                 _ => println!("Usage: login <email> <password>"),
             },
             str if str.starts_with("logout") => logout().await,
@@ -285,15 +289,15 @@ async fn main() {
                 _ => list("".to_string()).await,
             },
             str if str.starts_with("create") => match str.strip_prefix("create") {
-                Some(s) if s.trim() != "" => create(s).await,
+                Some(s) if s.trim() != "" => create(parse_line_into_arguments(s.trim())).await,
                 _ => println!("Usage: create <name> <date_start> <date_end> [invitees]"),
             },
             str if str.starts_with("new") => match str.strip_prefix("new") {
-                Some(s) if s.trim() != "" => create(s).await,
+                Some(s) if s.trim() != "" => create(parse_line_into_arguments(s.trim())).await,
                 _ => println!("Usage: new <name> <date_start> <date_end> [invitees]"),
             },
             str if str.starts_with("remove") => match str.strip_prefix("remove") {
-                Some(s) if s.trim() != "" => remove(s).await,
+                Some(s) if s.trim() != "" => remove(s.trim()).await,
                 _ => println!("Usage: remove <id>"),
             },
             _ => println!("SOON"),

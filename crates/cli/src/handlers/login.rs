@@ -97,8 +97,7 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
     }
 }
 
-pub async fn login(line: &str) {
-    let vec = parse_line_into_arguments(line);
+pub async fn login(vec: Vec<String>) {
     if vec.len() < 2 {
         println!("Usage: login <email> <password>");
         return;

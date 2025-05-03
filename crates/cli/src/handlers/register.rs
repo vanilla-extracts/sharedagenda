@@ -2,7 +2,7 @@ use argon2::{Argon2, PasswordHasher};
 use password_hash::{SaltString, rand_core::OsRng};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, parse_line_into_arguments};
+use crate::API_URL;
 
 use super::login::{Answer, call};
 
@@ -29,8 +29,7 @@ impl Answer for RegisterAnswer {
     fn process(&mut self) {}
 }
 
-pub async fn register(line: &str) {
-    let vec = parse_line_into_arguments(line);
+pub async fn register(vec: Vec<String>) {
     if vec.len() < 3 {
         println!("Usage: register <name> <email> <password>");
         return;
