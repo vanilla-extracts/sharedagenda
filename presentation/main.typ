@@ -1,5 +1,8 @@
 #import "@preview/touying:0.6.1": *
 #import "@preview/numbly:0.1.0": numbly
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.8": *
+
 #import themes.simple: *
 
 #let france_red = "e1000f"
@@ -63,6 +66,9 @@
     show footnote.entry: set text(size: .6em)
     show strong: self.methods.alert.with(self: self)
     show heading.where(level: self.slide-level + 1): set text(1.4em)
+    show: codly-init.with()
+    show raw: set text(size: 7pt)
+    codly(languages: codly-languages)
     set par(justify: true)
     body
   }),
@@ -167,25 +173,54 @@
     #stack(
       dir: ltr,
       pause,
-      h(10%),
-      image("rust.svg", width: 20%),
+      h(8%),
+      image("rust.svg", width: 15%),
       pause,
-      h(10%),
-      image("rest-api-icon.svg", width: 20%),
+      h(8%),
+      image("rest-api-icon.svg", width: 15%),
       footnote([Usage authorised under special licence see #link("https://uxwing.com/license/")]),
       pause,
-      h(10%),
-      image("rocket-svgrepo-com.svg", width: 20%),
+      h(8%),
+      image("rocket-svgrepo-com.svg", width: 15%),
+      pause,
+      h(8%),
+      image("psql.svg", width: 15%),
     )
   ],
 )
 ---
 
 === Implémentation
-
+#pause
+- Transactions BDD
+#pause
+- API Asynchrone
+#pause
+- Codes de retour (ex: 200 OK, 401 Token Expired)
+#pause
+- TTL des Tokens: 24h
 ---
+- Fonctions génériques
+```rust
+    pub async fn query<T: QueriedData>(self, sql: &str, args: &[&(dyn ToSql + Sync)]) -> Vec<T> {
+        let mut res: Vec<T> = vec![];
+        match self.connection.query(sql, args).await {
+            Ok(rows) => {
+                for row in rows {
+                    if row.len() < T::len() {
+                        continue;
+                    }
+                    res.push(T::create_from_row(&row))
+                }
+            }
+            Err(e) => {
+                println!("Error while reading database: {e}");
+            }
+        }
+        res
+    }
+```
 
-=== Difficultées Rencontrées
 
 == Client (CLI/REPL)
 === Choix Techniques
