@@ -100,15 +100,54 @@
   == Votre agenda dans le Cloud!
 ]
 == Introduction
-=== But
-
+=== Problématique
+#pause
+- Stockage distant
+#pause
+- Accéder partout
+#pause
+- Collaborer
 ---
 
 === Solution
-
+#pause
+- Un Agenda centralisé
+#pause
+- Accessible partout avec une connexion internet
+#pause
+- Sécurisé
 ---
 
-=== Architecture
+=== Architecture Serveur
+#box(inset: 0.5em, radius: 0.5cm, width: auto, height: auto, align(center)[
+  #stack(
+    dir: ltr,
+    pause,
+    h(10%),
+    image("http.svg", width: 20%),
+    footnote("All SVGs are under CC0 from SVGRepo unless stated otherwise"),
+    pause,
+    h(10%),
+    image("token.svg", width: 20%),
+    pause,
+    h(10%),
+    image("key.svg", width: 20%),
+  )
+])
+---
+
+=== Architecture Client
+#box(inset: 0.5em, radius: 0.5cm, width: auto, height: auto, align(center)[
+  #stack(
+    dir: ltr,
+    pause,
+    h(20%),
+    image("cli.svg", width: 20%),
+    pause,
+    h(20%),
+    image("api.svg", width: 20%),
+  )
+])
 
 ---
 
@@ -117,22 +156,29 @@
 ---
 
 === Infrastructure (V2)
-== Server
+== Serveur
 === Choix Techniques
-#box(inset: 0.5em, radius: 0.5cm, width: auto, height: auto, align(center)[
-  #stack(
-    dir: ltr,
-    h(10%),
-    pause,
-    image("rust-logo-blk.svg", width: 20%),
-    pause,
-    h(10%),
-    image("rest-api-icon.svg", width: 20%),
-    pause,
-    h(10%),
-    image("rocket-svgrepo-com.svg", width: 20%),
-  )
-])
+#box(
+  inset: 0.5em,
+  radius: 0.5cm,
+  width: auto,
+  height: auto,
+  align(center)[
+    #stack(
+      dir: ltr,
+      pause,
+      h(10%),
+      image("rust.svg", width: 20%),
+      pause,
+      h(10%),
+      image("rest-api-icon.svg", width: 20%),
+      footnote([Usage authorised under special licence see #link("https://uxwing.com/license/")]),
+      pause,
+      h(10%),
+      image("rocket-svgrepo-com.svg", width: 20%),
+    )
+  ],
+)
 ---
 
 === Implémentation
