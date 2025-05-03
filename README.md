@@ -25,29 +25,49 @@ podman build -t rust-builder -f Containerfile
 Use the script `cargo-podman` to compile the server.
 
 ### All
+
+If you don't have a rust toolchain installed simply type:
+```sh
+make
+```
+
+Alternatively if you have one
 ```sh
 make all
 ```
 
 ### Server
+If you don't have a rust toolchain installed:
 ```sh
 ./builder build --release --bin server
 #OR 
-cargo podman build --release --bin server #with the rust toolchain installed
-#OR 
+make podman_server
+```
+
+Alternatively if you have the rust toolchain installed just do
+```sh
+cargo build --release --bin server
+#OR
 make server
 ```
 
 ### Client
+If you don't have a rust toolchain installed:
 ```sh
 ./builder build --release --bin cli
 #OR
-cargo podman build --release --bin cli #with the rust toolchain installed
-#OR 
 make cli
 ```
 
-Alternatively you can use the pre-compiled binaries
+Alternatively,
+```sh
+cargo build --release --bin cli
+#OR
+make cli
+````
+
+### Pre-compiled binaries
+These binaries are built using the podman container which is a `debian 12` container linking with `libssl-1.0` it should work fine if you are on Debian, Ubuntu etc. but if you're on Fedora you want to build it yourself.
 - `server` is in `02-configuration/files/server`
 - `cli` is in `assets/cli`
 

@@ -1,7 +1,7 @@
 use chrono::{Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN, parse_line_into_arguments};
+use crate::{API_URL, TOKEN};
 
 use super::login::{Answer, call};
 
@@ -30,8 +30,7 @@ impl Answer for EventCreateAnswer {
     fn process(&mut self) {}
 }
 
-pub async fn create(line: &str) {
-    let vec = parse_line_into_arguments(line);
+pub async fn create(vec: Vec<String>) {
     if vec.len() < 3 {
         println!("Usage: create <name> <date_start> <date_end> [invitees]");
         return;
