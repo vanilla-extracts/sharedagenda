@@ -164,11 +164,12 @@
   )
 ])
 
----
+== Infrastructure (V1)
 #align(center)[
   #image("assets/infrastructure_v1.png")
 ]
----
+
+== Infrastructure (V2)
 
 #align(center)[
   #image("assets/infrastructure_v2.png")
