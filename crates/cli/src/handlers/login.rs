@@ -7,7 +7,6 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use crate::{
     API_URL, TOKEN,
     configuration::loader::{load, write_config},
-    parse_line_into_arguments,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

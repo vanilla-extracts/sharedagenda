@@ -1,7 +1,7 @@
 use chrono::{Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN, parse_line_into_arguments};
+use crate::{API_URL, TOKEN};
 
 use super::login::{Answer, call};
 
