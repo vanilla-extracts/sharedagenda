@@ -80,7 +80,6 @@ async fn main() {
     };
 
     let loaded = load_config(config);
-    println!("{}", loaded.greeting_message);
 
     *API_URL.lock().unwrap() = loaded.api_link;
     *TOKEN.lock().unwrap() = loaded.token;
@@ -95,7 +94,7 @@ async fn main() {
             }
         } else {
             args.nth(0);
-            a = parse_line_into_arguments(&args.collect::<Vec<String>>().join(" "));
+            args.for_each(|f| a.push(f));
         }
         let first = a.remove(0);
 
@@ -161,6 +160,7 @@ async fn main() {
         exit(0);
     }
 
+    println!("{}", loaded.greeting_message);
     let interface = Interface::new("sharedagenda").unwrap();
     let style = &loaded.prompt_colour;
     let prompt = &loaded.prompt_message;
