@@ -10,7 +10,7 @@ use handlers::{
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v2.1.0-dev";
+static VERSION: &str = "v2.2.0-dev";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
@@ -99,7 +99,7 @@ async fn main() {
         let first = a.remove(0);
 
         match first.as_str() {
-            "-v" | "--version" => println!("SharedAgenda CLI {VERSION}"),
+            "-v" | "version" => println!("SharedAgenda CLI {VERSION}"),
             "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
             "token" => println!("Current Token is: {}", TOKEN.lock().unwrap()),
             "api" => api(&a.join("")),
