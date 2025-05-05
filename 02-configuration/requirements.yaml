@@ -5,3 +5,9 @@ roles:
   - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/r-seau/keepalived
     version: v1.3.4
     name: keepalived
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/utilitaires/prerequis
+    version: v1.0.0
+    name: prerequis
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/utilitaires/hosts-aliases
+    version: v1.1.2
+    name: hosts-aliases
