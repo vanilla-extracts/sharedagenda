@@ -97,6 +97,34 @@ module "sg-grafana" {
   ]
 }
 
+module "sg-node-exporter" {
+  source         = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/networking/terraform-openstack-secgroup.git"
+  pf_prefixe     = var.pf_prefixe
+  phase          = var.phase
+  sg_objet       = "node-exporter"
+  sg_description = "node-exporter"
+  sg_rules = [
+    {
+      direction        = "egress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 9100
+      port_range_max   = 9100
+      remote_ip_prefix = "0.0.0.0/0"
+      remote_group     = ""
+    },
+    {
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 9100
+      port_range_max   = 9100
+      remote_ip_prefix = "0.0.0.0/0"
+      remote_group     = ""
+    }
+  ]
+}
+
 module "sg-caddy" {
   source         = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/networking/terraform-openstack-secgroup.git"
   pf_prefixe     = var.pf_prefixe

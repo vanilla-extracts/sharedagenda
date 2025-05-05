@@ -26,7 +26,7 @@ output "DNS_administration" {
 # Ajoute un recordset pour la FIP de publication
 resource "openstack_dns_recordset_v2" "dns_publi" {
   zone_id     = data.openstack_dns_zone_v2.zone_dns.id
-  name        = "www-${var.pf_prefixe}.${data.openstack_dns_zone_v2.zone_dns.name}"
+  name        = "api-${var.pf_prefixe}.${data.openstack_dns_zone_v2.zone_dns.name}"
   description = "Accès publication"
   ttl         = 3600
   type        = "A"

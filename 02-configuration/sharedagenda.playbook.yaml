@@ -6,7 +6,10 @@
   become: true
   roles:
     - prerequis
-    - hosts-aliases 
+    - hosts-aliases
+    - node-exporter
+- name: Grafana
+  ansible.builtin.import_playbook: grafana.yaml
 - name: Postgres
   ansible.builtin.import_playbook: postgresql.yaml
 - name: Replication

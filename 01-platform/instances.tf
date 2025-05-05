@@ -36,6 +36,24 @@ module "vm-bastion" {
       port_range_max   = 514
       remote_ip_prefix = local.admin_subnet_cidr
       remote_group     = ""
+    },
+    {
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 9100
+      port_range_max   = 9100
+      remote_ip_prefix = "0.0.0.0/0"
+      remote_group     = ""
+    },
+    {
+      direction        = "egress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 9100
+      port_range_max   = 9100
+      remote_ip_prefix = "0.0.0.0/0"
+      remote_group     = ""
     }
   ]
   group = "bastion"
@@ -66,7 +84,7 @@ module "vm-apis" {
   is_pub_network   = true
   is_data_network  = true
 
-  admin_secgroup_id = [module.sg-admin.secgroup_id]
+  admin_secgroup_id = [module.sg-admin.secgroup_id, module.sg-node-exporter.secgroup_id]
   pub_secgroup_id   = [module.sg-api.secgroup_id]
   data_secgroup_id  = []
 
@@ -98,7 +116,7 @@ module "vm-caddy" {
   is_pub_network   = true
   is_data_network  = false
 
-  admin_secgroup_id = [module.sg-admin.secgroup_id]
+  admin_secgroup_id = [module.sg-admin.secgroup_id, module.sg-node-exporter.secgroup_id]
   pub_secgroup_id   = [module.sg-api.secgroup_id, module.sg-caddy.secgroup_id]
   data_secgroup_id  = []
 

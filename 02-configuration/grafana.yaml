@@ -1,6 +1,8 @@
+---
 - name: Grafana
+  become: true
   hosts: platform_shag_grafana
-  var_files:
+  vars_files:
     - "vars/monitoring.yaml"
   roles:
     - grafana
