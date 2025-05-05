@@ -1,0 +1,27 @@
+#!/bin/bash
+
+source "{{ restic_common_utils }}"
+source "/etc/{{ component_name }}_restic.conf"
+
+echo "Begin backup {{ component_name }} $(date "+%Y-%m-%d %T")"
+
+PROMETHEUS_BACKUP="${BACKUP_FOLDER}/{{ component_name }}_$(date "+%Y-%m-%d_%H-%M-%S")"
+
+delete_local_backup
+
+systemctl stop {{ component_name }}
+
+create_local_backup "${PROMETHEUS_BACKUP}"
+
+backup_status=$?
+
+systemctl start {{ component_name }}
+
+{% if prometheus_backup_config.compress | bool %}
+if [[ $backup_status -eq 0 ]]; then
+   COMPRESSED_FILE="${BACKUP_FOLDER}/{{ component_name }}_$(date "+%Y-%m-%d_%H-%M-%S").tar.gz"
+   compress_folder "${PROMETHEUS_BACKUP}" "${COMPRESSED_FILE}"
+fi
+{% endif %}
+
+echo "End backup {{ component_name }} $(date "+%Y-%m-%d %T")"

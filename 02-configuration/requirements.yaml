@@ -14,3 +14,6 @@ roles:
   - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/grafana
     version: v1.3.1
     name: grafana
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/prometheus
+    version: v3.0.0
+    name: prometheus

@@ -1,0 +1,47 @@
+global
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    chroot /var/lib/haproxy
+    # stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+    # Default SSL material locations
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+
+defaults
+    log global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+{% for pool in haproxy_pools %}
+frontend {{ pool.frontend_name }}
+    mode {{ pool.mode|default('http') }}
+    {% if haproxy_tls_enabled %}
+    bind *:{{pool.frontend_port}} ssl crt  /etc/haproxy/certs.pem alpn h2,http/1.1  ssl-min-ver TLSv1.2
+    redirect scheme https code 301 if !{ ssl_fc }
+    {% else %}
+    bind *:{{pool.frontend_port}}
+    {% endif %}
+{%   if pool.backends is defined %}
+{% for backend in pool.backends%}
+    acl {{ backend.backend_name }}_acl path_beg -i {{ backend.backend_path }}
+    use_backend {{ backend.backend_name }} if {{ backend.backend_name }}_acl
+{% endfor %}
+{%   endif %}
+
+{%   if pool.backends is defined %}
+{% for backend in pool.backends%}
+backend {{ backend.backend_name }}
+    server {{ backend.backend_name }} 127.0.0.1:{{ backend.backend_port }}
+{% endfor %}
+{%   endif %}
+
+{% endfor %}

@@ -1,0 +1,195 @@
+---
+
+prometheus_version: 2.47.2
+prometheus_skip_install: false
+prometheus_admin_api_enabled: true
+prometheus_admin_password: "admin"
+prometheus_basic_auth_users_enabled: false
+# volume de stockage dédié
+monitoring_additional_volume: false
+
+force_purge_rules: false
+
+prometheus_config_dir: /etc/prometheus
+monitoring_dir: /var/lib/monitoring
+prometheus_db_dir: "{{ monitoring_dir }}/prometheus"
+
+prometheus_system_user: prometheus
+prometheus_system_group: prometheus
+
+prometheus_http_listen_address: "0.0.0.0"
+prometheus_http_listen_port: "9090"
+prometheus_web_external_url: "/prometheus"
+
+prometheus_storage_retention: "30d"
+# Available since Prometheus 2.7.0
+# [EXPERIMENTAL] Maximum number of bytes that can be stored for blocks. Units
+# supported: KB, MB, GB, TB, PB.
+prometheus_storage_retention_size: "0"
+
+prometheus_config_flags_extra: {}
+# prometheus_config_flags_extra:
+#   storage.tsdb.retention: 15d
+#   alertmanager.timeout: 10s
+
+prometheus_alertmanager_config: []
+# prometheus_alertmanager_config:
+#   - scheme: https
+#     path_prefix: alertmanager/
+#     basic_auth:
+#       username: user
+#       password: pass
+#     static_configs:
+#       - targets: ["127.0.0.1:9093"]
+#     proxy_url: "127.0.0.2"
+
+prometheus_alert_relabel_configs: []
+# prometheus_alert_relabel_configs:
+#   - action: labeldrop
+#     regex: replica
+
+prometheus_global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+prometheus_remote_write: []
+# prometheus_remote_write:
+#   - url: https://dev.kausal.co/prom/push
+#     basic_auth:
+#       password: FOO
+
+prometheus_remote_read: []
+# prometheus_remote_read:
+#   - url: https://demo.cloudalchemy.org:9201/read
+#     basic_auth:
+#       password: FOO
+
+prometheus_external_labels:
+  environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
+
+prometheus_targets: {}
+#  node:
+#    - targets:
+#        - localhost:9100
+#      labels:
+#        env: test
+#        job: node-exporter
+
+prometheus_file_sd_configs_format: "yaml"
+# prometheus_file_sd_configs_format: "json"
+
+prometheus_scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+
+# Alternative config file name, searched in ansible templates path.
+prometheus_config_file: "prometheus.yml.j2"
+prometheus_web_config_file: "prometheus.web.yml.j2"
+prometheus_alert_rules_files:
+  - prometheus/rules/*.rules
+
+prometheus_static_targets_files:
+  - prometheus/targets/*.yml
+  - prometheus/targets/*.json
+
+prometheus_group_alert_rules: "ansible managed alert rules"
+
+prometheus_alert_rules: []
+#  - alert: Watchdog
+#    expr: vector(1)
+#    for: 10m
+#    labels:
+#      severity: warning
+#    annotations:
+#      description: "This is an alert meant to ensure that the entire alerting pipeline is functional.\n
+#             This alert is always firing, therefore it should always be firing in Alertmanager\n
+#             and always fire against a receiver. There are integrations with various notification\n
+#             mechanisms that send a notification when this alert is not firing.
+#             For example the\n\"DeadMansSnitch\" integration in PagerDuty."
+#      summary: 'Ensure entire alerting pipeline is functional'
+#  - alert: InstanceDown
+#    expr: 'up == 0'
+#    for: 5m
+#    labels:
+#      severity: critical
+#    annotations:
+#      description: "{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.{% endraw %}"
+#      summary: "{% raw %}Instance {{ $labels.instance }} down{% endraw %}"
+#  - alert: CriticalCPULoad
+#    expr: '100 - (avg by (instance) (irate(node_cpu_seconds_total{job="node",mode="idle"}[5m])) * 100) > 96'
+#    for: 2m
+#    labels:
+#      severity: critical
+#    annotations:
+#      description: "{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has Critical CPU load for more than 2 minutes.{% endraw %}"
+#      summary: "{% raw %}Instance {{ $labels.instance }} - Critical CPU load{% endraw %}"
+#  - alert: CriticalRAMUsage
+#    expr: '(1 - ((node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes) / node_memory_MemTotal_bytes)) * 100 > 98'
+#    for: 5m
+#    labels:
+#      severity: critical
+#    annotations:
+#      description: "{% raw %}{{ $labels.instance }} has Critical Memory Usage more than 5 minutes.{% endraw %}"
+#      summary: "{% raw %}Instance {{ $labels.instance }} has Critical Memory Usage{% endraw %}"
+#  - alert: CriticalDiskSpace
+#    expr: 'node_filesystem_free_bytes{mountpoint!~"^/run(/.*|$)",fstype!~"(squashfs|fuse.*)",job="node"} / node_filesystem_size_bytes{job="node"} < 0.1'
+#    for: 4m
+#    labels:
+#      severity: critical
+#    annotations:
+#      description: "{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has less than 10% space remaining.{% endraw %}"
+#      summary: "{% raw %}Instance {{ $labels.instance }} - Critical disk space usage{% endraw %}"
+#  - alert: RebootRequired
+#    expr: "node_reboot_required > 0"
+#    labels:
+#      severity: warning
+#    annotations:
+#      description: "{% raw %}{{ $labels.instance }} requires a reboot.{% endraw %}"
+#      summary: "{% raw %}Instance {{ $labels.instance }} - reboot required{% endraw %}"
+#  - alert: ClockSkewDetected
+#    expr: 'abs(node_timex_offset_seconds) * 1000 > 30'
+#    for: 2m
+#    labels:
+#      severity: warning
+#    annotations:
+#      description: "{% raw %}Clock skew detected on {{ $labels.instance }}. Ensure NTP is configured correctly on this host.{% endraw %}"
+#      summary: "{% raw %}Instance {{ $labels.instance }} - Clock skew detected{% endraw %}"
+
+dgfip_download_url: "https://nexus3.appli.dgfip/repository/prometheus"
+
+
+# backup section
+component_name: "prometheus"
+prometheus_backup_enabled: false
+prometheus_backup_config:
+  prune: true
+  list_files: false
+  compress: true
+  recycle: true
+  list_snapshots: true
+  cron:
+    weekday: 1-5
+    minute: "0~30"
+    hour: 23
+
+restic_command_opts: ""
+restic_common_utils: "/usr/local/bin/restic-utils.sh"
+prometheus_backup_folder: "{{ monitoring_dir }}/backup/{{ component_name }}"
+prometheus_backup_scripts: "{{ monitoring_dir }}/scripts/{{ component_name }}"
+prometheus_restore_folder: "{{ monitoring_dir }}/restore/{{ component_name }}"
+prometheus_data_folder: "{{ prometheus_db_dir }}"
+prometheus_backup_keep_days: 30
+prometheus_backup_keep_locally: 30
+prometheus_restic_logdir: "{{ monitoring_dir }}/logs/{{ component_name }}"
+
+prometheus_restic_password: "prometheus_backup"
+prometheus_restic_pack_size: "16MB"
+prometheus_os_application_credential_id: "71d1f4a0c4594c3fa99f2b0e4338b1fb"
+prometheus_os_application_credential_secret: "test"
+prometheus_os_auth_url: "https://nuage01.dgfip.finances.rie.gouv.fr:5000/v3"
+prometheus_os_swift_bucket: "{{ component_name }}"
+prometheus_os_swift_folder: "backup"

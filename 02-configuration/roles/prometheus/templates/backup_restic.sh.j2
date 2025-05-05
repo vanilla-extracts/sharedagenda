@@ -1,0 +1,51 @@
+#!/bin/bash
+
+source "{{ restic_common_utils }}"
+source "/etc/{{ component_name }}_restic.conf"
+
+RET=0
+
+[ ! -f "${BACKUP_LOG_FILE}" ] && touch "${BACKUP_LOG_FILE}"
+
+echo $(date "+%Y-%m-%d %T") BEGIN BACKUP | tee -a ${BACKUP_LOG_FILE}
+
+PATH_SIZE=$(du -s ${SWIFT_BACKUP_FOLDER} | cut -f1)
+
+if [[ ${PATH_SIZE} != 0 ]]; then
+
+  init_swift_bucket | tee -a ${BACKUP_LOG_FILE}
+
+  swift_backup $(date +%Y%m%d%H%M) | tee -a ${BACKUP_LOG_FILE}
+
+  RET=$?
+
+  {% if prometheus_backup_config.recycle | bool %}
+  swift_recycle | tee -a ${BACKUP_LOG_FILE}
+  {% endif %}
+
+  {% if prometheus_backup_config.list_snapshots | bool %}
+  swift_list_snapshots
+  {% endif %}
+
+  {% if prometheus_backup_config.list_files | bool %}
+  swift_list_files | tee -a ${BACKUP_LOG_FILE}
+  {% endif %}
+else
+  echo "No backup found in ${SWIFT_BACKUP_FOLDER} to store into SWIFT bucket." | tee -a ${BACKUP_LOG_FILE}
+fi
+
+echo $(date "+%Y-%m-%d %T") END BACKUP | tee -a ${BACKUP_LOG_FILE}
+
+if [ $RET -ne 0 ]; then
+  echo echo "An error occured with restic backup for ${SWIFT_BACKUP_FOLDER}"
+  echo "One or more backup operations failed. Check the logs for details."
+  exit 1
+fi
+
+echo "ALL backup operations completed successfully."
+
+{% if prometheus_backup_config.prune | bool %}
+swift_prune | tee -a ${BACKUP_LOG_FILE}
+{% endif %}
+
+exit 0

@@ -1,0 +1,7 @@
+- name: Grafana
+  hosts: platform_shag_grafana
+  var_files:
+    - "vars/monitoring.yaml"
+  roles:
+    - grafana
+    - prometheus

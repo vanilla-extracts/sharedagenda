@@ -1,0 +1,10 @@
+grafana_address: {{ vm_grafana_01_pub_ip }}
+grafana_security_custom:
+  admin_user: admin
+  admin_password: admin
+grafana_dashboards:
+  - dashboard_id: 111
+    revision_id: 1
+    datasource: prometheus
+
+# Prometheus

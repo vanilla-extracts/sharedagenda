@@ -1,0 +1,19 @@
+---
+- name: Restart prometheus
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: prometheus
+    state: restarted
+  when:
+    - not ansible_check_mode
+    - "'molecule-docker-notest' not in ansible_skip_tags"
+
+- name: Reload prometheus
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus
+    state: reloaded
+  when:
+    - not ansible_check_mode
+    - "'molecule-docker-notest' not in ansible_skip_tags"

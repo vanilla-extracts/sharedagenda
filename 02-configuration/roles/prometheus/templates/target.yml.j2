@@ -1,0 +1,8 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+{% if  item.key == "grafana" -%}
+  - targets:
+    - {{ item.value }}
+{% else -%}
+{{ item.value | to_nice_yaml(indent=2, sort_keys=False) }}
+{%  endif %}

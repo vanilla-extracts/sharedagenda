@@ -1,0 +1,20 @@
+# Authentification
+
+export OS_AUTH_URL="{{ prometheus_os_auth_url }}"
+export OS_REGION_NAME="RegionOne"
+export OS_APPLICATION_CREDENTIAL_ID="{{ prometheus_os_application_credential_id }}"
+export OS_APPLICATION_CREDENTIAL_SECRET="{{ prometheus_os_application_credential_secret }}"
+export OS_USER_DOMAIN_NAME="Default"
+export RESTIC_PASSWORD="{{ prometheus_restic_password }}"
+export RESTIC_PACK_SIZE="{{ prometheus_restic_pack_size }}"
+
+# Sauvegarde / Restoration
+
+export KEEP_DAYS={{ prometheus_backup_keep_days|default('30') }}
+export KEEP_BACKUP={{ prometheus_backup_keep_locally|default('30') }}
+export BACKUP_LOG_FILE="{{ prometheus_restic_logdir }}/{{ component_name }}_restic-$(date +%F).log"
+export SWIFT_BUCKET_NAME="{{ prometheus_os_swift_bucket }}"
+export SWIFT_FOLDER="{{ prometheus_os_swift_folder }}"
+export BACKUP_FOLDER="{{ prometheus_backup_folder }}"
+export DATA_FOLDER="{{ prometheus_data_folder }}"
+export RESTORE_FOLDER="{{ prometheus_restore_folder }}"

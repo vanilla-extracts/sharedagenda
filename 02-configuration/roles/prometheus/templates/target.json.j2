@@ -1,0 +1,6 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{% if item.value | type_debug == "list" +%}
+{{ item.value | to_nice_json(indent=2, sort_keys=False) }}
+{% else +%}
+{{ [ item.value ] | to_nice_json(indent=2, sort_keys=False) }}
+{% endif %}

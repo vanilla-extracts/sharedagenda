@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ -z "$2" ]]; then
+  echo "Erreur: Un argument est requis."
+  exit 1
+fi
+
+source "{{ restic_common_utils }}"
+source "/etc/{{ component_name }}_restic.conf"
+
+# mode=snapshot ou mode=lastest+tag
+MODE=$1
+# ID du snapshot à restorer
+ID_BACKUP=$2 
+
+swift_restore ${MODE} ${ID_BACKUP}
