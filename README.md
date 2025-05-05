@@ -67,7 +67,7 @@ make cli
 ````
 
 ### Pre-compiled binaries
-These binaries are built using the podman container which is a `debian 12` container linking with `libssl-1.0` it should work fine if you are on Debian, Ubuntu etc. but if you're on Fedora you want to build it yourself.
+These binaries are built using the podman container which is a `Debian Bookworm (12)` container. It should work fine with all linux version with a Glibc at least at `2.36`
 - `server` is in `02-configuration/files/server`
 - `cli` is in `assets/cli`
 
@@ -75,7 +75,7 @@ These binaries are built using the podman container which is a `debian 12` conta
 SharedAgenda is hosted on NUBO, it uses _terraform_ for the creation of the VMs
 and _ansible_ for the configuration. 
 
-### Deployment on NUBO
+### Deployment on Openstack
 You need to place `clouds.yaml` and `secure.yaml` in `01-platform` and sim link
 them in `02-configuration`
 
