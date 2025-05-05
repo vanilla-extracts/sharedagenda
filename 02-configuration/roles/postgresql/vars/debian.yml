@@ -1,0 +1,18 @@
+---
+postgresql_packages:
+  - "postgresql-{{ postgresql_version }}"
+  - "postgresql-contrib-{{ postgresql_version }}"
+  # - libpq5
+  - libpq-dev
+  - acl
+
+
+selinux_postgresql_policy: "default"
+postgresql_bin_directory: "/usr/lib/postgresql/{{ postgresql_version }}/bin"
+postgresql_default_service_name: "postgresql"
+
+debian_postgresql_dict:
+  # data_directory: "{{ postgresql_data_directory }}"
+  # hba_file: "{{ postgresql_data_directory }}/pg_hba.conf"
+  # ident_file: "{{ postgresql_data_directory }}/pg_ident.conf"
+  include_if_exists: "{{ postgresql_data_directory }}/postgresql.conf"

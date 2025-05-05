@@ -1,0 +1,32 @@
+module my-postgresql 1.0;
+
+require {
+    type postgresql_t;
+    type postgresql_exec_t;
+    type init_t;
+    type default_t;
+    type etc_runtime_t;
+    type root_t;
+    type unreserved_port_t;
+    type var_log_t;
+    class dir { add_name create getattr open read remove_name search setattr write };
+    class file { create getattr link open read rename unlink write };
+    class file { create getattr open read write };
+    class lnk_file { create read };
+    class tcp_socket name_bind;
+}
+
+#============= postgresql_t ==============
+allow postgresql_t default_t:dir { add_name create getattr open read remove_name search setattr write };
+allow postgresql_t default_t:file { create getattr link open read rename unlink write };
+allow postgresql_t etc_runtime_t:file { create getattr link open read rename unlink write };
+allow postgresql_t etc_runtime_t:dir { add_name create getattr open read remove_name search setattr write };
+allow postgresql_t etc_runtime_t:lnk_file { create  read };
+allow postgresql_t root_t:dir { add_name write };
+allow postgresql_t root_t:file { create open read write };
+allow postgresql_t root_t:file getattr;
+allow postgresql_t postgresql_exec_t:dir { add_name create getattr open read remove_name search setattr write };
+allow init_t postgresql_exec_t:lnk_file { create  read };
+allow postgresql_t unreserved_port_t:tcp_socket name_bind;
+allow postgresql_t default_t:lnk_file { create  read };
+allow postgresql_t var_log_t:file { create getattr link open read rename unlink write };

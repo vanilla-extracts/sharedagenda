@@ -1,0 +1,9 @@
+---
+
+reboot_timeout: 600
+do_reboot: true
+override_path: true
+prerequis_packages: ["rsyslog"]
+prerequis_packages_state: "present"
+force_update_cache: true
+post_reboot_delay: 10

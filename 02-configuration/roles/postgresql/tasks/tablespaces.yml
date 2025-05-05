@@ -1,0 +1,28 @@
+---
+- name: Make sure postgres tablespaces directories exist
+  ansible.builtin.file:
+    path: "{{ item.location }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+    mode: "0700"
+  with_items: "{{ postgresql_tablespaces }}"
+  when: postgresql_tablespaces is defined
+  become: true
+
+- name: Ensure additional tablespaces locations have correct rights
+  ansible.builtin.file:
+    path: "{{ item.location }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    recurse: "{{ item.recurse | default('yes') }}"
+  with_items: "{{ postgresql_tablespaces }}"
+  when: postgresql_tablespaces is defined
+  become: true
+
+- name: Manage tablespaces
+  ansible.builtin.include_tasks: tablespace.yml
+  loop: "{{ postgresql_tablespaces }}"
+  loop_control:
+    loop_var: tablespace
+  when: postgresql_tablespaces is defined

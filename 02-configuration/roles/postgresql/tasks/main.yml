@@ -1,0 +1,92 @@
+---
+
+- name: Gather variables for each operating system
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_version'].split('.')[0] }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+
+- name: Check that the mandatory variables are defined
+  ansible.builtin.assert:
+    that:
+      - lookup('vars', item) is defined
+      - lookup('vars', item) | string  | length  > 0
+    fail_msg: "Validation error. This play requires '{{ item }}'"
+    quiet: true
+  with_items:
+    - postgresql_root_password
+    - postgresql_data_directory
+    - postgresql_version
+    - postgresql_db_username
+    - postgresql_db_password
+    - postgresql_db_name
+  delegate_to: localhost
+  run_once: true
+
+- name: Creating posgresql.conf dictionary variables using 'postgresql_default_config' and 'postgresql_custom_config' ...
+  ansible.builtin.set_fact:
+    postgresql_config: "{{ postgresql_default_config | combine(postgresql_custom_config | default({}), list_merge='replace') }}"
+
+- name: Creating system (sysctl) dictionary variables using 'postgresql_default_sysctl_config' and 'postgresql_custom_sysctl_config' ...
+  ansible.builtin.set_fact:
+    postgresql_sysctl_config: "{{ postgresql_default_sysctl_config | combine(postgresql_custom_sysctl_config | default({}), list_merge='replace') }}"
+
+- name: Check that PGDATA did not include TABBLESPACES folder(s) ...
+  ansible.builtin.assert:
+    that:
+      - not item.location.startswith(postgresql_data_directory)
+    fail_msg: "PGDATA: {{ postgresql_data_directory }} should not include TABBLESPACE: {{ item.location }} folder"
+    success_msg: "PGDATA: {{ postgresql_data_directory }} did not include TABBLESPACE: {{ item.location }} folder"
+    quiet: true
+  when:
+    - postgresql_tablespaces is defined
+    - postgresql_tablespaces | length > 0
+  with_items: "{{ postgresql_tablespaces }}"
+
+- name: Get all services facts
+  ansible.builtin.service_facts:
+
+- name: Conditional tasks based on Patroni installation
+  when: ansible_facts.services["patroni.service"] is not defined
+  block:
+    - name: Include prerequisites tasks
+      ansible.builtin.include_tasks: prerequisites.yml
+
+    - name: Include installation tasks
+      ansible.builtin.include_tasks: install.yml
+
+    - name: Include configuration tasks
+      ansible.builtin.include_tasks: configure.yml
+
+    - name: Include users tasks
+      ansible.builtin.import_tasks: users.yml
+
+    - name: Include tablespaces tasks
+      ansible.builtin.import_tasks: tablespaces.yml
+
+    - name: Include database operation tasks
+      ansible.builtin.import_tasks: databases.yml
+
+    - name: Include users configuration tasks
+      ansible.builtin.import_tasks: users_props.yml
+
+    - name: Include schemas creation/configuration tasks
+      ansible.builtin.include_tasks: schemas.yml
+      loop: "{{ postgresql_databases }}"
+      loop_control:
+        loop_var: database
+        label: "{{ database.name }}"
+
+    - name: Include post installation tests tasks
+      ansible.builtin.import_tasks: post_tests.yml
+
+    - name: Include post installation queries tasks
+      ansible.builtin.import_tasks: post_queries.yml

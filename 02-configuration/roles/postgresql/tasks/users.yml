@@ -1,0 +1,24 @@
+---
+- name: Ensure PostgreSQL is running
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: started
+
+- name: Make sure users are present.
+  community.postgresql.postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | default(omit) }}"
+    encrypted: "{{ item.encrypted | default(omit) }}"
+    login_host: "{{ item.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ item.login_password | default(postgresql_root_password) }}"
+    login_user: "{{ item.login_user | default(postgresql_user) }}"
+    port: "{{ item.port | default(postgresql_config.port) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_users }}"
+  no_log: "{{ postgresql_users_no_log }}"
+  become: true
+  become_user: "{{ postgresql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+  environment:
+    PGOPTIONS: "{{ (postgresql_auth_method == 'scram-sha-256') | ternary('-c password_encryption=scram-sha-256', '') }}"

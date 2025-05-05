@@ -1,0 +1,54 @@
+#jinja2: trim_blocks:True
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+## Réseau adm
+{% for i in groups['platform'] | sort %}
+{% if hostvars[i]['admin_ip'] is defined and hostvars[i]['admin_ip'] | ansible.utils.ipaddr %}
+{{ '%-16s' | format(hostvars[i]['admin_ip'] | ansible.utils.ipaddr) }}{% if default_hosts_domain != '' %} {{ i }}{{ hosts_suffix.admin }}.{{ default_hosts_domain }}{% endif %} {{ i }}{{ hosts_suffix.admin }}
+{% endif %}
+{% endfor %}
+
+# Réseau pub
+{% for i in groups['platform'] | sort %}
+{% if hostvars[i]['pub_ip'] is defined and hostvars[i]['pub_ip'] | ansible.utils.ipaddr %}
+{{ '%-16s' | format(hostvars[i]['pub_ip'] | ansible.utils.ipaddr) }}{% if default_hosts_domain != '' %} {{ i }}{{ hosts_suffix.pub }}.{{ default_hosts_domain }}{% endif %} {{ i }}{{ hosts_suffix.pub }}
+{% endif %}
+{% endfor %}
+
+# Réseau data
+{% for i in groups['platform'] | sort %}
+{% if hostvars[i]['data_ip'] is defined and hostvars[i]['data_ip'] | ansible.utils.ipaddr %}
+{{ '%-16s' | format(hostvars[i]['data_ip'] | ansible.utils.ipaddr) }}{% if default_hosts_domain != '' %} {{ i }}{{ hosts_suffix.data }}.{{ default_hosts_domain }}{% endif %} {{ i }}{{ hosts_suffix.data }}
+{% endif %}
+{% endfor %}
+
+# nuages
+{% for nuage in nuages %}
+{{ '%-16s' | format(nuage.address | ansible.utils.ipaddr) }} {{ nuage.hostname }} {{ nuage.aliases | default(['']) | join(' ') }}
+{% endfor %}
+
+{% if extra_hosts is defined %}
+# extra hosts common part
+{% for extra_host in extra_hosts %}
+{% if extra_host.address is defined %}
+{% if extra_host.hostname is defined %}
+{{ '%-16s' | format(extra_host.address | ansible.utils.ipaddr) }} {{ extra_host.hostname }} {{ extra_host.aliases | default(['']) | join(' ') }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if extra_hosts_opt is defined %}
+# extra hosts alt part
+{% for extra_host in extra_hosts_opt %}
+{% if extra_host.address is defined %}
+{% if extra_host.hostname is defined %}
+{{ '%-16s' | format(extra_host.address | ansible.utils.ipaddr) }} {{ extra_host.hostname }} {{ extra_host.aliases | default(['']) | join(' ') }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+# ----- Ajout des depots NUBO -----
+100.67.224.19 repo01.dgfip.finances.rie.gouv.fr

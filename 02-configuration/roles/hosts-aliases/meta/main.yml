@@ -1,0 +1,19 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: A2C
+  description: "Gestion automatisée du fichier /etc/hosts"
+  license: "N/A"
+  min_ansible_version: "2.10"
+  company: DGFiP
+  platforms:
+    - name: EL
+      versions:
+        - "7"
+        - "8"
+        - "9"
+  galaxy_tags:
+    - system
+    - network
+    - hosts

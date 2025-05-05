@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+# Systemd unit file override to specify user/group as well as separate config and data directories.
+[Service]
+Environment=PGDATA={{ postgresql_data_directory }}

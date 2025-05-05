@@ -1,0 +1,96 @@
+---
+- name: Ensure swap exists
+  ansible.builtin.command: swapon --show=SIZE --bytes --noheadings
+  register: swap_exists
+  changed_when: false
+  when: postgresql_vm_swap_file_create | bool
+
+- name: Swap exists
+  ansible.builtin.debug:
+    msg: "swap_size_mb: {{ (swap_exists.stdout_lines | map('trim') | map('int') | sum / 1024 / 1024) | round | int }}"
+  when: swap_exists.stdout is defined and swap_exists.stdout | length > 1
+
+- name: If the swap does not exist
+  when: (swap_exists.stdout is defined and swap_exists.stdout | length < 1)
+  block:
+    - name: Create swap file
+      ansible.builtin.command: >
+        dd if=/dev/zero of={{ postgresql_vm_swap_file_path }} bs=1M count={{ postgresql_vm_swap_file_size_mb }}
+        creates='{{ postgresql_vm_swap_file_path }}'
+      register: out
+      changed_when: out.rc != 0
+
+    - name: Set permissions on swap file
+      ansible.builtin.file:
+        path: "{{ postgresql_vm_swap_file_path }}"
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Make swap file if necessary
+      ansible.builtin.command: mkswap {{ postgresql_vm_swap_file_path }}
+      register: mkswap_result
+      changed_when: mkswap_result.rc != 0
+
+    - name: Run swapon on the swap file
+      ansible.builtin.command: swapon {{ postgresql_vm_swap_file_path }}
+      register: swapon_result
+      changed_when: swapon_result.rc != 0
+
+    - name: Manage swap file entry in fstab
+      ansible.posix.mount:
+        name: none
+        src: "{{ postgresql_vm_swap_file_path }}"
+        fstype: swap
+        opts: sw
+        state: present
+
+- name: Setting kernel parameters
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+    reload: true
+  with_dict: "{{ postgresql_sysctl_config }}"
+  notify: "Restart postgresql service"
+
+- name: Configure system settings, file descriptors and number of threads
+  community.general.pam_limits:
+    domain: "{{ postgresql_user }}"
+    limit_type: "{{ item.limit_type }}"
+    limit_item: "{{ item.limit_item }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { limit_type: "-", limit_item: "nofile", value: 65536 }
+    - { limit_type: "-", limit_item: "nproc", value: 65536 }
+    - { limit_type: "soft", limit_item: "memlock", value: unlimited }
+    - { limit_type: "hard", limit_item: "memlock", value: unlimited }
+    - { limit_type: "-", limit_item: "fsize", value: unlimited }
+    - { limit_type: "-", limit_item: "cpu", value: unlimited }
+  notify: "Restart postgresql service"
+
+- name: Reload settings from all system configuration files
+  ansible.builtin.command: sysctl --system
+  changed_when: false
+
+- name: Create systemd service "disable-transparent-huge-pages.service"
+  ansible.builtin.blockinfile:
+    path: /etc/systemd/system/disable-transparent-huge-pages.service
+    create: true
+    mode: "0644"
+    block: |
+      [Unit]
+      Description=Disable Transparent Huge Pages
+      DefaultDependencies=no
+      After=sysinit.target local-fs.target
+      Before=basic.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/bash -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+      ExecStart=/bin/bash -c 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+
+      [Install]
+      WantedBy=basic.target
+  notify: "Restart disable-thp"

@@ -1,0 +1,5 @@
+---
+postgresql_wal_directory: "{{ postgresql_data_directory | dirname }}/pg_wal"
+
+postgresql_user: postgres
+postgresql_group: postgres

@@ -1,0 +1,9 @@
+---
+
+- name: Reboot required
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ reboot_timeout }}"
+    post_reboot_delay: "{{ post_reboot_delay }}"
+  when:
+    - do_reboot | bool
+    - se_result.reboot_required | bool

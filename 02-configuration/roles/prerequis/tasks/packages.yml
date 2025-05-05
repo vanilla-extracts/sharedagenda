@@ -1,0 +1,6 @@
+---
+
+- name: Ensure packages are installed
+  ansible.builtin.package:
+    name: "{{ prerequis_packages }}"
+    state: "{{ prerequis_packages_state | default('present') }}"

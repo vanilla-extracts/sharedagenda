@@ -1,0 +1,134 @@
+---
+postgresql_conf_directory: "{{ postgresql_data_directory }}"
+
+postgresql_auth_method: "scram-sha-256"
+postgresql_certs_directory: "/etc/ssl/postgresql"
+postgresql_service_state: started
+postgresql_service_enabled: true
+postgresql_selinux_state: "enforcing" # "enforcing"
+postgresql_use_ssl: "{{ use_ssl | default(false) }}"
+postgresql_login_host: localhost
+
+vm_total_memory_gb: "{{ (ansible_memtotal_mb / 1000) | round | int }}"
+# Configuration 𝐶𝑜𝑚𝑚𝑖𝑡𝐿𝑖𝑚𝑖𝑡 = (𝑅𝐴𝑀 − 𝐻𝑢𝑔𝑒𝑃 𝑎𝑔𝑒) ∗ 𝑜𝑣𝑒𝑟𝑐𝑜𝑚𝑚𝑖𝑡_𝑟𝑎𝑡𝑖𝑜/100 + 𝑠𝑤𝑎𝑝
+
+# dictionnaire pour configurer le fichier de conf postgresql
+postgresql_default_config:
+  wal_level: "replica"
+  hot_standby: "on"
+  max_connections: "100"
+  max_wal_senders: "10"
+  max_replication_slots: "5"
+  max_prepared_transactions: "0"
+  max_locks_per_transaction: "64"
+  wal_log_hints: "off"
+  track_commit_timestamp: "off"
+  log_rotation_size: "100MB"
+  port: "5432"
+  listen_addresses: "*"
+  data_directory: "{{ postgresql_data_directory }}"
+  hba_file: "{{ postgresql_conf_directory }}/pg_hba.conf"
+  ident_file: "{{ postgresql_conf_directory }}/pg_ident.conf"
+  external_pid_file: "{% if ansible_os_family == \"Debian\" %}/run/postgresql/{{ postgresql_version }}-main.pid{% else %}/var/run/postgresql/pgsql.{{ postgresql_version }}.pid{% endif %}"
+  unix_socket_directories: "/var/run/postgresql"
+  log_directory: "/var/log/postgresql"
+  ssl: "{{ (postgresql_use_ssl == true) | ternary('on', 'off') }}"
+  ssl_ca_file: "{{ postgresql_certs_directory }}/root-ca.pem"
+  ssl_cert_file: "{{ postgresql_certs_directory }}/server.crt"
+  ssl_key_file: "{{ postgresql_certs_directory }}/server.key"
+# Optimisations Dalibo
+  autovacuum_max_workers: "3"
+  huge_pages: "try"
+  shared_buffers: "{{ ((ansible_memtotal_mb / 4) | round | int) }}MB"
+  temp_file_limit: "10GB"
+  maintenance_work_mem: "{{ ((ansible_memtotal_mb * 0.25) | round | int) }}MB"
+  min_wal_size: "512MB"
+  max_wal_size: "2GB"
+  max_worker_processes: "{{ ansible_processor_nproc }}"
+  max_parallel_workers: "{{ ansible_processor_nproc }}"
+  effective_cache_size: "{{ (((ansible_memtotal_mb / 1000) * (2 / 3)) | round | int) }}GB"
+  random_page_cost: "4"
+  checkpoint_flush_after: "256kB"
+  # reopen issue 46 (ajout log_line_prefix)
+  log_line_prefix: '%t [%p]: user=%u,db=%d,app=%a,client=%h '
+  # Issue #52 : more parameters, especially when Debian & enabling logging
+  log_destination: "stderr"
+  logging_collector: "true"
+  log_filename: "postgresql-%a.log"
+  log_rotation_age: "1d"
+  log_truncate_on_rotation: "true"
+
+postgresql_hba_entries:
+  - { type: local, database: all, user: all, auth_method: peer }
+  - { type: "{{ (postgresql_use_ssl == true) | ternary('hostssl', 'host') }}",
+      database: replication, user: all, address: all, auth_method: "{{ postgresql_auth_method }}"}
+  - { type: "{{ (postgresql_use_ssl == true) | ternary('hostssl', 'host') }}",
+      database: all, user: all, address: "0.0.0.0/0", auth_method: "{{ postgresql_auth_method }}"}
+  - { type: "{{ (postgresql_use_ssl == true) | ternary('hostssl', 'host') }}",
+      database: all, user: all, address: "::/0", auth_method: "{{ postgresql_auth_method }}"}
+
+postgresql_databases:
+  - name: "{{ postgresql_db_name }}"
+    #   lc_collate: # defaults to 'fr_FR.UTF-8'
+    #   lc_ctype: # defaults to 'fr_FR.UTF-8'
+    encoding: "UTF-8"
+    #   template: # defaults to 'template0'
+    # login_host: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}"
+    login_password: "{{ postgresql_root_password }}"
+    #   login_user: # defaults to '{{ postgresql_user }}'
+    #   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
+    #   port: # defaults to not set
+    #   owner: # defaults to postgresql_user
+    #   state: # defaults to 'present'
+    # schemas:
+    #  - "{{ postgresql_db_name }}_app"
+    #  - "{{ postgresql_db_name }}_tech"
+
+# Users to ensure exist.
+postgresql_users:
+  - name: "{{ postgresql_db_username }}"
+    password: "{{ postgresql_db_password }}"
+    #   encrypted: # defaults to not set
+    priv: ALL
+    #   role_attr_flags: # defaults to not set
+    db: "{{ postgresql_db_name }}"
+    # login_host: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}"
+    login_password: "{{ postgresql_root_password }}"
+#   login_user: # defaults to '{{ postgresql_user }}'
+#   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
+#   port: # defaults to not set
+#   state: # defaults to 'present'
+# Whether to output user data when managing users.
+postgresql_users_no_log: true
+# postgresql_tablespaces:
+#  - name: "{{ postgresql_db_name }}_tbs"
+#    owner: # defaults to postgresql_user
+#    location: "{{ postgresql_tablespace_directory }}/{{ postgresql_db_name }}_tbs"
+#    state: present # present is default
+#    login_host: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}"
+
+postgresql_enablerepo: ""
+# for centos 7 override to postgresql_python_library = python-psycopg2 ?
+postgresql_python_library: python3-psycopg2
+# to disable gpg key checking when installing yum packages
+# see https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html
+postgresql_disable_gpg_check: false
+
+# Configure swap space (if not already exists)
+postgresql_vm_swap_file_create: false
+postgresql_vm_swap_file_path: /swapfile
+postgresql_vm_swap_file_size_mb: "2048"
+
+postgresql_default_sysctl_config:
+  vm.overcommit_memory: "2"
+  vm.swappiness: "10"
+  vm.nr_overcommit_hugepages: "{{ (((ansible_memtotal_mb / 4) * 1.1) | round | int) }}"
+  vm.dirty_background_bytes: "67108864"  # (64 MB)
+  vm.dirty_bytes: "536870912"  # (512 MB)
+  vm.overcommit_ratio: "85"
+  vm.zone_reclaim_mode: "0"
+  kernel.sched_autogroup_enabled: "0"
+ # kernel.sched_migration_cost_ns: "5000000"
+
+postgresql_service_name: "{{ postgresql_default_service_name }}"
+postgresql_debian_subversion: main

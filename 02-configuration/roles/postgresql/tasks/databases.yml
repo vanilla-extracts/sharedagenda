@@ -1,0 +1,26 @@
+---
+- name: Ensure PostgreSQL is running
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: started
+
+- name: Make sure databases are present.
+  community.postgresql.postgresql_db:
+    name: "{{ item.name }}"
+    lc_collate: "{{ item.lc_collate | default('fr_FR.UTF-8') }}"
+    lc_ctype: "{{ item.lc_ctype | default('fr_FR.UTF-8') }}"
+    encoding: "{{ item.encoding | default('UTF-8') }}"
+    template: "{{ item.template | default('template0') }}"
+    login_host: "{{ item.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ item.login_password | default(postgresql_root_password) }}"
+    login_user: "{{ item.login_user | default(postgresql_user) }}"
+    port: "{{ item.port | default(postgresql_config.port) }}"
+    owner: "{{ item.owner | default(postgresql_user) }}"
+    state: "{{ item.state | default('present') }}"
+    tablespace: "{{ item.tablespace | default('') }}"
+  with_items: "{{ postgresql_databases }}"
+  become: true
+  no_log: "{{ postgresql_users_no_log }}"
+  become_user: "{{ postgresql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
