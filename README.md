@@ -59,7 +59,7 @@ If you don't have a rust toolchain installed:
 make cli
 ```
 
-Alternatively,
+Alternatively if you have one,
 ```sh
 cargo build --release --bin cli
 #OR
@@ -76,15 +76,21 @@ SharedAgenda is hosted on NUBO, it uses _terraform_ for the creation of the VMs
 and _ansible_ for the configuration. 
 
 ### Deployment on Openstack
-You need to place `clouds.yaml` and `secure.yaml` in `01-platform` and sim link
+
+> **WARNING:**
+
+You **must** modify the `env.sh` file for your own needs, by default it uses the DGFiP's Git Forge and proxy.
+If you are deploying this on another openstack, you MUST update the script.
+
+You need to put `clouds.yaml` and `secure.yaml` in `01-platform` and sim link
 them in `02-configuration`
 
 ```sh 
-. env.sh #do the steps
-python3 -m pip install -r r.txt #install the components
+. env.sh #follow the steps
+python3 -m pip install -r r.txt #install the required ansible components
 
-cd 01-platform
-tf apply #deploy the infrastructure
+cd 01-platform 
+tf apply #deploy the infrastructure on openstack
 
 cd ../02-configuration
 ansible-playbook -i inventory sharedagenda.playbook.yaml #configure servers
