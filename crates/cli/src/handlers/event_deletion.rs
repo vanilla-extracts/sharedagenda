@@ -23,6 +23,7 @@ impl Answer for EventDeletionAnswer {
     fn answer(&self) -> String {
         self.body.clone()
     }
+    fn process(&mut self) {}
 }
 
 pub async fn remove(line: &str) {

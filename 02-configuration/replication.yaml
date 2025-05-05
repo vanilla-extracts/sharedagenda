@@ -43,7 +43,7 @@
       community.postgresql.postgresql_privs:
         login_db: agenda
         state: present
-        privs: SELECT
+        privs: SELECT,USAGE
         type: sequence
         schema: agenda
         objs: ALL_IN_SCHEMA

@@ -49,9 +49,8 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
             }
         };
 
-        let date_start;
-        match DateTime::parse_from_str(&body.date_start, "%Y-%m-%d %H:%M %z") {
-            Ok(date) => date_start = date,
+        let date_start = match DateTime::parse_from_str(&body.date_start, "%Y-%m-%d %H:%M %z") {
+            Ok(date) => date,
             Err(e) => {
                 println!("{e}");
                 return Json(EventCreationAnswer {
@@ -61,11 +60,10 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
                     .to_string(),
         });
             }
-        }
+        };
 
-        let date_end;
-        match DateTime::parse_from_str(&body.date_end, "%Y-%m-%d %H:%M %z") {
-            Ok(date) => date_end = date,
+        let date_end = match DateTime::parse_from_str(&body.date_end, "%Y-%m-%d %H:%M %z") {
+            Ok(date) => date,
             Err(e) => {
                 println!("{e}");
                 return Json(EventCreationAnswer {
@@ -75,7 +73,7 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
                     .to_string(),
         });
             }
-        }
+        };
 
         if date_end < date_start {
             return Json(EventCreationAnswer {

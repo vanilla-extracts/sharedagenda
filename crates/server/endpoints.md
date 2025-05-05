@@ -29,7 +29,7 @@ WITH body
 The server checks and if successful return the following object
 ```json
 {
-  "status": "200 OK"
+  "code": "200 OK"
   "token": "{token}"
 }
 ```
@@ -45,6 +45,14 @@ WITH body
 }
 ```
 Deletes the token in the database, effectively loging out the user
+
+It returns
+```json
+{
+  "code": "{code}",
+  "body": "{body}"
+}
+```
 
 ### User whoami
 POST at /user/whoami
@@ -82,6 +90,14 @@ WITH body
 ```
 Checks the token, and modifies the password, email, name if filled.
 
+It returns
+```json
+{
+  "code": "{code}",
+  "body": "{body}"
+}
+```
+
 ### User Deletion
 POST at /user/delete
 
@@ -89,6 +105,14 @@ WITH body
 ```json
 {
   "token": "{token}",
+}
+```
+
+It returns
+```json
+{
+  "code": "{code}",
+  "body": "{body}"
 }
 ```
 
@@ -140,7 +164,13 @@ WITH body
 ```
 Creates an event with the specified invitees. 
 
-Send a HTTP Code 
+It returns
+```json
+{
+  "code": "{code}",
+  "answer": "{answer}"
+}
+```
 
 ### Modify an event
 POST at /event/modify
@@ -157,6 +187,14 @@ WITH body
 ```
 Modifies an event with the specified fields.
 
+It returns
+```json
+{
+  "code": "{code}",
+  "body": "{body}"
+}
+```
+
 ### Delete an event
 POST at /event/delete
 
@@ -168,3 +206,11 @@ WITH body
 }
 ```
 Deletes the specified event
+
+It returns
+```json
+{
+  "code": "{code}",
+  "body": "{body}"
+}
+```
