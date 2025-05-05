@@ -1,0 +1,14 @@
+---
+- name: "Post-Install : Ensure keepalived_exporter is Up & Running ..."
+  ansible.builtin.uri:
+    url: "http://{{ postgres_exporter_listen_address }}:{{ postgres_exporter_port }}/metrics"
+    method: GET
+  register: result
+  until: result.status == 200
+  retries: 12 # 5 * 12 seconds --> 1 minute
+  delay: 5 # Every 5 seconds
+  when: not ansible_check_mode
+
+- name: "Keepalived_exporter metrics / information"
+  ansible.builtin.debug:
+    var: result

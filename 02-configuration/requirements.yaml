@@ -20,3 +20,6 @@ roles:
   - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/node-exporter.git
     version: v1.0.13
     name: node-exporter
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/postgres-exporter
+    version: v1.2.0
+    name: postgres-exporter

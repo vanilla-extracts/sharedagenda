@@ -1,0 +1,77 @@
+---
+# tasks file for postgres-exporter
+- name: Assertions
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: Installation
+  ansible.builtin.import_tasks: install.yml
+  become: true
+  when:
+    ( not __postgres_exporter_is_installed.stat.exists ) or
+    ( (__postgres_exporter_current_version_output.stderr_lines | length > 0)
+      and (__postgres_exporter_current_version_output.stderr_lines[0].split(" ")[2] != postgres_exporter_version) ) or
+    ( (__postgres_exporter_current_version_output.stdout_lines | length > 0)
+      and (__postgres_exporter_current_version_output.stdout_lines[0].split(" ")[2] != postgres_exporter_version) )
+
+
+- name: "Process custum queries"
+  when: 
+    - postgres_pg_exporter_extend_query_path is defined
+    - postgres_pg_exporter_extend_query_path != ""
+  block:
+    - name: Make sure destination dir exists
+      ansible.builtin.file:
+        path: "{{ postgres_pg_exporter_extend_query_path | dirname }}"
+        state: directory
+    
+    - name: Apply queries
+      ansible.builtin.template:
+        src: "queries.j2"
+        dest: "{{ postgres_pg_exporter_extend_query_path }}"
+        owner: "{{ postgres_exporter_system_user }}"
+        group: "{{ postgres_exporter_system_group }}"
+        mode: "0640"
+  # end block
+
+- name: Systemd service
+  become: true
+  ansible.builtin.template:
+    dest: /etc/systemd/system/postgres_exporter.service
+    src: postgres-exporter-service.j2
+    mode: "0644"
+    owner: root
+    group: root
+  notify:
+    - Restart postgres_exporter
+
+- name: Ensure override systemD exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/systemd/system/postgres_exporter.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Systemd service override configuration file
+  become: true
+  ansible.builtin.template:
+    dest: /etc/systemd/system/postgres_exporter.service.d/override.conf
+    src: override.conf.j2
+    mode: "0644"
+    owner: root
+    group: root
+  notify:
+    - Restart postgres_exporter
+
+- name: Enable and start server systemd
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    enabled: true
+    name: postgres_exporter
+    state: started
+
+- name: Post-installation check
+  ansible.builtin.import_tasks: post-install.yml
+  become: true
