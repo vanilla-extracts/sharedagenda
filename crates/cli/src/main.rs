@@ -179,50 +179,6 @@ async fn main() {
             "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
             "token" => println!("Current Token is: {}", TOKEN.lock().unwrap()),
             "exit" => break,
-            "help" => {
-                println!("-----SharedAgenda CLI REPL Help-----");
-                println!(
-                    "> help                                                  > shows the help"
-                );
-                println!(
-                    "> config                                                > prints the configuration file path"
-                );
-                println!(
-                    "> version                                               > prints the version"
-                );
-                println!(
-                    "> api [url]                                             > sets the URL for which API to use"
-                );
-                println!(
-                    "> register <name> <email> <password>                    > registers a new account for sharedagenda"
-                );
-                println!(
-                    "> login <email> <password>                              > login with your account"
-                );
-                println!(
-                    "> logout                                                > logout of your account"
-                );
-                println!(
-                    "> delete                                                > deletes your account"
-                );
-                println!(
-                    "> remove <id>                                           > removes an event"
-                );
-                println!(
-                    "> new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
-                );
-                println!(
-                    "> list <date>                                           > prints out the list of events"
-                );
-                println!(
-                    "> whoami                                                > prints user informations"
-                );
-
-                println!(
-                    "> modify <name> <email> <password>                      > modifies user information"
-                );
-                println!("-----SharedAgenda CLI REPL Help-----");
-            }
             str if str.starts_with("api") => match str.strip_prefix("api") {
                 Some(str) if str.trim() != "" => {
                     api(str.trim());
@@ -266,7 +222,50 @@ async fn main() {
                 Some(s) if s.trim() != "" => remove(s.trim()).await,
                 _ => println!("Usage: remove <id>"),
             },
-            _ => println!("SOON"),
+            _ => {
+                println!("-----SharedAgenda CLI REPL Help-----");
+                println!(
+                    "> help                                                  > shows the help"
+                );
+                println!(
+                    "> config                                                > prints the configuration file path"
+                );
+                println!(
+                    "> version                                               > prints the version"
+                );
+                println!(
+                    "> api [url]                                             > sets the URL for which API to use"
+                );
+                println!(
+                    "> register <name> <email> <password>                    > registers a new account for sharedagenda"
+                );
+                println!(
+                    "> login <email> <password>                              > login with your account"
+                );
+                println!(
+                    "> logout                                                > logout of your account"
+                );
+                println!(
+                    "> delete                                                > deletes your account"
+                );
+                println!(
+                    "> remove <id>                                           > removes an event"
+                );
+                println!(
+                    "> new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "> list <date>                                           > prints out the list of events"
+                );
+                println!(
+                    "> whoami                                                > prints user informations"
+                );
+
+                println!(
+                    "> modify <name> <email> <password>                      > modifies user information"
+                );
+                println!("-----SharedAgenda CLI REPL Help-----");
+            }
         }
         interface.add_history_unique(line);
     }
