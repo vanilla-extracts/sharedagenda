@@ -1,0 +1,89 @@
+---
+- name: Ensure grafana configuration directories exist
+  ansible.builtin.file:
+    path: "{{ item.src }}"
+    state: directory
+    owner: "{{ grafana_user }}"
+    group: "{{ grafana_group }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { mode: "0755", src: "/etc/grafana" }
+    - { mode: "0750", src: "/etc/grafana/datasources" }
+    - { mode: "0755", src: "/etc/grafana/provisioning" }
+    - { mode: "0755", src: "/etc/grafana/provisioning/dashboards" }
+    - { mode: "0755", src: "/etc/grafana/provisioning/datasources" }
+    - { mode: "0755", src: "/etc/grafana/provisioning/notifiers" }
+    - { mode: "0755", src: "/etc/grafana/provisioning/plugins" }
+
+- name: Create grafana main configuration file
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: "{{ grafana_user }}"
+    group: "{{ grafana_group }}"
+    mode: "0640"
+  no_log: "{{ ansible_no_log }}"
+  notify: Restart grafana
+
+- name: Create grafana LDAP configuration file
+  ansible.builtin.template:
+    src: ldap.toml.j2
+    dest: "{{ grafana_auth.ldap.config_file | default('/etc/grafana/ldap.toml') }}"
+    owner: "{{ grafana_user }}"
+    group: "{{ grafana_group }}"
+    mode: "0640"
+  when:
+    - "'ldap' in grafana_auth"
+    - "'enabled' not in grafana_auth.ldap or grafana_auth.ldap.enabled"
+  no_log: "{{ ansible_no_log }}"
+  notify: Restart grafana
+
+- name: Create grafana directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ grafana_user }}"
+    group: "{{ grafana_group }}"
+  with_items:
+    - "{{ grafana_logs_dir }}"
+    - "{{ grafana_data_dir }}"
+    - "{{ grafana_data_dir }}/dashboards"
+    - "{{ grafana_data_dir }}/plugins"
+
+- name: "Configure grafana socket"
+  when:
+    - grafana_server.protocol is defined and grafana_server.protocol == 'socket'
+    - grafana_server.socket | dirname != '/var/run'
+  block:
+    - name: Create grafana socket directory
+      ansible.builtin.file:
+        path: "{{ grafana_server.socket | dirname }}"
+        state: directory
+        mode: "0775"
+        owner: "{{ grafana_user }}"
+        group: "{{ grafana_group }}"
+
+    - name: Ensure grafana socket directory created on startup
+      ansible.builtin.template:
+        src: tmpfiles.j2
+        dest: /etc/tmpfiles.d/grafana.conf
+        owner: "{{ grafana_user }}"
+        group: "{{ grafana_group }}"
+        mode: "0644"
+
+- name: Enable grafana to ports lower than port 1024
+  community.general.capabilities:
+    path: /usr/sbin/grafana-server
+    capability: CAP_NET_BIND_SERVICE+ep
+    state: present
+  when:
+    - grafana_port | int <= 1024
+    - grafana_cap_net_bind_service
+
+- name: Enable and start Grafana systemd unit
+  ansible.builtin.systemd:
+    name: grafana-server
+    enabled: true
+    state: started
+    daemon_reload: true

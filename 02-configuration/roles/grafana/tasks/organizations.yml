@@ -1,0 +1,22 @@
+---
+- name: Create a Grafana organization ...
+  ansible.builtin.uri:
+    url: "{{ grafana_url }}/api/orgs"
+    user: "{{ grafana_security.admin_user }}"
+    password: "{{ grafana_security.admin_password }}"
+    method: POST
+    force_basic_auth: true
+    return_content: true
+    body:
+      name: "{{ item }}"
+    body_format: json
+    status_code: 200
+    headers:
+      Content-Type: application/json
+  with_items: "{{ grafana_organizations }}"
+  no_log: "{{ ansible_no_log }}"
+  register: response
+
+- name: Print the organization creation response
+  ansible.builtin.debug:
+    var: response

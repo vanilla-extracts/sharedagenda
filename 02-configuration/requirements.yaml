@@ -11,3 +11,6 @@ roles:
   - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/utilitaires/hosts-aliases
     version: v1.1.2
     name: hosts-aliases
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/grafana
+    version: v1.3.1
+    name: grafana

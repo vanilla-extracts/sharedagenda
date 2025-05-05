@@ -1,0 +1,108 @@
+---
+- name: Create the Grafana group
+  ansible.builtin.group:
+    name: "{{ grafana_group }}"
+    system: true
+    state: present
+
+- name: Create the Grafana user
+  ansible.builtin.user:
+    name: "{{ grafana_user }}"
+    group: "{{ grafana_group }}"
+    system: true
+    createhome: false
+    state: present
+
+- name: Install packagee ...
+  block:
+    - name: Update apt cache APT
+      ansible.builtin.apt:
+        update_cache: true
+      register: _pre_update_apt_cache
+      until: _pre_update_apt_cache is succeeded
+      when: ansible_os_family == "Debian"
+
+    - name: Update apt cache YUM
+      ansible.builtin.yum:
+        update_cache: true
+      register: _pre_update_yum_cache
+      until: _pre_update_yum_cache is succeeded
+      when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+
+    - name: Install dependencies
+      ansible.builtin.package:
+        name: "{{ grafana_dependencies }}"
+        state: present
+      register: _install_dep_packages
+      until: _install_dep_packages is succeeded
+      retries: 2
+      delay: 1
+
+- name: Remove conflicting grafana packages
+  ansible.builtin.package:
+    name: grafana-data
+    state: absent
+  register: _old_grafana_pkgs
+
+- name: Install Grafana image rendering dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "fontconfig"
+    - "freetype*"
+    - "urw-fonts"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+
+- name: Deb URL
+  ansible.builtin.set_fact:
+    _grafana_package_name: "grafana_{{ grafana_version }}_amd64.deb"
+  when: ansible_os_family == "Debian"
+
+- name: RPM URL
+  ansible.builtin.set_fact:
+    _grafana_package_name: "grafana-{{ grafana_version }}-1.x86_64.rpm"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+
+- name: Download Grafana binary from Nexus
+  ansible.builtin.get_url:
+    url: "{{ dgfip_download_url }}/{{ _grafana_package_name }}"
+    dest: "/tmp/"
+    mode: "0755"
+    validate_certs: false
+  register: _download_binary
+  until: _download_binary is succeeded
+  retries: 2
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+  become: false
+
+- name: Propagate grafana binary
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/{{ _grafana_package_name }}"
+    dest: "/tmp"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Remove temp grafana binary
+  ansible.builtin.file:
+    path: "/tmp/{{ _grafana_package_name }}"
+    state: absent
+  delegate_to: localhost
+  become: false
+
+- name: "Install Grafana YUM"
+  ansible.builtin.yum:
+    name: "/tmp/{{ _grafana_package_name }}"
+    disable_gpg_check: true
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  notify: Restart grafana
+
+- name: "Install Grafana DEB"
+  ansible.builtin.apt:
+    deb: "/tmp/{{ _grafana_package_name }}"
+  when: ansible_os_family == "Debian"
+  notify: Restart grafana
