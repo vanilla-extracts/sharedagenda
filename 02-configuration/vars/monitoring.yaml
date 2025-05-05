@@ -17,6 +17,12 @@ prometheus_scrape_configs:
     static_configs:
       - targets:
           - "{{ vm_grafana_admin_ip }}:9090"
+  - job_name: "postgres exporter"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "{{ vm_bdds_01_admin_ip }}:9187"
+        - '{{ vm_bdds_02_admin_ip }}:9187'
   - job_name: "node exporter"
     metrics_path: "/metrics"
     static_configs:

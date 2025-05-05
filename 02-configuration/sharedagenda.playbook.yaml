@@ -14,6 +14,11 @@
   ansible.builtin.import_playbook: postgresql.yaml
 - name: Replication
   ansible.builtin.import_playbook: replication.yaml
+- name: Postgres Exporter
+  hosts: platform_shag_bdds
+  become: true
+  roles:
+    - postgres-exporter
 - name: Postgresql Keepalived
   ansible.builtin.import_playbook: keepalived.yaml
 - name: Install and configure the API
