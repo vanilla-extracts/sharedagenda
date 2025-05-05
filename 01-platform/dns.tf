@@ -5,7 +5,7 @@ data "openstack_dns_zone_v2" "zone_dns" {
 
 # Affiche les informations sur la zone
 output "DNS_zone" {
-    value = "${data.openstack_dns_zone_v2.zone_dns.name}"
+  value = data.openstack_dns_zone_v2.zone_dns.name
 }
 
 # Ajoute un recordset pour la FIP d'administration
@@ -15,12 +15,12 @@ resource "openstack_dns_recordset_v2" "dns_admin" {
   description = "Accès administration"
   ttl         = 3600
   type        = "A"
-  records     = [ data.openstack_networking_floatingip_v2.fip_admin.address ]
+  records     = [data.openstack_networking_floatingip_v2.fip_admin.address]
 }
 
 # Affiche le nom d'administration
 output "DNS_administration" {
-    value = "${openstack_dns_recordset_v2.dns_admin.name}"
+  value = openstack_dns_recordset_v2.dns_admin.name
 }
 
 # Ajoute un recordset pour la FIP de publication
@@ -30,12 +30,25 @@ resource "openstack_dns_recordset_v2" "dns_publi" {
   description = "Accès publication"
   ttl         = 3600
   type        = "A"
-  records     = [ data.openstack_networking_floatingip_v2.fip_publi.address ]
+  records     = [data.openstack_networking_floatingip_v2.fip_publi.address]
+}
+
+resource "openstack_dns_recordset_v2" "grafana" {
+  zone_id     = data.openstack_dns_zone_v2.zone_dns.id
+  name        = "grafana-${var.pf_prefixe}.${data.openstack_dns_zone_v2.zone_dns.name}"
+  description = "Accès graphana"
+  ttl         = 3600
+  type        = "A"
+  records     = [data.openstack_networking_floatingip_v2.fip_publi.address]
 }
 
 # Affiche le nom de publication
 output "DNS_publication" {
-    value = "${openstack_dns_recordset_v2.dns_publi.name}"
+  value = openstack_dns_recordset_v2.dns_publi.name
+}
+
+output "DNS_grafana" {
+  value = openstack_dns_recordset_v2.grafana.name
 }
 
 # Ajoute un recordset pour Bastion
@@ -45,5 +58,5 @@ resource "openstack_dns_recordset_v2" "dns_bastion" {
   description = "IP internes - Bastion"
   ttl         = 3600
   type        = "A"
-  records     = [ module.vm-bastion.instance_admin_ip[0] ]
+  records     = [module.vm-bastion.instance_admin_ip[0]]
 }

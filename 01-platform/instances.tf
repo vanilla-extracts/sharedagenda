@@ -99,7 +99,7 @@ module "vm-caddy" {
   is_data_network  = false
 
   admin_secgroup_id = [module.sg-admin.secgroup_id]
-  pub_secgroup_id   = [module.sg-api.secgroup_id,module.sg-caddy.secgroup_id]
+  pub_secgroup_id   = [module.sg-api.secgroup_id, module.sg-caddy.secgroup_id]
   data_secgroup_id  = []
 
   # Ajouté pour connecter la FIP Publication au HAProxy
@@ -114,19 +114,36 @@ module "vm-caddy" {
 }
 
 module "vm-bdds" {
-  source              = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/base-de-donn-es/terraform-openstack-bdd-ha.git"
-  pf_prefixe          = var.pf_prefixe
-  bdd_server_count    = local.number_of_database_servers
-  bdd_flavor_name     = var.bdd_flavor_name
-  key_pair            = openstack_compute_keypair_v2.ssh_keypair.name
-  admin_network_id    = module.networks.admin_network_id
-  data_network_id     = module.networks.data_network_id
-  etcd_server_count   = 0
-  bdd_image_name      = var.image_name
+  source            = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/base-de-donn-es/terraform-openstack-bdd-ha.git"
+  pf_prefixe        = var.pf_prefixe
+  bdd_server_count  = local.number_of_database_servers
+  bdd_flavor_name   = var.bdd_flavor_name
+  key_pair          = openstack_compute_keypair_v2.ssh_keypair.name
+  admin_network_id  = module.networks.admin_network_id
+  data_network_id   = module.networks.data_network_id
+  etcd_server_count = 0
+  bdd_image_name    = var.image_name
   additional_bdd_metadata = {
-      pf_prefixe = var.pf_prefixe
-      group = "bdds"
-      phase = var.phase
-    }
+    pf_prefixe = var.pf_prefixe
+    group      = "bdds"
+    phase      = var.phase
+  }
 }
 
+module "vm-grafana" {
+  source                      = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/observabilit/terraform-openstack-monitoring.git"
+  pf_prefixe                  = var.pf_prefixe
+  image_name                  = var.image_name
+  phase                       = var.phase
+  key_pair                    = openstack_compute_keypair_v2.ssh_keypair.name
+  admin_network_id            = module.networks.admin_network_id
+  pub_network_id              = module.networks.pub_network_id
+  data_network_id             = module.networks.data_network_id
+  additional_pub_secgroup_ids = [module.sg-grafana.secgroup_id]
+  assign_admin_floating_ip    = false
+  additional_monitoring_metadata = {
+    pf_prefixe = var.pf_prefixe
+    group      = "grafana"
+    phase      = var.phase
+  }
+}

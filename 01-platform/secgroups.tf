@@ -10,21 +10,21 @@ module "sg-admin" {
   sg_description = "admin"
   sg_rules = [
     {
-      direction        = "ingress"
-      ethertype        = "IPv4"
-      protocol         = "tcp"
-      port_range_min   = 22
-      port_range_max   = 22
+      direction      = "ingress"
+      ethertype      = "IPv4"
+      protocol       = "tcp"
+      port_range_min = 22
+      port_range_max = 22
 
-# To allow from all admin subnet
-#      remote_ip_prefix = local.admin_subnet_cidr
+      # To allow from all admin subnet
+      #      remote_ip_prefix = local.admin_subnet_cidr
 
-# To allow only from Bastion
-# Attention :
-#  - instance_admin_ip is a list with only one ip in our case.
-#  - remote_ip_prefix is appended with /32 by OpenStack. This forces replacement each time.
-#           ~ remote_ip_prefix  = "172.18.0.91/32" -> "172.18.0.91" # forces replacement
-#remote_ip_prefix = "${module.vm-bastion.instance_admin_ip[0]}/32"
+      # To allow only from Bastion
+      # Attention :
+      #  - instance_admin_ip is a list with only one ip in our case.
+      #  - remote_ip_prefix is appended with /32 by OpenStack. This forces replacement each time.
+      #           ~ remote_ip_prefix  = "172.18.0.91/32" -> "172.18.0.91" # forces replacement
+      #remote_ip_prefix = "${module.vm-bastion.instance_admin_ip[0]}/32"
       remote_ip_prefix = "0.0.0.0/0"
       remote_group     = ""
     },
@@ -57,13 +57,42 @@ module "sg-api" {
       remote_group     = ""
     },
     {
-      direction  = "ingress"
-      ethertype = "IPv4"
-      protocol = "tcp"
-      port_range_min = 8000
-      port_range_max = 8000
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 8000
+      port_range_max   = 8000
       remote_ip_prefix = "0.0.0.0/0"
-      remote_group = ""
+      remote_group     = ""
+    }
+  ]
+}
+
+
+module "sg-grafana" {
+  source         = "git::https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/module-terraform-dgfip/networking/terraform-openstack-secgroup.git"
+  pf_prefixe     = var.pf_prefixe
+  phase          = var.phase
+  sg_objet       = "grafana"
+  sg_description = "grafana"
+  sg_rules = [
+    {
+      direction        = "egress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 3000
+      port_range_max   = 3000
+      remote_ip_prefix = "0.0.0.0/0"
+      remote_group     = ""
+    },
+    {
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 3000
+      port_range_max   = 3000
+      remote_ip_prefix = "0.0.0.0/0"
+      remote_group     = ""
     }
   ]
 }
@@ -85,13 +114,13 @@ module "sg-caddy" {
       remote_group     = ""
     },
     {
-      direction  = "ingress"
-      ethertype = "IPv4"
-      protocol = "tcp"
-      port_range_min = 80
-      port_range_max = 80
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 80
+      port_range_max   = 80
       remote_ip_prefix = "0.0.0.0/0"
-      remote_group = ""
+      remote_group     = ""
     },
 
     {
@@ -104,13 +133,13 @@ module "sg-caddy" {
       remote_group     = ""
     },
     {
-      direction  = "ingress"
-      ethertype = "IPv4"
-      protocol = "tcp"
-      port_range_min = 443
-      port_range_max = 443
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      port_range_min   = 443
+      port_range_max   = 443
       remote_ip_prefix = "0.0.0.0/0"
-      remote_group = ""
+      remote_group     = ""
     }
   ]
 }
