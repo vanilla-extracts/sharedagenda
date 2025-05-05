@@ -2,7 +2,9 @@
 SharedAgenda is our project for the end of our year as probationary civil
 servants in ENFiP Toulouse as Inspectrices PSE.
 
-The deployed version of SharedAgenda is v2.2.0. See the diagrams below.
+The deployed version of SharedAgenda is v2.2.0-prod. See the diagrams below.
+
+The dev version of SharedAgenda is v3.0.0-dev
 
 It has two different main components, the [server](crates/server) and the
 [cli](crates/cli).
