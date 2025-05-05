@@ -8,3 +8,6 @@ grafana_dashboards:
     datasource: prometheus
 
 # Prometheus
+prometheus_storage_retention: "10d"
+platform_name: "{{ deploy.pf_prefixe }}"
+monitoring_additional_volume: false

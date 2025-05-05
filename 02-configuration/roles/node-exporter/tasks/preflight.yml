@@ -1,0 +1,71 @@
+---
+- name: Assert usage of systemd as an init system
+  ansible.builtin.assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This role only works with systemd"
+
+- name: Get systemd version
+  command: systemctl --version
+  changed_when: false
+  check_mode: false
+  register: __systemd_version
+  tags:
+    - skip_ansible_lint
+
+- name: Set systemd version fact
+  ansible.builtin.set_fact:
+    node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0] | regex_replace('^systemd\\s(\\d+).*$', '\\1') }}"
+
+- name: Naive assertion of proper listen address
+  ansible.builtin.assert:
+    that:
+      - "':' in node_exporter_web_listen_address"
+
+- name: Assert collectors are not both disabled and enabled at the same time
+  ansible.builtin.assert:
+    that:
+      - "item not in node_exporter_enabled_collectors"
+  with_items: "{{ node_exporter_disabled_collectors }}"
+
+- name: Block when TLS is configured
+  when: node_exporter_tls_server_config | length > 0
+  block:
+    - name: Assert that TLS key and cert path are set
+      ansible.builtin.assert:
+        that:
+          - "node_exporter_tls_server_config.cert_file is defined"
+          - "node_exporter_tls_server_config.key_file is defined"
+
+    - name: Check existence of TLS cert file
+      ansible.builtin.stat:
+        path: "{{ node_exporter_tls_server_config.cert_file }}"
+      register: __node_exporter_cert_file
+
+    - name: Check existence of TLS key file
+      ansible.builtin.stat:
+        path: "{{ node_exporter_tls_server_config.key_file }}"
+      register: __node_exporter_key_file
+
+    - name: Assert that TLS key and cert are present
+      ansible.builtin.assert:
+        that:
+          - "{{ __node_exporter_cert_file.stat.exists }}"
+          - "{{ __node_exporter_key_file.stat.exists }}"
+
+- name: Check if node_exporter is installed
+  ansible.builtin.stat:
+    path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+  register: __node_exporter_is_installed
+  check_mode: false
+  tags:
+    - node_exporter_install
+
+- name: Gather currently installed node_exporter version (if any)
+  command: "{{ _node_exporter_binary_install_dir }}/node_exporter --version"
+  changed_when: false
+  register: __node_exporter_current_version_output
+  check_mode: false
+  when: __node_exporter_is_installed.stat.exists
+  tags:
+    - node_exporter_install
+    - skip_ansible_lint
