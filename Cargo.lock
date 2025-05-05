@@ -281,7 +281,7 @@ dependencies = [
 
 [[package]]
 name = "cli"
-version = "2.2.0-dev"
+version = "2.2.0-prod"
 dependencies = [
  "ansi_term",
  "argon2",
@@ -2162,7 +2162,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "2.2.0-dev"
+version = "2.2.0-prod"
 dependencies = [
  "argon2",
  "chrono",

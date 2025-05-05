@@ -1,6 +1,6 @@
 [package]
 name = "cli"
-version = "2.2.0-dev"
+version = "2.2.0-prod"
 edition = "2024"
 
 [dependencies]
