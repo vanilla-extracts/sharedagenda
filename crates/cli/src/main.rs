@@ -23,7 +23,6 @@ mod handlers;
 
 pub fn parse_line_into_arguments(line: &str) -> Vec<String> {
     let mut args = vec![];
-    //"Mon Nom" email@test.fr tortue => ["Mon Nom", "email@test.fr", "tortue"]
 
     fn parse_string(mut acc: Vec<String>, chars: &mut Chars) -> String {
         for char in chars.by_ref() {
