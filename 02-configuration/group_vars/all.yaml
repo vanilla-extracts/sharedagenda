@@ -15,7 +15,7 @@ vm_bdds_01_data_ip: "{{ hostvars[vm_bdds_01]['openstack']['addresses'][network_d
 vm_apis_01_pub_ip: "{{ hostvars[vm_api_01]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
 vm_apis_02_pub_ip: "{{ hostvars[vm_api_02]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
 vm_apis_03_pub_ip: "{{ hostvars[vm_api_03]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
-vm_grafana_01_pub_ip: "{{ hostvars[vm_grafana_01]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
+vm_grafana_pub_ip: "{{ hostvars[vm_grafana_01]['openstack']['addresses'][network_pub_name][0]['addr'] }}"
 fip_publication: "{{ hostvars[vm_caddy]['openstack']['addresses'][network_pub_name][1]['addr'] }}"
 vip_data: "{{ hostvars[vm_bdds_01]['openstack']['metadata']['bdd_vip'] }}"
 branch: "load_balancing"
