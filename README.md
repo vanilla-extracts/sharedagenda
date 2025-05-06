@@ -1,11 +1,11 @@
 # SharedAgenda
 
 > [!CAUTION]
-> This project is FOR FUN AND LEARNING ONLY
-> Do NOT under ANY CIRCUMSTANCES use your REAL EMAIL
-> You would be at risk of LEAKING such an email because of the /user/list endpoint
-> Even if the password are hashed DO NOT use your own password
-> You have been warned
+> This project is FOR FUN AND LEARNING ONLY.
+> Do NOT under ANY CIRCUMSTANCES use your REAL EMAIL.
+> You would be at risk of LEAKING such an email because of the `/user/list` endpoint.
+> Even if the password are hashed DO NOT use your own password.
+> You have been warned!!
 
 
 SharedAgenda was my project for the end of my year as probationary civil
