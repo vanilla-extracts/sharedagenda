@@ -1,0 +1,17 @@
+---
+- name: Start disable-transparent-huge-pages service
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: disable-transparent-huge-pages
+    state: restarted
+    enabled: true
+  listen: "Restart disable-thp"
+  when: not ansible_check_mode
+
+- name: Make sure postgres service is started and enabled on boot.
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: "restarted"
+    enabled: true
+  listen: "Restart postgresql service"
+  when: not ansible_check_mode

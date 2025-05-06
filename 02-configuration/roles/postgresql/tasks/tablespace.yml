@@ -1,0 +1,13 @@
+---
+- name: "Ensure tablespace is present {{ tablespace.name }}"
+  community.postgresql.postgresql_tablespace:
+    name: "{{ tablespace.name }}"
+    owner: "{{ tablespace.owner | default(postgresql_user) }}"
+    port: "{{ postgresql_config.port }}"
+    location: "{{ tablespace.location }}"
+    db: "postgres"
+    login_host: "{{ tablespace.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ postgresql_root_password }}"
+    state: "{{ tablespace.state | default('present') }}"
+  become: true
+  become_user: "{{ postgresql_user }}"

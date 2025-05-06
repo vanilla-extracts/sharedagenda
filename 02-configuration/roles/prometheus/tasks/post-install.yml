@@ -1,0 +1,34 @@
+---
+- name: Setting host facts using complex arguments
+  ansible.builtin.set_fact:
+    addr: "{{ prometheus_http_listen_address }}"
+    listen_port: "{{ prometheus_http_listen_port }}"
+    extaddr: "{{ prometheus_web_external_url }}"
+
+- name: "Prometheus - Post-Install : Ensure prometheus service is Ready ..."
+  ansible.builtin.uri:
+    url: "http://{{ addr }}:{{ listen_port }}{% if (not extaddr.startswith('/')) and (not extaddr == '') %}/{% endif %}{{ extaddr }}/-/ready"
+    method: GET
+  register: ready
+  until: ready.status == 200
+  retries: 12 # 5 * 12 seconds --> 1 minute
+  delay: 5 # Every 5 seconds
+  when: not ansible_check_mode
+
+- name: "Prometheus - Post-Install : Readiness check information"
+  ansible.builtin.debug:
+    var: ready
+
+- name: "Prometheus - Post-Install : Ensure prometheus service is Healthy..."
+  ansible.builtin.uri:
+    url: "http://{{ addr }}:{{ listen_port }}{% if (not extaddr.startswith('/')) and (not extaddr == '') %}/{% endif %}{{ extaddr }}/-/healthy"
+    method: GET
+  register: healthy
+  until: healthy.status == 200
+  retries: 12 # 5 * 12 seconds --> 1 minute
+  delay: 5 # Every 5 seconds
+  when: not ansible_check_mode
+
+- name: "Prometheus - Post-Install : Health check information"
+  ansible.builtin.debug:
+    var: healthy

@@ -1,0 +1,42 @@
+grafana_address: "{{ vm_grafana_pub_ip }}"
+grafana_security_custom:
+  admin_user: admin
+  admin_password: admin
+grafana_dashboards:
+  - dashboard_id: 1860
+    revision_id: 40
+    datasource: prometheus
+  - dashboard_id: 9628
+    revision_id: 4
+    datasource: prometheus
+
+
+# Prometheus
+prometheus_storage_retention: "10d"
+platform_name: "{{ deploy.pf_prefixe }}"
+monitoring_additional_volume: false
+prometheus_scrape_configs:
+  - job_name: "prometheus exporter"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "{{ vm_grafana_admin_ip }}:9090"
+  - job_name: "postgres exporter"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "{{ vm_bdds_01_admin_ip }}:9187"
+        - '{{ vm_bdds_02_admin_ip }}:9187'
+  - job_name: "node exporter"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "{{ vm_caddy_admin_ip }}:9100"
+          - "{{ vm_api_01_admin_ip }}:9100"
+          - "{{ vm_api_02_admin_ip }}:9100"
+          - "{{ vm_api_03_admin_ip }}:9100"
+          - "{{ vm_grafana_admin_ip }}:9100"
+          - "{{ vm_bdds_01_admin_ip }}:9100"
+          - "{{ vm_bdds_02_admin_ip }}:9100"
+          - "{{ vm_bastion_admin_ip }}:9100"
+  

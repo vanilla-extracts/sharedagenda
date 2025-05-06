@@ -63,3 +63,6 @@ groups:
   platform_shag_bdds_02: >-
     openstack.name == deploy.pf_prefixe+"-vm-bdd-02-"+deploy.phase
     and openstack.metadata.pf_prefixe == "shag-01"
+  platform_shag_grafana: >-
+    openstack.name == deploy.pf_prefixe+"-vm-prometheus-01-"+deploy.phase
+    and openstack.metadata.pf_prefixe == "shag-01"

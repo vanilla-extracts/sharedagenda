@@ -1,0 +1,47 @@
+---
+
+- name: Download and install haproxy
+  ansible.builtin.package:
+    name: haproxy
+    state: present
+
+- name: SELINUX set haproxy_connect_any=yes
+  ansible.posix.seboolean:
+    name: haproxy_connect_any
+    state: true
+    persistent: true
+  notify:
+    - Restart haproxy
+  when: ansible_os_family in ['RedHat', 'Rocky']  ### , 'Debian']
+  # ERR DEBIAN : SELinux boolean haproxy_connect_any does not exist.
+  #      https://github.com/ansible-collections/ansible.posix/issues/191
+  # When persistent: yes, it uses semanage to control the boolean,
+  # and when persistent: no, it uses selinux.
+  # The former schedules a change in the next reboot, while the latter immediately effects the change.
+  # This is very similar in the concept of systemctl enable vs systemctl start.
+
+- name: Configure the haproxy load balancer
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Restart haproxy
+
+- name: Create Tls pem file
+  become: true
+  ansible.builtin.copy:
+    content: "{{ plain_pem_tls }}"
+    dest: /etc/haproxy/grafana-tls.pem
+    mode: "0755"
+    owner: root
+    group: root
+  when: haproxy_tls_enabled | bool
+
+- name: Start the haproxy service
+  ansible.builtin.service:
+    name: haproxy
+    state: started
+    enabled: true

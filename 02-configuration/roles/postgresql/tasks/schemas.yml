@@ -1,0 +1,48 @@
+---
+- name: "Create a new schema  : {{ item }}"
+  community.postgresql.postgresql_schema:
+    db: "{{ database.name }}"
+    name: "{{ item }}"
+    owner: "{{ database.owner | default(postgresql_db_username) }}"
+    login_host: "{{ database.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ postgresql_root_password }}"
+    state: present
+    port: "{{ database.port | default(postgresql_config.port) }}"
+  become: true
+  no_log: "{{ postgresql_users_no_log }}"
+  become_user: "{{ postgresql_user }}"
+  loop: "{{ database.schemas | default([database.name]) }}"
+
+- name: Check if  'public' schema exists
+  community.postgresql.postgresql_query:
+    db: "{{ database.name }}"
+    login_host: "{{ database.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ postgresql_root_password }}"
+    port: "{{ database.port | default(postgresql_config.port) }}"
+    query: SELECT nspname FROM pg_catalog.pg_namespace WHERE nspname = %(public_schema_name)s
+    named_args:
+      public_schema_name: public
+  become: true
+  no_log: "{{ postgresql_users_no_log }}"
+  become_user: "{{ postgresql_user }}"
+  register: query_result
+
+- name: Remove the fact that any role is allowed to create object in Public Schema in created database
+  community.postgresql.postgresql_privs:
+    database: "{{ database.name }}"
+    privs: ALL
+    type: schema
+    objs: public
+    roles: public
+    state: absent
+    login_host: "{{ database.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ postgresql_root_password }}"
+    fail_on_role: "{{ postgresql_privs_fail_on_role | default(true) }}"
+    port: "{{ database.port | default(postgresql_config.port) }}"
+  become: true
+  no_log: "{{ postgresql_users_no_log }}"
+  changed_when: false
+  become_user: "{{ postgresql_user }}"
+  when:
+    - query_result is defined
+    - query_result.rowcount == 1

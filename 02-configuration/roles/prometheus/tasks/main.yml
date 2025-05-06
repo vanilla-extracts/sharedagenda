@@ -1,0 +1,67 @@
+---
+- name: Gather variables for each operating system
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+
+- name: Pre-checks
+  ansible.builtin.include_tasks: preflight.yml
+  tags:
+    - prometheus_configure
+    - prometheus_install
+    - prometheus_run
+
+- name: Create monitoring data directory
+  ansible.builtin.file:
+    path: "{{ monitoring_dir }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0777"
+
+- name: Mountpoint
+  ansible.builtin.include_tasks: mountpoint.yml
+  when: monitoring_additional_volume
+
+- name: Install
+  ansible.builtin.include_tasks: install.yml
+  when: ( not __prometheus_is_installed.stat.exists ) or
+    ( (__prometheus_current_version_output.stderr_lines | length > 0)
+    and (__prometheus_current_version_output.stderr_lines[0].split(" ")[2] != prometheus_version) ) or
+    ( (__prometheus_current_version_output.stdout_lines | length > 0)
+    and (__prometheus_current_version_output.stdout_lines[0].split(" ")[2] != prometheus_version) )
+  tags:
+    - prometheus_install
+
+- name: Configure
+  ansible.builtin.import_tasks: configure.yml
+  tags:
+    - prometheus_configure
+
+- name: Ensure prometheus service is started and enabled
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: prometheus
+    state: started
+    enabled: true
+  tags:
+    - prometheus_run
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+
+- name: Post-installaton
+  ansible.builtin.include_tasks:
+    file: post-install.yml
+    apply:
+      tags: post-install
+  tags: post-install
+
+- name: Manage restic backups
+  ansible.builtin.include_tasks:
+    file: backup_restic.yml
+    apply:
+      tags: restic-backup
+  when: prometheus_backup_enabled
+  tags: restic-backup

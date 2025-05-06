@@ -1,0 +1,51 @@
+---
+
+- name: Installation SELinux sur distribution Debian
+  when: ansible_os_family == "Debian"
+  block:
+
+    - name: Ensure apt cache is updated
+      ansible.builtin.apt:
+        update_cache: yes
+      when: force_update_cache | bool
+        
+    - name: "Debug ansible_facts.apparmor.status: {{ ansible_facts.apparmor.status }}"
+      ansible.builtin.debug:
+        msg: "LE FLAG APPARMOR EST : {{ ansible_facts.apparmor.status }}"
+
+    - name: Desinstalle AppArmor
+      ansible.builtin.import_tasks: apparmor-debian.yml
+      when: ansible_facts.apparmor.status == "enabled"
+
+    - name: "Debug ansible_facts.selinux.status: {{ ansible_facts.selinux.status }}"
+      ansible.builtin.debug:
+        msg: "LE FLAG SELINUX EST : {{ ansible_facts.selinux.status }}"
+
+    - name: Installe SELinux en mode permissive
+      ansible.builtin.import_tasks: selinux-debian.yml
+      when: ansible_facts.selinux.status == "disabled"
+
+    - name: Flush handlers if notify when permissive
+      ansible.builtin.meta: flush_handlers
+
+    - name: Check SELinux is correctly installed
+      ansible.builtin.command: check-selinux-installation
+      register: endselinux
+
+    - name: Display report
+      ansible.builtin.debug:
+        msg: "{{ endselinux }}"
+
+    - name: Installe SELinux sur distribution Debian en mode enforcing
+      ansible.builtin.import_tasks: selinux-debian-enforcing.yml
+
+    - name: Ajout de /usr/sbin au PATH
+      ansible.builtin.import_tasks: ssh.yml
+
+  # - name: SELinux et connexions ssh
+  #   ansible.builtin.import_tasks: ssh_connect.yml
+
+# end block
+
+- name: Assure la présence de packages nécessaires
+  ansible.builtin.import_tasks: packages.yml

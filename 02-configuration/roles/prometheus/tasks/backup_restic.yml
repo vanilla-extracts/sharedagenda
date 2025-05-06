@@ -1,0 +1,54 @@
+- name: Check availability of restic
+  ansible.builtin.command: restic version
+  ignore_errors: true
+  changed_when: false
+  register: restic_version_output
+
+- name: Restic not available
+  ansible.builtin.fail:
+    msg: "Restic is not installed. Please install it using the restic role from the A2C catalog before."
+  when: restic_version_output.rc != 0
+
+- name: "Ensure prometheus restic config file '/etc/prometheus_restic.conf' is present & configured"
+  ansible.builtin.template:
+    src: "restic.conf.j2"
+    dest: "/etc/{{ component_name }}_restic.conf"
+    owner: "{{ prometheus_system_user }}"
+    group: "{{ prometheus_system_group }}"
+    mode: "0755"
+
+- name: "Ensure prometheus backup and scripts folder are created"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ prometheus_system_user }}"
+    group: "{{ prometheus_system_group }}"
+    mode: "0755"
+  with_items:
+    - "{{ prometheus_backup_scripts }}"
+    - "{{ prometheus_backup_folder }}"
+    - "{{ prometheus_restore_folder }}"
+    - "{{ prometheus_restic_logdir }}"
+
+- name: "Ensure prometheus backup scripts are present"
+  ansible.builtin.template:
+    src: "{{ item.tpl }}"
+    dest: "{{ item.name }}"
+    owner: "{{ prometheus_system_user }}"
+    group: "{{ prometheus_system_group }}"
+    mode: "0755"
+  with_items:
+    - { tpl: "backup_restic.sh.j2", name: "{{ prometheus_backup_scripts }}/backup_restic.sh" }
+    - { tpl: "backup_local.sh.j2", name: "{{ prometheus_backup_scripts }}/backup_local.sh" }
+    - { tpl: "backup_restore.sh.j2", name: "{{ prometheus_backup_scripts }}/backup_restore.sh" }
+    - { tpl: "backup_prune.sh.j2", name: "{{ prometheus_backup_scripts }}/backup_prune.sh" }
+
+- name: "CRON input for prometheus backup"
+  ansible.builtin.cron:
+    name: "Backup Prometheus"
+    user: root
+    weekday: "{{ prometheus_backup_config.cron.weekday | default('*') }}"
+    minute: "{{ prometheus_backup_config.cron.minute }}"
+    hour: "{{ prometheus_backup_config.cron.hour }}"
+    job: "{{ prometheus_backup_scripts }}/backup_local.sh && {{ prometheus_backup_scripts }}/backup_restic.sh "
+    state: "{{ prometheus_backup_config.cron.state | default('present') }}"

@@ -1,0 +1,35 @@
+---
+
+# - name: Verifier le fichier grub
+#   ansible.builtin.lineinfile:
+#     dest: /etc/default/grub
+#     line: apparmor=0
+#   check_mode: true
+#   register: line_check
+
+# - name: Modifier le fichier grub
+#   ansible.builtin.lineinfile:
+#     dest: /etc/default/grub
+#     regexp: '^GRUB_CMDLINE_LINUX_DEFAULT*'
+#     line: GRUB_CMDLINE_LINUX_DEFAULT="quiet apparmor=0"
+#     state: present
+#   notify: Reboot required
+
+# - name: Mettre à jour par update-grub
+#   ansible.builtin.command: update-grub
+#   when: line_check.changed
+
+- name: Configure systemctl pour apparmor
+  ansible.builtin.systemd:
+    name: apparmor
+    state: stopped
+    enabled: false
+
+# - name: Installe les packages relatifs à SELinux
+#   ansible.builtin.package:
+#     name:
+#       - policycoreutils
+#     state: present
+
+# - name: Flush handlers prior to running install
+#   ansible.builtin.meta: flush_handlers

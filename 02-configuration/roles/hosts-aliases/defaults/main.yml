@@ -1,0 +1,40 @@
+---
+# reseaux par defaut
+admin_network_name: "{{ deploy.pf_prefixe }}-network-adm-{{ deploy.phase }}"  # nom du reseau d administration
+internal_network_name: "{{ deploy.pf_prefixe }}-network-pub-{{ deploy.phase }}"  # nom du reseau publication
+data_network_name: "{{ deploy.pf_prefixe }}-network-data-{{ deploy.phase }}"  # nom du reseau data
+
+default_hosts_domain: "novalocal"
+hosts_suffix:
+  admin: ""
+  pub: "-int"
+  data: "-data"
+
+nuages:
+  - address: 100.67.0.14
+    hostname: nuage01.dgfip.finances.rie.gouv.fr
+    aliases:
+      - "nuage01"
+      - "nubo01"
+  - address: 100.67.0.46
+    hostname: nuage11.dgfip.finances.rie.gouv.fr
+    aliases:
+      - "nuage11"
+      - "nubo11"
+  - address: 100.67.0.110
+    hostname: nuage02.dgfip.finances.rie.gouv.fr
+    aliases:
+      - "nuage02"
+      - "nubo02"
+  - address: 100.67.0.78
+    hostname: nuage12.dgfip.finances.rie.gouv.fr
+    aliases:
+      - "nuage12"
+      - "nubo12"
+
+# exemple pour clamav
+# extra_hosts:
+#   - hostname: "proxy-antivirus-alternatif.infra.dgfip"
+#     address: "10.154.61.6"
+#   - hostname: "proxy-antivirus.infra.dgfip"
+#     address: "10.154.68.19"

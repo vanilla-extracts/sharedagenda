@@ -1,0 +1,42 @@
+---
+- name: Disable postgresql module
+  ansible.builtin.command:
+    cmd: dnf module disable postgresql -y
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version == '8'
+  register: disable_postgresql_module
+  changed_when:
+    - "disable_postgresql_module.rc == 0"
+    - "'Disabling modules:\\n postgresql' in disable_postgresql_module.stdout"
+
+- name: "Redhat: Install version {{ postgresql_version }}"
+  ansible.builtin.yum:
+    name: "{{ postgresql_packages }}"
+    state: "{{ postgresql_package_state | default('present') }}"
+    update_cache: "yes"
+    disable_gpg_check: "{{ postgresql_disable_gpg_check | default(false) }}"
+    exclude: python-unversioned-command
+    enablerepo: ["postgresql{{ postgresql_version }}", "postgresql-common"]
+  when: ansible_os_family == "RedHat"
+
+- name: Debian packages prepare
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Ensure postgresql repo is enabled
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list.d/servo_sources.list
+        regexp: '^#(.*)postgresql(.*)$'
+        line: '\1postgresql\2'
+        backrefs: "yes"
+
+    - name: "Debian: Install version {{ postgresql_version }}"
+      ansible.builtin.apt:
+        name: "{{ postgresql_packages }}"
+        state: "{{ postgresql_package_state | default('present') }}"
+        update_cache: "yes"
+
+- name: Ensure Python libraries are installed
+  ansible.builtin.package:
+    name: "{{ postgresql_python_library }}"
+    state: "{{ postgresql_package_state | default('present') }}"

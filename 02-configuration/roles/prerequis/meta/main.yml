@@ -1,0 +1,21 @@
+---
+
+galaxy_info:
+  author: A2C
+  description: "Installation de SELinux et prérequis"
+  company: DGFiP
+  license: "N/A"
+  min_ansible_version: "2.13"
+  platforms:
+    - name: "Debian"
+      versions:
+        - "bookworm"
+    - name: Rocky
+      versions:
+        - "all"
+  galaxy_tags:
+    - "system"
+    - "utilities"
+    - "security"
+
+dependencies: []

@@ -1,0 +1,15 @@
+---
+
+- name: Activation de SELinux en mode enforcing
+  ansible.posix.selinux:
+    policy: default
+    state: enforcing
+  register: se_result
+
+- name: Reboot necessaire
+  ansible.builtin.debug:
+    msg: "Reboot Necessaire : {{ se_result.reboot_required }}"
+
+- name: Reboot necessaire précis
+  ansible.builtin.debug:
+    msg: "{{ se_result }}"

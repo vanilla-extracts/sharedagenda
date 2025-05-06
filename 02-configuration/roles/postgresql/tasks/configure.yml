@@ -1,0 +1,333 @@
+---
+- name: "Put SELinux in mode {{ postgresql_selinux_state }}"
+  ansible.posix.selinux:
+    policy: "{{ selinux_postgresql_policy }}" # depending on distro
+    state: "{{ postgresql_selinux_state }}"
+
+- name: Make sure unix socket dirs exist
+  ansible.builtin.file:
+    path: "{{ postgresql_config.unix_socket_directories }}"
+    state: directory
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: "0755"
+
+- name: Make sure log directory exists.
+  ansible.builtin.file:
+    path: "{{ postgresql_config.log_directory }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+    mode: "0700"
+
+- name: Make sure SSL certs directory exists.
+  ansible.builtin.file:
+    path: "{{ postgresql_certs_directory }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+    mode: "0700"
+  when: postgresql_use_ssl | bool
+
+- name: Configure SSL certs for database ...
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    remote_src: "yes"
+    mode: "0600"
+  loop:
+    - { src: "{{ certs_path }}/{{ root_ca_cert_name }}", dest: "{{ postgresql_certs_directory }}"}
+    - { src: "{{ certs_path }}/{{ root_ca_key_name }}", dest: "{{ postgresql_certs_directory }}"}
+    - { src: "{{ certs_path }}/{{ ansible_hostname }}.pem", dest: "{{ postgresql_certs_directory }}/server.crt"}
+    - { src: "{{ certs_path }}/{{ ansible_hostname }}.key", dest: "{{ postgresql_certs_directory }}/server.key"}
+  when: postgresql_use_ssl | bool
+
+- name: Make sure the postgres data directory exists
+  ansible.builtin.file:
+    path: "{{ postgresql_data_directory }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+    mode: "0700"
+  register: pgdata_dir_exist
+
+- name: Make sure the postgres WAL directory exists
+  ansible.builtin.file:
+    path: "{{ postgresql_wal_directory }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+    mode: "0700"
+  register: pgwal_dir_exist
+  when: postgresql_wal_directory != ""
+
+- name: Set environment variables
+  ansible.builtin.template:
+    src: postgres.sh.j2
+    dest: /etc/profile.d/postgres.sh
+    mode: "0644"
+    owner: root
+    group: root
+
+- name: Ensure the systemd directory for PostgreSQL exists
+  ansible.builtin.file:
+    name: "/etc/systemd/system/{{ postgresql_service_name }}.service.d"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Use the conf directory when starting the Postgres service
+  ansible.builtin.template:
+    src: postgresql_systemd_custom_conf.conf.j2
+    dest: "/etc/systemd/system/{{ postgresql_service_name }}.service.d/override.conf"
+    mode: "0644"
+    owner: root
+    group: root
+
+- name: Force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: "yes"
+
+- name: Check if database is initialized.
+  ansible.builtin.stat:
+    path: "{{ postgresql_data_directory }}/PG_VERSION"
+  register: pgdata_dir_version
+
+- name: Make sure database is initialized.
+  ansible.builtin.command: >
+    {{ postgresql_bin_directory }}/initdb --pgdata={{ postgresql_data_directory }} --waldir={{ postgresql_wal_directory }} --data-checksums
+  when: not pgdata_dir_version.stat.exists
+  become: true
+  register: rs
+  changed_when: rs.rc != 0
+  become_user: "{{ postgresql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Set file context type
+  when: ansible_facts.selinux.status == 'enabled'
+  community.general.sefcontext:
+    setype: postgresql_db_t
+    target: "{{ postgresql_wal_directory }}(/.*)?"
+    state: present
+  register: sefcontext
+
+- name: Apply SELinux context to WAL directory
+  ansible.builtin.command:
+    cmd: "restorecon -Rv {{ postgresql_wal_directory }}"
+  when: sefcontext.changed
+
+- name: Set file context type to binary dir
+  when: ansible_facts.selinux.status == 'enabled'
+  community.general.sefcontext:
+    setype: postgresql_exec_t
+    target: "{{ postgresql_bin_directory }}(/.*)?"
+    state: present
+  register: sefcontext
+
+- name: Apply SELinux context to binary dir
+  ansible.builtin.command:
+    cmd: "restorecon -Rv {{ postgresql_bin_directory }}"
+  when: sefcontext.changed
+
+# Add-on 30/08/2024
+- name: SELinux management
+  when: ansible_facts.selinux.status == 'enabled'
+  block:
+    - name: SELINUX my-postgresql conf
+      ansible.builtin.copy:
+        src: my-postgresql.te
+        dest: /var/tmp/my-postgresql.te
+        owner: root
+        group: root
+        mode: "0640"
+      become: true
+
+    - name: Compile SELinux rule
+      ansible.builtin.shell: checkmodule -M -m -o my-postgresql /var/tmp/my-postgresql.te && semodule_package -o /var/tmp/my-postgresql.pp -m my-postgresql
+      changed_when: false
+      become: true
+
+    - name: Reload SELinux rule
+      ansible.builtin.shell: semodule -X 300 -i  /var/tmp/my-postgresql.pp
+      changed_when: false
+      become: true
+ # end block
+
+- name: Verify postgresql cluster version
+  ansible.builtin.command: grep ^{{ postgresql_version }}$ {{ postgresql_data_directory }}/PG_VERSION
+  changed_when: false
+
+- name: Make sure configuration directory exists
+  ansible.builtin.file:
+    path: "{{ postgresql_conf_directory }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: "0700"
+    state: directory
+
+- name: Create folder for additional configuration files
+  ansible.builtin.file:
+    name: "{{ postgresql_conf_directory }}/conf.d"
+    state: directory
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: "0755"
+
+- name: Customize postgresql.conf for server configuration
+  ansible.builtin.lineinfile:
+    dest: "{{ postgresql_conf_directory }}/postgresql.conf"
+    regexp: "^#*{{ item.key }}[ =].*"
+    line: "{{ item.key }} = '{{ item.value }}'"
+    mode: "0644"
+  notify: "Restart postgresql service"
+  with_dict: "{{ postgresql_config }}"
+
+- name: Configure host based authentication (pg_hba.conf).
+  ansible.builtin.template:
+    src: "pg_hba.conf.j2"
+    dest: "{{ postgresql_conf_directory }}/pg_hba.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: "0600"
+  notify: "Restart postgresql service"
+
+- name: Customize standard installation only whe Debian
+  when: ansible_os_family == "Debian"
+  ansible.builtin.lineinfile:
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    regexp: "^#*{{ item.key }}[ =].*"
+    line: "{{ item.key }} = '{{ item.value }}'"
+    mode: "0644"
+  with_dict: "{{ debian_postgresql_dict }}"
+
+- name: Fix debian bad selinux properties
+  when: 
+    - ansible_os_family == "Debian"
+    - ansible_facts.selinux.status == "enabled"
+  block:
+    - name: Fix debian for pg_controldata at patroni bootstrap
+      community.general.sefcontext:
+        setype: postgresql_db_t
+        target: "{{ item }}"
+        state: present
+      with_items:
+        - "{{ postgresql_data_directory }}(/.*)?"
+        - "{{ postgresql_data_directory }}/..(/.*)?" # for pg_wal in parent dir
+
+    - name: Apply new types
+      ansible.builtin.command:
+        cmd: "restorecon -Rv {{ item }}"
+      changed_when: false
+      with_items:
+        - "{{ postgresql_data_directory }}"
+        - "{{ postgresql_data_directory }}/../"
+        # - "{{ postgresql_data_directory }}/*"
+        # - "{{ postgresql_data_directory }}/global/pg_control"
+
+    - name: "Put SELinux in mode permissive temporarily"
+      ansible.posix.selinux:
+        policy: "{{ selinux_postgresql_policy }}" # depending on distro
+        state: "permissive"
+
+    - name: Fake start to get selinux rules to be added
+      ansible.builtin.systemd:
+        name: "{{ postgresql_service_name }}"
+        state: "restarted"
+      ignore_errors: true
+      become: true
+
+    - name: Pause for 10s so auditd detects information
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Prepare selinux for pg_ctl
+      ansible.builtin.shell: "/usr/sbin/ausearch -c pg_ctl --raw | /usr/bin/audit2allow -M pg_ctl"
+      args:
+        chdir: /var/tmp
+      become: true
+      register: result
+      changed_when: result.rc != 0
+
+    - name: Check wheter /var/tmp/pg_ctl.pp exists
+      ansible.builtin.stat:
+        path: /var/tmp/pg_ctl.pp
+      register: pp_pgctl
+
+    - name: Install SELinux policy module for pg_ctl
+      ansible.builtin.command: "/usr/sbin/semodule -i /var/tmp/pg_ctl.pp"
+      become: true
+      register: result
+      changed_when: result.changed
+      when: pp_pgctl.stat.exists
+
+    - name: Prepare selinux policy for postgres
+      ansible.builtin.shell: "/usr/sbin/ausearch -c postgres --raw | /usr/bin/audit2allow -M postgres"
+      args:
+        chdir: /var/tmp
+      become: true
+      register: result
+      changed_when: result.rc != 0
+
+    - name: Check wheter /var/tmp/postgres.pp exists
+      ansible.builtin.stat:
+        path: /var/tmp/postgres.pp
+      register: pp_postgres
+
+    - name: Install SELinux policy module for postgres binary
+      ansible.builtin.command: "/usr/sbin/semodule -i /var/tmp/postgres.pp"
+      become: true
+      register: result
+      when: pp_postgres.stat.exists
+      changed_when: result.rc!=0
+
+    # new test
+    - name: Set file context type
+      community.general.sefcontext:
+        setype: postgresql_db_t
+        target: "{{ postgresql_data_directory }}(/.*)?"
+        state: present
+      register: sefcontext
+
+    - name: Apply new types
+      ansible.builtin.command:
+        cmd: "restorecon -Rv {{ postgresql_data_directory }}"
+      when: sefcontext.changed
+    
+    - name: "Put SELinux in mode {{ postgresql_selinux_state }}"
+      ansible.posix.selinux:
+        policy: "{{ selinux_postgresql_policy }}" # depending on distro
+        state: "{{ postgresql_selinux_state }}"
+
+    - name: 'Permit SELinux for allow_execmem, allow_execstack '
+      ansible.posix.seboolean:
+        name: "{{ item }}"
+        state: true
+        persistent: true
+      with_items:
+        - "allow_execmem"
+        - "allow_execstack"
+# end block
+
+
+- name: Make sure service is started and enabled on boot.
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: started
+
+- name: Set postgres root password
+  no_log: "{{ postgresql_users_no_log }}"
+  become: true
+  become_user: "{{ postgresql_user }}"
+  community.postgresql.postgresql_user:
+    db: postgres
+    name: "{{ postgresql_user }}"
+    password: "{{ postgresql_root_password | mandatory }}"
+    port: "{{ postgresql_config.port }}"
+  vars:
+    ansible_ssh_pipelining: true
+  environment:
+    PGOPTIONS: "{{ (postgresql_auth_method == 'scram-sha-256') | ternary('-c password_encryption=scram-sha-256', '') }}"

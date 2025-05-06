@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source "{{ restic_common_utils }}"
+source "/etc/{{ component_name }}_restic.conf"
+
+swift_prune

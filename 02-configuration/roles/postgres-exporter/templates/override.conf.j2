@@ -1,0 +1,5 @@
+[Service]
+Environment="DATA_SOURCE_NAME={{ postgres_exporter_data_source_name }}"
+{% if postgres_pg_exporter_extend_query_path != '' %} 
+Environment="PG_EXPORTER_EXTEND_QUERY_PATH={{ postgres_pg_exporter_extend_query_path }}"
+{% endif %}

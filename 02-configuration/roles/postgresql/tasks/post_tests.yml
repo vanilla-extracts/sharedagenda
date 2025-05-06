@@ -1,0 +1,40 @@
+---
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure specific version is enabled at boot when Debian
+  when: ansible_os_family == "Debian"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ postgresql_version }}-{{ postgresql_debian_subversion }}"
+    enabled: true
+    state: started # should already be started
+
+- name: Creating list from 'postgresql_config.listen_addresses'
+  ansible.builtin.set_fact:
+    listen_addresses: "{{ postgresql_config.listen_addresses | split(',') }}"
+  register: addresses
+
+- name: Debug postgresql listen addresses
+  ansible.builtin.debug:
+    var: addresses
+
+- name: Check if PostgreSQL port is open -- > {{ postgresql_config.port }}
+  loop: "{{ listen_addresses }}"
+  ansible.builtin.include_tasks: listen_addresses.yml
+
+- name: "PostgreSQL | Check if database accept connexion"
+  ansible.builtin.command: "{{ postgresql_bin_directory }}/pg_isready --port={{ postgresql_config.port }}"
+  become: true
+  changed_when: postgresql_connexion_status.rc != 0
+  become_user: postgres
+  register: postgresql_connexion_status
+
+- name: Debug connexion status
+  ansible.builtin.debug:
+    var: postgresql_connexion_status
+
+- name: PostgreSQL connexion fail
+  ansible.builtin.fail:
+    msg: >
+      Connections to the database do not seem to be working ...
+  when: postgresql_connexion_status.rc != 0

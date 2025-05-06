@@ -5,3 +5,21 @@ roles:
   - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/r-seau/keepalived
     version: v1.3.4
     name: keepalived
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/utilitaires/prerequis
+    version: v1.0.0
+    name: prerequis
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/utilitaires/hosts-aliases
+    version: v1.1.2
+    name: hosts-aliases
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/grafana
+    version: v1.3.1
+    name: grafana
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/prometheus
+    version: v3.0.0
+    name: prometheus
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/node-exporter.git
+    version: v1.0.13
+    name: node-exporter
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/postgres-exporter
+    version: v1.2.0
+    name: postgres-exporter

@@ -1,0 +1,19 @@
+---
+- name: "Testing {{ item }}"
+  ansible.builtin.wait_for:
+    port: "{{ postgresql_config.port }}"
+    host: "{{ (item == '*') | ternary('localhost', item | trim) }}"
+    state: started
+    timeout: 60
+    delay: 5
+  register: postgresql_port_status
+
+- name: Debug port status
+  ansible.builtin.debug:
+    var: postgresql_port_status
+
+- name: PostgreSQL port fail
+  ansible.builtin.fail:
+    msg: >
+      Le port {{ item }}:{{ postgresql_config.port }} ne semble pas être ouvert!
+  when: postgresql_port_status.state != 'started'

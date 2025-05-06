@@ -1,0 +1,16 @@
+---
+- name: "Post install query {{ query.name }}"
+  community.postgresql.postgresql_query:
+    login_host: "{{ item.login_host | default(postgresql_login_host) }}"
+    login_password: "{{ item.login_password | default(omit) }}"
+    login_user: "{{ item.login_user | default(postgresql_user) }}"
+    port: "{{ postgresql_config.port }}"
+    db: "{{ item.name }}"
+    query: "{{ query.query }}"
+  when: query.database is not defined or query.database == item.name
+  loop: "{{ postgresql_databases }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: true
+  become_user: postgres
+  no_log: "{{ postgresql_users_no_log }}"

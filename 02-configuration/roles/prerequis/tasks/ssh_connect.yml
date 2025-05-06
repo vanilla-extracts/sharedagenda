@@ -1,0 +1,27 @@
+---
+
+- name: Test de la commande
+  ansible.builtin.shell: "/usr/sbin/ausearch -c sshd --raw"
+  args:
+    chdir: /var/tmp
+  become: true
+  register: result_debug
+  changed_when: result_debug.rc != 0
+
+- name: Debug task
+  ansible.builtin.debug:
+    msg: "{{ result_debug }}"
+
+- name: Authorize ssh connections
+  ansible.builtin.shell: "/usr/sbin/ausearch -c sshd --raw | /usr/bin/audit2allow -M sshd"
+  args:
+    chdir: /var/tmp
+  become: true
+  register: result
+  changed_when: result.rc != 0
+
+- name: Install SELinux policy module
+  ansible.builtin.command: "/usr/sbin/semodule -X 300 -i /var/tmp/sshd.pp"
+  become: true
+  register: result
+  changed_when: result.rc != 0

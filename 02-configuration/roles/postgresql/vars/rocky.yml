@@ -1,0 +1,10 @@
+---
+postgresql_packages:
+  - "postgresql{{ postgresql_version }}"
+  - "postgresql{{ postgresql_version }}-server"
+  - "postgresql{{ postgresql_version }}-contrib"
+  - libpq
+
+selinux_postgresql_policy: "targeted"
+postgresql_bin_directory: "/usr/pgsql-{{ postgresql_version }}/bin"
+postgresql_default_service_name: "postgresql-{{ postgresql_version }}"

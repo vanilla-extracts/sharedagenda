@@ -1,0 +1,32 @@
+---
+
+- name: Installe les packages relatifs à SELinux
+  ansible.builtin.package:
+    name:
+      - policycoreutils
+      - selinux-basics
+      - selinux-policy-default
+      - auditd
+    state: present
+
+- name: Mettre à jour par selinux-activate
+  ansible.builtin.command: selinux-activate
+  notify: Reboot required
+
+- name: Activation de SELinux en mode permissive
+  ansible.posix.selinux:
+    policy: default # targeted  # https://github.com/ansible/ansible/issues/25112
+    state: permissive # enforcing
+    # enforcing
+    # permissive
+    # disabled
+  register: se_result
+  notify: Reboot required
+
+- name: Reboot necessaire
+  ansible.builtin.debug:
+    msg: "Reboot Necessaire : {{ se_result.reboot_required }}"
+
+- name: Reboot necessaire précis
+  ansible.builtin.debug:
+    msg: "{{ se_result }}"

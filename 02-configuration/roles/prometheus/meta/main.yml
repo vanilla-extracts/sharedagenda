@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  author: DANA2C
+  role_name: prometheus
+  description: Prometheus monitoring system configuration and management
+  license: MIT
+  company: none
+  min_ansible_version: "2.5"
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+
+  galaxy_tags:
+    - monitoring
+    - prometheus
+    - metrics
+    - alerts
+    - alerting
+    - molecule
+    - cloud
+
+dependencies: []

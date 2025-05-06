@@ -1,0 +1,22 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: postgresql
+  author: DAN/A2C derived from geerlingguy
+  description: PostgreSQL server for Linux.
+  min_ansible_version: "2.8"
+  license: "N/A"
+  platforms:
+    - name: "Debian"
+      versions:
+        - "bookworm"
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - database
+    - postgresql
+    - postgres
+    - rdbms

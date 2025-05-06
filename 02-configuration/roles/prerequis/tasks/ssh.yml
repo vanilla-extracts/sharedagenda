@@ -1,0 +1,10 @@
+---
+
+- name: Add /usr/sbin to PATH
+  copy:
+    src: "dgfip_profile.sh"
+    dest: "/etc/profile.d/dgfip_profile.sh"
+    owner: root 
+    group: root
+    mode: "0644"
+  when: override_path | bool

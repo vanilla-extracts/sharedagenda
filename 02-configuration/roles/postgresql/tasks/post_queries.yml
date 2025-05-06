@@ -1,0 +1,7 @@
+---
+- name: Run postgresql post-install queries
+  loop: "{{ postgresql_post_install_queries }}"
+  ansible.builtin.include_tasks: post_query.yml
+  loop_control:
+    loop_var: query
+  when: postgresql_post_install_queries is defined

@@ -1,0 +1,14 @@
+[Unit]
+Description=Prometheus Postgres Exporter Server
+After=network.target
+
+[Service]
+Type=simple
+User={{ postgres_exporter_system_user }}
+ExecStart={{ postgres_exporter_bin_dir }}/postgres_exporter \
+   {% if postgres_exporter_flags_collector != "" %} {{ postgres_exporter_flags_collector }} \ {% endif %}
+    --web.listen-address {{ postgres_exporter_listen_address }}:{{ postgres_exporter_port }}
+SyslogIdentifier=postgres_exporter
+Restart=always
+[Install]
+WantedBy=multi-user.target
