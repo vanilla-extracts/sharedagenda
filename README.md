@@ -4,7 +4,7 @@
 > This project is FOR FUN AND LEARNING ONLY.
 > Do NOT under ANY CIRCUMSTANCES use your REAL EMAIL.
 > You would be at risk of LEAKING such an email because of the `/user/list` endpoint.
-> Even if the password are hashed DO NOT use your own password.
+> Even if the passwords are hashed DO NOT use your own password.
 > You have been warned!!
 
 
