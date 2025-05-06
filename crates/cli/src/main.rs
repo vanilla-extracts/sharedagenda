@@ -10,7 +10,7 @@ use handlers::{
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v2.2.0-prod";
+static VERSION: &str = "v2.3.0-prod";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
