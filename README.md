@@ -84,7 +84,7 @@ If you don't have a rust toolchain installed:
 ```sh
 ./builder build --release --bin cli
 #OR
-make cli
+make podman_cli
 ```
 
 Alternatively if you have one,
@@ -105,10 +105,9 @@ and _ansible_ for the configuration.
 
 ### Deployment on Openstack
 
-> **WARNING:**
-
-You **must** modify the `env.sh` file for your own needs, by default it uses the DGFiP's Git Forge and proxy.
-If you are deploying this on another openstack, you MUST update the script.
+> [!WARNING]
+> You **must** modify the `env.sh` file for your own needs, by default it uses the DGFiP's Git Forge and proxy.
+> If you are deploying this on another openstack, you MUST update the script.
 
 You need to put `clouds.yaml` and `secure.yaml` in `01-platform` and sim link
 them in `02-configuration`

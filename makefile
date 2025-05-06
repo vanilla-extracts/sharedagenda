@@ -9,3 +9,7 @@ podman_cli:
 	cp target/release/cli assets/cli
 all:
 	cargo build --release
+cli:
+	cargo build --release --bin cli
+server:
+	cargo build --release --bin server
