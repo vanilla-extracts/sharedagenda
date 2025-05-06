@@ -6,6 +6,10 @@ grafana_dashboards:
   - dashboard_id: 1860
     revision_id: 40
     datasource: prometheus
+  - dashboard_id: 9628
+    revision_id: 4
+    datasource: prometheus
+
 
 # Prometheus
 prometheus_storage_retention: "10d"
