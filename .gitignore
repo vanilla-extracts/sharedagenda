@@ -6,3 +6,5 @@ target/
 *.log
 clouds.yaml
 secure.yaml
+server
+cli

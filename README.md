@@ -92,12 +92,7 @@ Alternatively if you have one,
 cargo build --release --bin cli
 #OR
 make cli
-````
-
-### Pre-compiled binaries
-These binaries are built using the podman container which is a `Debian Bookworm (12)` container. It should work fine with all linux version with a Glibc at least at `2.36`
-- `server` is in `02-configuration/files/server`
-- `cli` is in `assets/cli`
+```
 
 ## Deployment
 SharedAgenda is hosted on NUBO, it uses _terraform_ for the creation of the VMs
