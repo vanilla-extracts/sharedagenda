@@ -1,9 +1,30 @@
-api-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr:80 {	
+{
+	default_sni sni.local
+	http_port 80
+	https_port 443
+	email sharedagenda@dgfip.finances.gouv.fr
+}
+
+sni.local {
+	tls /etc/caddy/self-signed.pem /etc/caddy/self-signed.key
+}
+
+api-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr:80 {
+	redir https://api-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr
+}
+
+grafana-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr:80 {
+	redir https://grafana-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr
+}
+
+api-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr {	
+	tls /etc/caddy/self-signed.pem /etc/caddy/self-signed.key
 	reverse_proxy http://{{ vm_apis_01_pub_ip }}:8000 http://{{ vm_apis_02_pub_ip }}:8000 http://{{ vm_apis_03_pub_ip }}:8000 {
 		lb_policy random 
 	}
 }
 
-grafana-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr:80 {
+grafana-{{ name }}.{{ zone }}.dgfip.nuage01.fi.francecloud.rie.gouv.fr {
+	tls /etc/caddy/self-signed.pem /etc/caddy/self-signed.key
 	reverse_proxy http://{{ vm_grafana_pub_ip }}:3000
 }

@@ -69,6 +69,7 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
     let client = Client::new();
     match client
         .post(format!("{}/{}/{}", url, first_route, second_route))
+        .danger_accept_invalid_cert(true)
         .json(data)
         .send()
         .await
