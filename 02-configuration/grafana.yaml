@@ -3,6 +3,7 @@
   become: true
   hosts: platform_shag_grafana
   vars_files:
+    - "vars/password.yaml"
     - "vars/monitoring.yaml"
   roles:
     - grafana

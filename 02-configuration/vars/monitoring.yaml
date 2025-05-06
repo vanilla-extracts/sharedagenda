@@ -1,7 +1,7 @@
 grafana_address: "{{ vm_grafana_pub_ip }}"
 grafana_security_custom:
   admin_user: admin
-  admin_password: admin
+  admin_password: "{{ vault_admin_grafana_password }}"
 grafana_dashboards:
   - dashboard_id: 1860
     revision_id: 40
