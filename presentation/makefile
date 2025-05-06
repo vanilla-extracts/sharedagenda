@@ -1,3 +1,4 @@
+export TYPST_FONT_PATHS=fonts/
 build: main.typ
 	typst c main.typ
 watch: build
