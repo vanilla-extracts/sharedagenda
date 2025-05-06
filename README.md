@@ -1,8 +1,8 @@
 # SharedAgenda
-SharedAgenda is our project for the end of our year as probationary civil
-servants in ENFiP Toulouse as Inspectrices PSE.
+SharedAgenda was my project for the end of my year as probationary civil
+servants in ENFiP Toulouse as Inspectrice PSE (think system administrator).
 
-The deployed version of SharedAgenda is v2.2.0-prod. See the diagrams below.
+The deployed version of SharedAgenda is v2.3.0-prod. See the diagrams below.
 
 The dev version of SharedAgenda is v3.0.0-dev
 
@@ -114,5 +114,7 @@ Here is the diagram for the deployed V1 infrastructure.
 
 ### V2
 Here is the diagram for the deployed V2 infrastructure.
+
+*Version shown is v2.2.0-prod, there is a monitoring machine in v2.3.0-prod*
 
 [![](assets/infrastructure_v2.png)](assets/infrastructure_v2.png)
