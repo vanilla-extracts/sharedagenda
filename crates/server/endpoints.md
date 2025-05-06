@@ -1,5 +1,29 @@
 # List of Endpoints
 ## Users
+### User list
+GET at /user/list
+
+Return the list of users
+```json
+{
+  "code": "{code}",
+  "users": [
+    {
+      "uuid": "{uuid}"
+      "email": "{email}",
+      "name": "{name}",
+      "password": "{password}",
+    },
+    [...]
+    {
+      "uuid": "{uuid}",
+      "email": "{email}",
+      "name": "{name}",
+      "password": "{password}"
+    }
+  ]
+}
+```
 ### User creation:
 POST at /user/create 
 
