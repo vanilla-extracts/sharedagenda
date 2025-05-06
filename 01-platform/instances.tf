@@ -70,7 +70,7 @@ module "vm-apis" {
   phase        = var.phase
   server_type  = "apis"
   image_name   = var.image_name
-  flavor_name  = var.flavor_name
+  flavor_name  = var.api_flavor_name
   key_pair     = openstack_compute_keypair_v2.ssh_keypair.name
   server_count = local.number_of_api_servers
 

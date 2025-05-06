@@ -4,10 +4,10 @@ locals {
   # cloud      = var.cloud
   # pf_prefixe = var.pf_prefixe
 
-  number_of_api_servers = 3 
-  number_of_database_servers = 2 
-  number_of_caddy_servers = 1 
-  number_of_bastion = 1 
+  number_of_api_servers      = 3
+  number_of_database_servers = 2
+  number_of_caddy_servers    = 1
+  number_of_bastion          = 1
   # Définition des réseau IP internes (Norme DGFiP)
   admin_subnet_cidr = "172.18.0.0/24" # Réseau IP interne d'administration
   pub_subnet_cidr   = "172.16.0.0/24" # Réseau IP interne de publication
@@ -61,3 +61,4 @@ variable "sg_description" { default = "" }
 variable "image_name" { default = "debian12" }
 variable "flavor_name" { default = "CO1.1" }
 variable "bdd_flavor_name" { default = "CO1.2" }
+variable "api_flavor_name" { default = "CO1.2" }
