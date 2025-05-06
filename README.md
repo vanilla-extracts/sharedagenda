@@ -1,4 +1,13 @@
 # SharedAgenda
+
+> [!CAUTION]
+> This project is FOR FUN AND LEARNING ONLY
+> Do NOT under ANY CIRCUMSTANCES use your REAL EMAIL
+> You would be at risk of LEAKING such an email because of the /user/list endpoint
+> Even if the password are hashed DO NOT use your own password
+> You have been warned
+
+
 SharedAgenda was my project for the end of my year as probationary civil
 servants in ENFiP Toulouse as Inspectrice PSE (think system administrator).
 
@@ -10,6 +19,23 @@ It has two different main components, the [server](crates/server) and the
 [cli](crates/cli).
 
 See their different README for more information and documentation.
+
+## Live APIs
+### DGFiP
+For the DGFiP's Network the live API is available until june at
+
+```
+http://api-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr
+````
+
+### Internet
+An API will (soon) be opened at
+
+```
+https://api.sharedagenda.faefox.dev
+#OR
+https://api.sharedagenda.charlotte-thomas.me
+```
 
 ## Build
 To build SharedAgenda you first need to install `podman` on your machine. 
