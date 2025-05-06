@@ -66,10 +66,11 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
     first_route: &str,
     second_route: &str,
 ) {
-    let client = Client::new();
-    match client
+    match Client::builder()
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap()
         .post(format!("{}/{}/{}", url, first_route, second_route))
-        .danger_accept_invalid_cert(true)
         .json(data)
         .send()
         .await
