@@ -6,5 +6,5 @@ target/
 *.log
 clouds.yaml
 secure.yaml
-server
-cli
+02-configuration/files/server
+assets/cli
