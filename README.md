@@ -138,3 +138,6 @@ Here is the diagram for the deployed V2 infrastructure.
 *Version shown is v2.2.0-prod, there is a monitoring machine in v2.3.0-prod*
 
 [![](assets/infrastructure_v2.png)](assets/infrastructure_v2.png)
+
+## Credits
+Logo is under CC0 for SVGRepo
