@@ -3,10 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::database::Database;
 
-use super::{
-    delete::{get_token_struct_from_token, get_user_from_token},
-    structs::User,
-};
+use super::structs::User;
 
 extern crate rocket;
 
@@ -27,8 +24,8 @@ async fn get_list_of_users() -> Vec<User> {
 
 #[get("/user/list")]
 pub async fn list() -> Json<UserListAnswer> {
-    Json(UserWhoamiAnswer {
+    Json(UserListAnswer {
         code: 200,
-        user: Some(user),
+        user: get_list_of_users().await,
     })
 }
