@@ -11,7 +11,6 @@ pub struct User {
     pub uuid: String,
     pub email: String,
     pub name: String,
-    pub password: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -43,7 +42,6 @@ impl Answer for WhoamiAnswer {
                 println!("UUID: {}", usr.uuid);
                 println!("Name: {}", usr.name);
                 println!("Email: {}", usr.email);
-                println!("Password: {}", usr.password);
                 println!("---- User Information ----");
             }
             None => {
