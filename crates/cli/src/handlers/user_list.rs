@@ -40,5 +40,5 @@ impl Answer for UserListAnswer {
 
 pub async fn user_list() {
     let url = API_URL.lock().unwrap().to_string();
-    call::<(), UserListAnswer>(url, None, "event", "list").await
+    call::<(), UserListAnswer>(url, None, "user", "list").await
 }

@@ -206,6 +206,7 @@ async fn main() {
             str if str.starts_with("logout") => logout().await,
             str if str.starts_with("whoami") => whoami().await,
             str if str.starts_with("delete") => delete().await,
+            str if str.starts_with("user_list") => user_list().await,
             str if str.starts_with("list") => match str.strip_prefix("list") {
                 Some(time) => list(time.trim().to_string()).await,
                 _ => list("".to_string()).await,
@@ -244,6 +245,9 @@ async fn main() {
                 );
                 println!(
                     "> logout                                                > logout of your account"
+                );
+                println!(
+                    "> user_list                                             > prints the list of users"
                 );
                 println!(
                     "> delete                                                > deletes your account"
