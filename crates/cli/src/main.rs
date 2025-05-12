@@ -5,7 +5,7 @@ use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
     create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, modify::modify, register::register, whoami::whoami,
+    logout::logout, modify::modify, register::register, user_list::user_list, whoami::whoami,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -109,6 +109,7 @@ async fn main() {
             "remove" => remove(&a.join("")).await,
             "new" | "create" => create(a).await,
             "list" => list(a.join("")).await,
+            "users" => user_list().await,
             "whoami" => whoami().await,
             "modify" => modify(a).await,
             _ => {

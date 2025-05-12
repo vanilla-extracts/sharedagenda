@@ -57,5 +57,5 @@ pub async fn whoami() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = WhoamiPost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    call::<WhoamiPost<'_>, WhoamiAnswer>(url, &data, "user", "whoami").await;
+    call::<WhoamiPost<'_>, WhoamiAnswer>(url, Some(&data), "user", "whoami").await;
 }

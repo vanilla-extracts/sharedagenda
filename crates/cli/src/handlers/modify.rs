@@ -54,5 +54,5 @@ pub async fn modify(vec: Vec<String>) {
         password: &password_hashed,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<UserModifyPost<'_>, UserModifyAnswer>(url, &data, "user", "modify").await;
+    call::<UserModifyPost<'_>, UserModifyAnswer>(url, Some(&data), "user", "modify").await;
 }

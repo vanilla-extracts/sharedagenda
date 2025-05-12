@@ -69,5 +69,5 @@ pub async fn list(line: String) {
         date_start: date,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<ListPost<'_>, ListAnswer>(url, &data, "event", "list").await
+    call::<ListPost<'_>, ListAnswer>(url, Some(&data), "event", "list").await
 }
