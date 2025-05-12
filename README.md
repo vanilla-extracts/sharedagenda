@@ -143,3 +143,6 @@ Here is the diagram for the deployed V2 infrastructure.
 Here is the diagram for the deployed V3 infrastructure
 
 [![](assets/infrastructure_v3.png)](assets/infrastructure_v3.png)
+
+## Credits
+Logo is under CC0 for SVGRepo
