@@ -14,6 +14,13 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserWithoutPassword {
+    pub uuid: String,
+    pub email: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Token {
     pub token: String,
     pub owner: String,
@@ -57,6 +64,16 @@ impl Token {
                 Some(date) => date,
                 None => Utc::now(),
             },
+        }
+    }
+}
+
+impl UserWithoutPassword {
+    pub fn from_user(user: &User) -> Self {
+        Self {
+            name: user.name.clone(),
+            email: user.email.clone(),
+            uuid: user.uuid.clone(),
         }
     }
 }

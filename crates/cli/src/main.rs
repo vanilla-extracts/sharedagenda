@@ -5,7 +5,7 @@ use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
     create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, modify::modify, register::register, whoami::whoami,
+    logout::logout, modify::modify, register::register, user_list::user_list, whoami::whoami,
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -109,6 +109,7 @@ async fn main() {
             "remove" => remove(&a.join("")).await,
             "new" | "create" => create(a).await,
             "list" => list(a.join("")).await,
+            "users" => user_list().await,
             "whoami" => whoami().await,
             "modify" => modify(a).await,
             _ => {
@@ -205,6 +206,7 @@ async fn main() {
             str if str.starts_with("logout") => logout().await,
             str if str.starts_with("whoami") => whoami().await,
             str if str.starts_with("delete") => delete().await,
+            str if str.starts_with("user_list") => user_list().await,
             str if str.starts_with("list") => match str.strip_prefix("list") {
                 Some(time) => list(time.trim().to_string()).await,
                 _ => list("".to_string()).await,
@@ -243,6 +245,9 @@ async fn main() {
                 );
                 println!(
                     "> logout                                                > logout of your account"
+                );
+                println!(
+                    "> user_list                                             > prints the list of users"
                 );
                 println!(
                     "> delete                                                > deletes your account"

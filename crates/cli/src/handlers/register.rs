@@ -51,5 +51,5 @@ pub async fn register(vec: Vec<String>) {
         password: &password_hashed,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<RegisterPost<'_>, RegisterAnswer>(url, &data, "user", "create").await;
+    call::<RegisterPost<'_>, RegisterAnswer>(url, Some(&data), "user", "create").await;
 }

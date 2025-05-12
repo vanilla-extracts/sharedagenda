@@ -62,19 +62,26 @@ impl Answer for LoginAnswer {
 
 pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
     url: String,
-    data: &U,
+    data: Option<&U>,
     first_route: &str,
     second_route: &str,
 ) {
-    match Client::builder()
-        .danger_accept_invalid_certs(true)
-        .build()
-        .unwrap()
-        .post(format!("{}/{}/{}", url, first_route, second_route))
-        .json(data)
-        .send()
-        .await
-    {
+    let client = match data {
+        Some(js) => Client::builder()
+            .danger_accept_invalid_certs(true)
+            .build()
+            .unwrap()
+            .post(format!("{}/{}/{}", url, first_route, second_route))
+            .json(js)
+            .send(),
+        None => Client::builder()
+            .danger_accept_invalid_certs(true)
+            .build()
+            .unwrap()
+            .get(format!("{}/{}/{}", url, first_route, second_route))
+            .send(),
+    };
+    match client.await {
         Ok(e) => match e.json::<V>().await {
             Ok(mut answer) => {
                 if answer.code() != 200 {
@@ -109,5 +116,5 @@ pub async fn login(vec: Vec<String>) {
         password: &vec[1],
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<LoginPost<'_>, LoginAnswer>(url, &data, "user", "login").await;
+    call::<LoginPost<'_>, LoginAnswer>(url, Some(&data), "user", "login").await;
 }

@@ -40,5 +40,5 @@ pub async fn remove(line: &str) {
         event_id,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<EventDeletionPost<'_>, EventDeletionAnswer>(url, &data, "event", "delete").await;
+    call::<EventDeletionPost<'_>, EventDeletionAnswer>(url, Some(&data), "event", "delete").await;
 }

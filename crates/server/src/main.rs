@@ -51,6 +51,7 @@ async fn rocket() -> _ {
             users::modify::modify,
             users::delete::delete,
             users::whoami::whoami,
+            users::list::list,
             events::create::create,
             events::delete::delete,
             events::modify::modify,

@@ -76,5 +76,5 @@ pub async fn create(vec: Vec<String>) {
         invitees,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<EventCreatePost<'_>, EventCreateAnswer>(url, &data, "event", "create").await;
+    call::<EventCreatePost<'_>, EventCreateAnswer>(url, Some(&data), "event", "create").await;
 }

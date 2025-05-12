@@ -44,5 +44,5 @@ pub async fn logout() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = LogoutPost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    call::<LogoutPost<'_>, LogoutAnswer>(url, &data, "user", "logout").await;
+    call::<LogoutPost<'_>, LogoutAnswer>(url, Some(&data), "user", "logout").await;
 }

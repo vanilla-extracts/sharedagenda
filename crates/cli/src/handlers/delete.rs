@@ -50,5 +50,5 @@ pub async fn delete() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = DeletePost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    call::<DeletePost<'_>, DeleteAnswer>(url, &data, "user", "delete").await;
+    call::<DeletePost<'_>, DeleteAnswer>(url, Some(&data), "user", "delete").await;
 }

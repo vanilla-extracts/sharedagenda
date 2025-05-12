@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     delete::{get_token_struct_from_token, get_user_from_token},
-    structs::User,
+    structs::UserWithoutPassword,
 };
 
 extern crate rocket;
@@ -18,7 +18,7 @@ pub struct UserWhoami {
 #[serde(crate = "rocket::serde")]
 pub struct UserWhoamiAnswer {
     code: i32,
-    user: Option<User>,
+    user: Option<UserWithoutPassword>,
 }
 
 #[post("/user/whoami", format = "application/json", data = "<body>")]
@@ -43,6 +43,6 @@ pub async fn whoami(body: Json<UserWhoami>) -> Json<UserWhoamiAnswer> {
     };
     Json(UserWhoamiAnswer {
         code: 200,
-        user: Some(user),
+        user: Some(UserWithoutPassword::from_user(&user)),
     })
 }
