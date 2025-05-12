@@ -11,7 +11,7 @@ extern crate rocket;
 #[serde(crate = "rocket::serde")]
 pub struct UserListAnswer {
     code: i32,
-    user: Vec<User>,
+    users: Vec<User>,
 }
 
 async fn get_list_of_users() -> Vec<User> {
@@ -26,6 +26,6 @@ async fn get_list_of_users() -> Vec<User> {
 pub async fn list() -> Json<UserListAnswer> {
     Json(UserListAnswer {
         code: 200,
-        user: get_list_of_users().await,
+        users: get_list_of_users().await,
     })
 }
