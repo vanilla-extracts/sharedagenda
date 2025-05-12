@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::database::Database;
 
-use super::structs::User;
+use super::structs::{User, UserWithoutPassword};
 
 extern crate rocket;
 
@@ -11,15 +11,18 @@ extern crate rocket;
 #[serde(crate = "rocket::serde")]
 pub struct UserListAnswer {
     code: i32,
-    users: Vec<User>,
+    users: Vec<UserWithoutPassword>,
 }
 
-async fn get_list_of_users() -> Vec<User> {
+async fn get_list_of_users() -> Vec<UserWithoutPassword> {
     let db = Database::new().await;
     let result: Vec<User> = db
         .query(&format!("select uuid,email,name,password from users"), &[])
         .await;
     result
+        .iter()
+        .map(|f| UserWithoutPassword::from_user(f))
+        .collect()
 }
 
 #[get("/user/list")]
