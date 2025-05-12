@@ -9,7 +9,6 @@ pub struct User {
     pub uuid: String,
     pub name: String,
     pub email: String,
-    pub password: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -32,7 +31,6 @@ impl Answer for UserListAnswer {
             println!("UUID: {}", user.uuid);
             println!("Name: {}", user.name);
             println!("Email: {}", user.email);
-            println!("Password: {}", user.password);
             println!("------");
         }
     }
