@@ -92,7 +92,7 @@ async fn main() {
                 a.push(line.unwrap());
             }
         } else {
-            args.nth(0);
+            args.next();
             args.for_each(|f| a.push(f));
         }
         let first = a.remove(0);
