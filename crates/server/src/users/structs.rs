@@ -55,6 +55,20 @@ impl QueriedData for Token {
     }
 }
 
+impl QueriedData for UserWithoutPassword {
+    fn len() -> usize {
+        3_usize
+    }
+
+    fn create_from_row(row: &Row) -> Self {
+        Self {
+            uuid: row.get(0),
+            email: row.get(1),
+            name: row.get(2),
+        }
+    }
+}
+
 impl Token {
     pub fn new(owner: String) -> Self {
         Self {
