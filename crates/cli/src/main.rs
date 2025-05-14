@@ -112,6 +112,7 @@ async fn main() {
             "users" => user_list().await,
             "whoami" => whoami().await,
             "modify" => modify(a).await,
+            "change" => change(a).await,
             _ => {
                 println!("-----SharedAgenda CLI Help-----");
                 println!(
@@ -143,6 +144,9 @@ async fn main() {
                 );
                 println!(
                     "sharedagenda new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "sharedagenda change <id> <name> <date_start> <date_end>            > modifies an event"
                 );
                 println!(
                     "sharedagenda list <date>                                           > prints out the list of events"
@@ -223,6 +227,10 @@ async fn main() {
                 Some(s) if s.trim() != "" => remove(s.trim()).await,
                 _ => println!("Usage: remove <id>"),
             },
+            str if str.starts_with("change") => match str.strip_prefix("change") {
+                Some(s) if s.trim() != "" => change(parse_line_into_arguments(s.trim())).await,
+                _ => println!("Usage: change <id> <name> <date_start> <date_end>"),
+            },
             _ => {
                 println!("-----SharedAgenda CLI REPL Help-----");
                 println!(
@@ -257,6 +265,9 @@ async fn main() {
                 );
                 println!(
                     "> new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "> change <id> <name> <date_start> <date_end>            > creates a new event"
                 );
                 println!(
                     "> list <date>                                           > prints out the list of events"
