@@ -9,7 +9,7 @@ use crate::{
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct EventModifyPost<'r> {
     token: &'r str,
-    event_id: &'r str,
+    event_id: i32,
     date_start: &'r str,
     date_end: &'r str,
     name: &'r str,
@@ -37,20 +37,34 @@ pub async fn change(vec: Vec<String>) {
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
-    let date_start = match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
-        Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
-        Err(e) => {
-            println!(
-                "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
-            );
+    let event_id: i32 = match vec[0].parse() {
+        Ok(e) => e,
+        Err(_) => {
+            println!("Error while parsing event id, please input a valid integer");
             return;
         }
-    }
-    .unwrap()
-    .format("%Y-%m-%d %H:%M %z")
-    .to_string();
+    };
 
-    let date_end = match NaiveDateTime::parse_from_str(&vec[3], "%Y-%m-%d %H:%M") {
+    let date_start = match vec[2].trim() {
+        "" => "".to_string(),
+        _ => match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
+            Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
+            Err(e) => {
+                println!(
+                    "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
+                );
+                return;
+            }
+        }
+    .unwrap()
+    .format("%Y-%m-%d %H:%M %z")
+    .to_string()
+    };
+
+    let date_end =
+        match vec[3].trim() {
+        "" => "".to_string(),
+        _ => match NaiveDateTime::parse_from_str(&vec[3], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
             println!(
@@ -61,14 +75,15 @@ pub async fn change(vec: Vec<String>) {
     }
     .unwrap()
     .format("%Y-%m-%d %H:%M %z")
-    .to_string();
+    .to_string()
+    };
 
     let data = EventModifyPost {
-        name: &vec[2],
+        name: &vec[1],
         token: &token,
         date_start: &date_start,
         date_end: &date_end,
-        event_id: &vec[1],
+        event_id,
     };
     let url = API_URL.lock().unwrap().to_string();
     call::<EventModifyPost<'_>, EventModifyAnswer>(url, Some(&data), "event", "modify").await;
