@@ -26,7 +26,7 @@ pub struct EventCreation<'r> {
 #[serde(crate = "rocket::serde")]
 pub struct EventCreationAnswer {
     code: i64,
-    answer: String,
+    body: String,
 }
 
 #[post("/event/create", format = "application/json", data = "<body>")]
@@ -35,7 +35,7 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
         if token.expiration_date < Utc::now() {
             return Json(EventCreationAnswer {
                 code: 401,
-                answer: "Token is expired".to_string(),
+                body: "Token is expired".to_string(),
             });
         }
 
@@ -44,7 +44,7 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
             None => {
                 return Json(EventCreationAnswer {
                     code: 405,
-                    answer: "User does not exists".to_string(),
+                    body: "User does not exists".to_string(),
                 });
             }
         };
@@ -53,9 +53,10 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
             Ok(date) => date,
             Err(e) => {
                 println!("{e}");
-                return Json(EventCreationAnswer {
+                return Json(EventCreationAnswer
+ {
             code: 406,
-            answer:
+            body:
                 "Error while parsing the start date, the date must be in the following format: %Y-%m-%d %H:%M %z"
                     .to_string(),
         });
@@ -66,9 +67,10 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
             Ok(date) => date,
             Err(e) => {
                 println!("{e}");
-                return Json(EventCreationAnswer {
+                return Json(EventCreationAnswer
+ {
             code: 406,
-            answer:
+            body:
                 "Error while parsing the end date, the date must be in the following format: %Y-%m-%d %H:%M %z"
                     .to_string(),
         });
@@ -78,7 +80,7 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
         if date_end < date_start {
             return Json(EventCreationAnswer {
                 code: 407,
-                answer: "Error, the end of the event must be after the start of the event"
+                body: "Error, the end of the event must be after the start of the event"
                     .to_string(),
             });
         }
@@ -104,11 +106,11 @@ pub async fn create(body: Json<EventCreation<'_>>) -> Json<EventCreationAnswer> 
 
         return Json(EventCreationAnswer {
             code: 200,
-            answer: format!("Event {} has been created.", body.name),
+            body: format!("Event {} has been created.", body.name),
         });
     }
     Json(EventCreationAnswer {
         code: 402,
-        answer: "Token does not exists".to_string(),
+        body: "Token does not exists".to_string(),
     })
 }

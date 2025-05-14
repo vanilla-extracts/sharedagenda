@@ -1,48 +1,43 @@
 use chrono::{Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
-
-use super::login::{Answer, call};
+use crate::{
+    API_URL, TOKEN,
+    handlers::user::login::{Answer, call},
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct EventCreatePost<'r> {
+pub struct EventModifyPost<'r> {
     token: &'r str,
+    event_id: &'r str,
     date_start: &'r str,
     date_end: &'r str,
     name: &'r str,
-    invitees: Vec<&'r str>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct EventCreateAnswer {
+pub struct EventModifyAnswer {
     code: i32,
-    answer: String,
+    body: String,
 }
 
-impl Answer for EventCreateAnswer {
+impl Answer for EventModifyAnswer {
     fn code(&self) -> i32 {
         self.code
     }
     fn answer(&self) -> String {
-        self.answer.clone()
+        self.body.clone()
     }
     fn process(&mut self) {}
 }
 
-pub async fn create(vec: Vec<String>) {
-    if vec.len() < 3 {
-        println!("Usage: create <name> <date_start> <date_end> [invitees]");
+pub async fn change(vec: Vec<String>) {
+    if vec.len() < 4 {
+        println!("Usage: change <id> <name> <date_start> <date_end>");
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
-    let mut invitees = vec![];
-    if vec.len() > 3 {
-        for invitee in vec[3].split(",") {
-            invitees.push(invitee);
-        }
-    }
-    let date_start = match NaiveDateTime::parse_from_str(&vec[1], "%Y-%m-%d %H:%M") {
+    let date_start = match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
             println!(
@@ -55,7 +50,7 @@ pub async fn create(vec: Vec<String>) {
     .format("%Y-%m-%d %H:%M %z")
     .to_string();
 
-    let date_end = match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
+    let date_end = match NaiveDateTime::parse_from_str(&vec[3], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
             println!(
@@ -68,13 +63,13 @@ pub async fn create(vec: Vec<String>) {
     .format("%Y-%m-%d %H:%M %z")
     .to_string();
 
-    let data = EventCreatePost {
-        name: &vec[0],
+    let data = EventModifyPost {
+        name: &vec[2],
         token: &token,
         date_start: &date_start,
         date_end: &date_end,
-        invitees,
+        event_id: &vec[1],
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<EventCreatePost<'_>, EventCreateAnswer>(url, Some(&data), "event", "create").await;
+    call::<EventModifyPost<'_>, EventModifyAnswer>(url, Some(&data), "event", "modify").await;
 }

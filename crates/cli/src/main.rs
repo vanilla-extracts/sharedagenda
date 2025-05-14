@@ -4,8 +4,11 @@ use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, modify::modify, register::register, user_list::user_list, whoami::whoami,
+    event::{change::change, create::create, delete::remove, list::list},
+    user::{
+        delete::delete, login::login, logout::logout, modify::modify, register::register,
+        user_list::user_list, whoami::whoami,
+    },
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
