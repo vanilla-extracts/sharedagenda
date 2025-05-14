@@ -97,6 +97,14 @@ pub async fn modify(body: Json<EventModification<'_>>) -> Json<EventModification
             }
         }
 
+        if date_end < date_start {
+            return Json(EventModificationAnswer {
+                code: 407,
+                body: "Error, the end of the event must be after the start of the event"
+                    .to_string(),
+            });
+        }
+
         let db = Database::new().await;
         let sql = format!(
             "update events set name='{}', date_start=$1, date_end=$2 where owner='{}' and id={}",
