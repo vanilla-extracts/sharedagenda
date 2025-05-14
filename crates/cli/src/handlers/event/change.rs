@@ -10,9 +10,9 @@ use crate::{
 pub struct EventModifyPost<'r> {
     token: &'r str,
     event_id: i32,
-    date_start: &'r str,
-    date_end: &'r str,
-    name: &'r str,
+    date_start: Option<&'r str>,
+    date_end: Option<&'r str>,
+    name: Option<&'r str>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -79,10 +79,22 @@ pub async fn change(vec: Vec<String>) {
     };
 
     let data = EventModifyPost {
-        name: &vec[1],
+        name: if vec[1].trim() == "" {
+            None
+        } else {
+            Some(&vec[1])
+        },
         token: &token,
-        date_start: &date_start,
-        date_end: &date_end,
+        date_start: if date_start.trim() == "" {
+            None
+        } else {
+            Some(&date_start)
+        },
+        date_end: if date_end.trim() == "" {
+            None
+        } else {
+            Some(&date_end)
+        },
         event_id,
     };
     let url = API_URL.lock().unwrap().to_string();
