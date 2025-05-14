@@ -13,10 +13,8 @@
 # Vérifie qu'on utilise bien la commande 'source'
 python='env python3'
 nbMaxProjects=30
-sshPem=~/.ssh/id_github_me.pub
+sshPem=~/.ssh/id_github_me
 virtualEnv=.Home
-
-
 
 function setupSSH
 {
