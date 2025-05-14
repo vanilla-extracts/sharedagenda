@@ -56,26 +56,25 @@ pub async fn change(vec: Vec<String>) {
                 return;
             }
         }
-    .unwrap()
-    .format("%Y-%m-%d %H:%M %z")
-    .to_string()
+        .unwrap()
+        .format("%Y-%m-%d %H:%M %z")
+        .to_string()
     };
 
-    let date_end =
-        match vec[3].trim() {
+    let date_end = match vec[3].trim() {
         "" => "".to_string(),
         _ => match NaiveDateTime::parse_from_str(&vec[3], "%Y-%m-%d %H:%M") {
-        Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
-        Err(e) => {
-            println!(
-                "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
-            );
-            return;
+            Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
+            Err(e) => {
+                println!(
+                    "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
+                );
+                return;
+            }
         }
-    }
-    .unwrap()
-    .format("%Y-%m-%d %H:%M %z")
-    .to_string()
+        .unwrap()
+        .format("%Y-%m-%d %H:%M %z")
+        .to_string()
     };
 
     let data = EventModifyPost {
