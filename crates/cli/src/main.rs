@@ -4,8 +4,11 @@ use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, modify::modify, register::register, user_list::user_list, whoami::whoami,
+    event::{change::change, create::create, delete::remove, list::list},
+    user::{
+        delete::delete, login::login, logout::logout, modify::modify, register::register,
+        user_list::user_list, whoami::whoami,
+    },
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
@@ -112,6 +115,7 @@ async fn main() {
             "users" => user_list().await,
             "whoami" => whoami().await,
             "modify" => modify(a).await,
+            "change" => change(a).await,
             _ => {
                 println!("-----SharedAgenda CLI Help-----");
                 println!(
@@ -143,6 +147,9 @@ async fn main() {
                 );
                 println!(
                     "sharedagenda new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "sharedagenda change <id> <name> <date_start> <date_end>            > modifies an event"
                 );
                 println!(
                     "sharedagenda list <date>                                           > prints out the list of events"
@@ -223,6 +230,10 @@ async fn main() {
                 Some(s) if s.trim() != "" => remove(s.trim()).await,
                 _ => println!("Usage: remove <id>"),
             },
+            str if str.starts_with("change") => match str.strip_prefix("change") {
+                Some(s) if s.trim() != "" => change(parse_line_into_arguments(s.trim())).await,
+                _ => println!("Usage: change <id> <name> <date_start> <date_end>"),
+            },
             _ => {
                 println!("-----SharedAgenda CLI REPL Help-----");
                 println!(
@@ -257,6 +268,9 @@ async fn main() {
                 );
                 println!(
                     "> new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "> change <id> <name> <date_start> <date_end>            > creates a new event"
                 );
                 println!(
                     "> list <date>                                           > prints out the list of events"

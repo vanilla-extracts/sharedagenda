@@ -1,9 +1,10 @@
 use chrono::{DateTime, FixedOffset, Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
-
-use super::login::{Answer, call};
+use crate::{
+    API_URL, TOKEN,
+    handlers::user::login::{Answer, call},
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ListPost<'r> {

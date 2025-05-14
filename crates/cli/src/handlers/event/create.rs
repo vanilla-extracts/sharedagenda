@@ -1,9 +1,10 @@
 use chrono::{Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
-
-use super::login::{Answer, call};
+use crate::{
+    API_URL, TOKEN,
+    handlers::user::login::{Answer, call},
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct EventCreatePost<'r> {
@@ -17,7 +18,7 @@ pub struct EventCreatePost<'r> {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct EventCreateAnswer {
     code: i32,
-    answer: String,
+    body: String,
 }
 
 impl Answer for EventCreateAnswer {
@@ -25,7 +26,7 @@ impl Answer for EventCreateAnswer {
         self.code
     }
     fn answer(&self) -> String {
-        self.answer.clone()
+        self.body.clone()
     }
     fn process(&mut self) {}
 }
