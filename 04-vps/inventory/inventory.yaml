@@ -1,5 +1,4 @@
 ---
 all:
-  children:
-    - nova
-    - ambassador
+  hosts:
+    nova:
