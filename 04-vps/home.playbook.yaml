@@ -1,0 +1,8 @@
+---
+- name: Install node_exporter
+  hosts: all
+  become: true
+  vars:
+    node_exporter_web_listen_address: 127.0.0.1:9100
+  roles:
+    - prometheus.prometheus.node_exporter
