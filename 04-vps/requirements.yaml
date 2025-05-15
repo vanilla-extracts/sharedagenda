@@ -3,4 +3,4 @@ collections:
     version: 0.26.2
     source: https://galaxy.ansible.com
   - name: grafana.grafana
-    version: 1.0.0
+    version: 6.0.1

@@ -15,3 +15,14 @@
     - "vars/monitoring.yaml"
   roles:
     - prometheus.prometheus.prometheus
+- name: Install grafana on nova
+  hosts: dev
+  become: true
+  no_log: false
+  vars_files:
+    - "vars/password.yaml"
+    - "vars/monitoring.yaml"
+  roles:
+    - role: grafana.grafana.grafana
+      vars:
+        no_log: false
