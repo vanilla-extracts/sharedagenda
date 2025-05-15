@@ -21,7 +21,6 @@
   become: true
   vars_files:
     - "vars/password.yaml"
-    - "vars/monitoring.yaml"
   roles:
     - role: grafana.grafana.grafana
       vars:
@@ -29,5 +28,15 @@
           admin_user: "{{ vault_admin_grafana_username }}"
           admin_password: "{{ vault_admin_grafana_password }}"
 
+        grafana_datasources:
+          - name: prometheus
+            type: prometheus
+            access: proxy
+            url: 'http://127.0.0.1:9999'
+            basicAuth: false
+        grafana_dashboards:
+          - dashboard_id: 1860
+            revision_id: 40
+            datasource: prometheus
 - name: Install and Configure Caddy
   ansible.builtin.import_playbook: caddy.yaml
