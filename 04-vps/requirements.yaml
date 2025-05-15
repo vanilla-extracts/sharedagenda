@@ -2,3 +2,5 @@ collections:
   - name: prometheus.prometheus
     version: 0.26.2
     source: https://galaxy.ansible.com
+  - name: grafana.grafana
+    version: 1.0.0
