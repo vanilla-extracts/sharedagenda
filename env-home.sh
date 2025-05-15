@@ -51,7 +51,6 @@ function setupAliases
 
 # Programme principal
 
-setupEnv
 setupSSH
 setupAliases
 setupPythonEnv

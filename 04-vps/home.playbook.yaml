@@ -11,5 +11,5 @@
   become: true
   vars_files:
     - "vars/monitoring.yaml"
-  role:
+  roles:
     - prometheus.prometheus.prometheus
