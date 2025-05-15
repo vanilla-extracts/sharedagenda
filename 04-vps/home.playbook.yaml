@@ -9,6 +9,8 @@
 - name: Install prometheus on nova
   hosts: dev
   become: true
+  vars:
+    prometheus_web_listen_address: 127.0.0.1:9999
   vars_files:
     - "vars/monitoring.yaml"
   roles:
