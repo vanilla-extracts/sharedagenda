@@ -54,10 +54,18 @@ impl App {
     }
 
     fn decrement_counter(&mut self) {
+        if self.counter == 0 {
+            self.counter = u8::MAX;
+            return;
+        }
         self.counter -= 1;
     }
 
     fn increment_counter(&mut self) {
+        if self.counter == u8::MAX {
+            self.counter = 0;
+            return;
+        }
         self.counter += 1;
     }
 }
