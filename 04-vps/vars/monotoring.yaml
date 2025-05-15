@@ -10,4 +10,17 @@ prometheus_scrape_configs:
       - targets:
         - "127.0.0.1:9100"
         - "https://nodeexporter.primary.faefox.dev"
-  
+grafana_ini.server.http_addr: 127.0.0.1
+grafana_datasources:
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    url: 'http://127.0.0.1:9999'
+    basicAuth: false
+grafana_dashboards:
+  - dashboard_id: 1860
+    revision_id: 40
+    datasource: prometheus
+grafana_security_custom:
+  admin_user: "{{ vault_admin_grafana_username }}"
+  admin_password: "{{ vault_admin_grafana_password }}"
