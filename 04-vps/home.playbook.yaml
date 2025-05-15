@@ -15,6 +15,7 @@
     - "vars/monitoring.yaml"
   roles:
     - prometheus.prometheus.prometheus
+
 - name: Install grafana on nova
   hosts: dev
   become: true
@@ -27,3 +28,6 @@
         grafana_security:
           admin_user: "{{ vault_admin_grafana_username }}"
           admin_password: "{{ vault_admin_grafana_password }}"
+
+- name: Install and Configure Caddy
+  ansible.builtin.import_playbook: caddy.yaml
