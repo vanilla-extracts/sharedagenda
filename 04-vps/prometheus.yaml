@@ -1,4 +1,0 @@
-- name: Install prometheus on nova
-  hosts: dev
-  become: true
-  vars:
