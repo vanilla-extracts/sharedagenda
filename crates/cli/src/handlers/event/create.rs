@@ -1,5 +1,5 @@
 use chrono::{Local, NaiveDateTime};
-use common::Answer;
+use common::{Answer, Call};
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, TOKEN};
@@ -80,5 +80,5 @@ pub async fn create(vec: Vec<String>) {
         invitees,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<EventCreatePost<'_>, EventCreateAnswer>(url, Some(&data), "event", "create").await;
+    Call::call::<EventCreatePost<'_>, EventCreateAnswer>(url, Some(&data), "event", "create").await;
 }

@@ -3,7 +3,7 @@ use crate::{
     configuration::loader::{load, write_config},
 };
 use chrono::{DateTime, Utc};
-use common::Answer;
+use common::{Answer, Call};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -54,5 +54,5 @@ pub async fn login(vec: Vec<String>) {
         password: &vec[1],
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<LoginPost<'_>, LoginAnswer>(url, Some(&data), "user", "login").await;
+    Call::call::<LoginPost<'_>, LoginAnswer>(url, Some(&data), "user", "login").await;
 }

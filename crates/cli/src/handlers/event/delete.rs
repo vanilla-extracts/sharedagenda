@@ -1,4 +1,4 @@
-use common::Answer;
+use common::{Answer, Call};
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, TOKEN};
@@ -42,5 +42,6 @@ pub async fn remove(line: &str) {
         event_id,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<EventDeletionPost<'_>, EventDeletionAnswer>(url, Some(&data), "event", "delete").await;
+    Call::call::<EventDeletionPost<'_>, EventDeletionAnswer>(url, Some(&data), "event", "delete")
+        .await;
 }
