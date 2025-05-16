@@ -1,13 +1,13 @@
 use argon2::{Argon2, PasswordHasher};
-use common::{
-    Answer, Call,
-    struct_user::{RegisterAnswer, RegisterPost},
-};
+use common::{Answer, Call};
 use password_hash::{SaltString, rand_core::OsRng};
 
-use crate::{API_URL, CliAnswer};
+use crate::{
+    API_URL,
+    structs::struct_user::{RegisterAnswer, RegisterPost},
+};
 
-impl CliAnswer for RegisterAnswer {
+impl Answer for RegisterAnswer {
     fn code(&self) -> i32 {
         self.code
     }

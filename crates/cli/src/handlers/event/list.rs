@@ -1,12 +1,12 @@
 use chrono::{Local, NaiveDateTime};
-use common::{
-    Call,
-    struct_event::{ListAnswer, ListPost},
+use common::{Answer, Call};
+
+use crate::{
+    API_URL, TOKEN,
+    structs::struct_event::{ListAnswer, ListPost},
 };
 
-use crate::{API_URL, CliAnswer, TOKEN};
-
-impl CliAnswer for ListAnswer {
+impl Answer for ListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

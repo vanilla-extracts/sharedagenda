@@ -1,14 +1,12 @@
-use common::{
-    Call,
-    struct_user::{LogoutAnswer, LogoutPost},
-};
+use common::{Answer, Call};
 
 use crate::{
-    API_URL, CliAnswer, TOKEN,
+    API_URL, TOKEN,
     configuration::loader::{load, write_config},
+    structs::struct_user::{LogoutAnswer, LogoutPost},
 };
 
-impl CliAnswer for LogoutAnswer {
+impl Answer for LogoutAnswer {
     fn code(&self) -> i32 {
         self.code
     }

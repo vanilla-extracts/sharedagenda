@@ -1,13 +1,11 @@
 use crate::{
-    API_URL, CliAnswer, TOKEN,
+    API_URL, TOKEN,
     configuration::loader::{load, write_config},
+    structs::struct_user::{LoginAnswer, LoginPost},
 };
-use common::{
-    Call,
-    struct_user::{LoginAnswer, LoginPost},
-};
+use common::{Answer, Call};
 
-impl CliAnswer for LoginAnswer {
+impl Answer for LoginAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

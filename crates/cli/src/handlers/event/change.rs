@@ -1,12 +1,12 @@
 use chrono::{Local, NaiveDateTime};
-use common::{
-    Call,
-    struct_event::{EventModifyAnswer, EventModifyPost},
+use common::{Answer, Call};
+
+use crate::{
+    API_URL, TOKEN,
+    structs::struct_event::{EventModifyAnswer, EventModifyPost},
 };
 
-use crate::{API_URL, CliAnswer, TOKEN};
-
-impl CliAnswer for EventModifyAnswer {
+impl Answer for EventModifyAnswer {
     fn code(&self) -> i32 {
         self.code
     }

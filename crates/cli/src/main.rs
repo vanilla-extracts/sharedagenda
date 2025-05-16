@@ -14,12 +14,6 @@ use handlers::{
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-trait CliAnswer: Answer {
-    fn code(&self) -> i32;
-    fn process_error(&self);
-    fn process(&mut self);
-}
-
 static VERSION: &str = "v3.0.0-dev";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
@@ -30,6 +24,7 @@ lazy_static! {
 
 mod configuration;
 mod handlers;
+mod structs;
 
 pub fn parse_line_into_arguments(line: &str) -> Vec<String> {
     let mut args = vec![];
