@@ -21,9 +21,9 @@ lazy_static! {
     static ref API_URL: Mutex<String> = Mutex::new(String::new());
 }
 
+mod call;
 mod configuration;
 mod handlers;
-mod structs;
 
 pub fn parse_line_into_arguments(line: &str) -> Vec<String> {
     let mut args = vec![];

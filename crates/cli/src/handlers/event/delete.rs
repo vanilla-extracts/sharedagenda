@@ -1,8 +1,8 @@
-use common::{Answer, call};
+use common::structs::struct_event::{EventDeletionAnswer, EventDeletionPost};
 
 use crate::{
     API_URL, TOKEN,
-    structs::struct_event::{EventDeletionAnswer, EventDeletionPost},
+    call::{Answer, call},
 };
 
 impl Answer for EventDeletionAnswer {

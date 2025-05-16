@@ -313,6 +313,7 @@ dependencies = [
  "lazy_static",
  "linefeed",
  "password-hash",
+ "reqwest",
  "serde",
  "tokio",
 ]
@@ -348,7 +349,7 @@ dependencies = [
 name = "common"
 version = "0.1.0"
 dependencies = [
- "reqwest",
+ "chrono",
  "serde",
 ]
 

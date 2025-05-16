@@ -1,9 +1,9 @@
 use chrono::{Local, NaiveDateTime};
-use common::{Answer, call};
+use common::structs::struct_event::{EventCreateAnswer, EventCreatePost};
 
 use crate::{
     API_URL, TOKEN,
-    structs::struct_event::{EventCreateAnswer, EventCreatePost},
+    call::{Answer, call},
 };
 
 impl Answer for EventCreateAnswer {

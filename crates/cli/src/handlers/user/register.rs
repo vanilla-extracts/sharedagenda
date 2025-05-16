@@ -1,10 +1,10 @@
 use argon2::{Argon2, PasswordHasher};
-use common::{Answer, call};
+use common::structs::struct_user::{RegisterAnswer, RegisterPost};
 use password_hash::{SaltString, rand_core::OsRng};
 
 use crate::{
     API_URL,
-    structs::struct_user::{RegisterAnswer, RegisterPost},
+    call::{Answer, call},
 };
 
 impl Answer for RegisterAnswer {
