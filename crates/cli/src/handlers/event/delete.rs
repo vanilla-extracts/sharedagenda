@@ -1,4 +1,4 @@
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -32,6 +32,5 @@ pub async fn remove(line: &str) {
         event_id,
     };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<EventDeletionPost<'_>, EventDeletionAnswer>(url, Some(&data), "event", "delete")
-        .await;
+    call::<EventDeletionPost<'_>, EventDeletionAnswer>(url, Some(&data), "event", "delete").await;
 }

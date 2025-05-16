@@ -1,5 +1,5 @@
 use chrono::{Local, NaiveDateTime};
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -67,5 +67,5 @@ pub async fn create(vec: Vec<String>) {
         invitees,
     };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<EventCreatePost<'_>, EventCreateAnswer>(url, Some(&data), "event", "create").await;
+    call::<EventCreatePost<'_>, EventCreateAnswer>(url, Some(&data), "event", "create").await;
 }

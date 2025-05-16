@@ -3,7 +3,7 @@ use crate::{
     configuration::loader::{load, write_config},
     structs::struct_user::{LoginAnswer, LoginPost},
 };
-use common::{Answer, Call};
+use common::{Answer, call};
 
 impl Answer for LoginAnswer {
     fn code(&self) -> i32 {
@@ -40,5 +40,5 @@ pub async fn login(vec: Vec<String>) {
         password: &vec[1],
     };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<LoginPost<'_>, LoginAnswer>(url, Some(&data), "user", "login").await;
+    call::<LoginPost<'_>, LoginAnswer>(url, Some(&data), "user", "login").await;
 }

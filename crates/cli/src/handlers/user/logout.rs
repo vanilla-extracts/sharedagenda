@@ -1,4 +1,4 @@
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -31,5 +31,5 @@ pub async fn logout() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = LogoutPost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<LogoutPost<'_>, LogoutAnswer>(url, Some(&data), "user", "logout").await;
+    call::<LogoutPost<'_>, LogoutAnswer>(url, Some(&data), "user", "logout").await;
 }
