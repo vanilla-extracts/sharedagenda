@@ -11,7 +11,7 @@ impl Answer for LoginAnswer {
         self.code as i32
     }
     fn process_error(&self) {
-        println!("Error on login, code {}, message {}", self.code, self.token);
+        eprintln!("Error on login, code {}, message {}", self.code, self.token);
     }
 
     fn process(&mut self) {
@@ -24,7 +24,7 @@ impl Answer for LoginAnswer {
                 println!("Configuration has been updated")
             }
             Err(_) => {
-                println!("Error while updating configuration")
+                eprintln!("Error while updating configuration")
             }
         }
     }
@@ -32,7 +32,7 @@ impl Answer for LoginAnswer {
 
 pub async fn login(vec: Vec<String>) {
     if vec.len() < 2 {
-        println!("Usage: login <email> <password>");
+        eprintln!("Usage: login <email> <password>");
         return;
     }
 

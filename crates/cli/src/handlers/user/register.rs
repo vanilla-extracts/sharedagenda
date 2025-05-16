@@ -12,7 +12,7 @@ impl Answer for RegisterAnswer {
         self.code
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while registering, code {}, message {}",
             self.code, self.answer
         );
@@ -24,7 +24,7 @@ impl Answer for RegisterAnswer {
 
 pub async fn register(vec: Vec<String>) {
     if vec.len() < 3 {
-        println!("Usage: register <name> <email> <password>");
+        eprintln!("Usage: register <name> <email> <password>");
         return;
     }
 
@@ -33,7 +33,7 @@ pub async fn register(vec: Vec<String>) {
     let password_hashed = match argon.hash_password(vec[2].as_bytes(), &salt) {
         Ok(e) => e.to_string(),
         Err(e) => {
-            println!("Error, aborting registration of user.\n{e}");
+            eprintln!("Error, aborting registration of user.\n{e}");
             return;
         }
     };

@@ -10,7 +10,7 @@ impl Answer for EventDeletionAnswer {
         self.code as i32
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while deleting an event, code {}, message {}",
             self.code, self.body
         );
@@ -23,7 +23,7 @@ pub async fn remove(line: &str) {
     let event_id: i32 = match line.trim().parse() {
         Ok(id) => id,
         Err(e) => {
-            println!("Please specify an integer: {e}");
+            eprintln!("Please specify an integer: {e}");
             return;
         }
     };

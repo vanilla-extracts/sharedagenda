@@ -10,7 +10,7 @@ impl Answer for UserListAnswer {
         self.code as i32
     }
     fn process_error(&self) {
-        println!("Error while fetching user list, code {}", self.code);
+        eprintln!("Error while fetching user list, code {}", self.code);
     }
     fn process(&mut self) {
         self.users.sort_by_key(|f| f.name.clone());

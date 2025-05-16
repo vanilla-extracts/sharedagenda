@@ -12,7 +12,7 @@ impl Answer for UserModifyAnswer {
         self.code
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while modifying user account, code {}, message {}",
             self.code, self.body
         );
@@ -24,7 +24,7 @@ impl Answer for UserModifyAnswer {
 
 pub async fn modify(vec: Vec<String>) {
     if vec.len() < 3 {
-        println!("Usage: change <name> <email> <password>");
+        eprintln!("Usage: change <name> <email> <password>");
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
@@ -34,7 +34,7 @@ pub async fn modify(vec: Vec<String>) {
     let password_hashed = match argon.hash_password(vec[2].as_bytes(), &salt) {
         Ok(e) => e.to_string(),
         Err(e) => {
-            println!("Error, aborting registration of user.\n{e}");
+            eprintln!("Error, aborting registration of user.\n{e}");
             return;
         }
     };

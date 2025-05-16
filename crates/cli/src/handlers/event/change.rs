@@ -11,7 +11,7 @@ impl Answer for EventModifyAnswer {
         self.code
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while modifiying an event, code {}, message {}",
             self.code, self.body
         );
@@ -23,14 +23,14 @@ impl Answer for EventModifyAnswer {
 
 pub async fn change(vec: Vec<String>) {
     if vec.len() < 4 {
-        println!("Usage: change <id> <name> <date_start> <date_end>");
+        eprintln!("Usage: change <id> <name> <date_start> <date_end>");
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
     let event_id: i32 = match vec[0].parse() {
         Ok(e) => e,
         Err(_) => {
-            println!("Error while parsing event id, please input a valid integer");
+            eprintln!("Error while parsing event id, please input a valid integer");
             return;
         }
     };
@@ -40,7 +40,7 @@ pub async fn change(vec: Vec<String>) {
         _ => match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
             Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
             Err(e) => {
-                println!(
+                eprintln!(
                     "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
                 );
                 return;
@@ -56,7 +56,7 @@ pub async fn change(vec: Vec<String>) {
         _ => match NaiveDateTime::parse_from_str(&vec[3], "%Y-%m-%d %H:%M") {
             Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
             Err(e) => {
-                println!(
+                eprintln!(
                     "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
                 );
                 return;

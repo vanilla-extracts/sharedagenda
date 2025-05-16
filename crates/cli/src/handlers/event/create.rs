@@ -11,7 +11,7 @@ impl Answer for EventCreateAnswer {
         self.code
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while creating the event, code {}, message {}",
             self.code, self.body
         );
@@ -23,7 +23,7 @@ impl Answer for EventCreateAnswer {
 
 pub async fn create(vec: Vec<String>) {
     if vec.len() < 3 {
-        println!("Usage: create <name> <date_start> <date_end> [invitees]");
+        eprintln!("Usage: create <name> <date_start> <date_end> [invitees]");
         return;
     }
     let token = TOKEN.lock().unwrap().to_string();
@@ -36,7 +36,7 @@ pub async fn create(vec: Vec<String>) {
     let date_start = match NaiveDateTime::parse_from_str(&vec[1], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
-            println!(
+            eprintln!(
                 "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
             );
             return;
@@ -49,7 +49,7 @@ pub async fn create(vec: Vec<String>) {
     let date_end = match NaiveDateTime::parse_from_str(&vec[2], "%Y-%m-%d %H:%M") {
         Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
         Err(e) => {
-            println!(
+            eprintln!(
                 "Error while parsing date, it must be in the following format: %Y-%m-%d %H:%M, {e}"
             );
             return;
