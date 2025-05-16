@@ -1,23 +1,14 @@
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use common::{
+    Call,
+    struct_event::{DeleteAnswer, DeletePost},
+};
 
 use crate::{
-    API_URL, TOKEN,
+    API_URL, CliAnswer, TOKEN,
     configuration::loader::{load, write_config},
 };
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct DeletePost<'r> {
-    token: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct DeleteAnswer {
-    code: u16,
-    body: String,
-}
-
-impl Answer for DeleteAnswer {
+impl CliAnswer for DeleteAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

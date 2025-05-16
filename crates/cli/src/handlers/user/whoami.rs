@@ -1,29 +1,11 @@
-use std::fmt::Debug;
+use common::{
+    Call,
+    struct_event::{WhoamiAnswer, WhoamiPost},
+};
 
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use crate::{API_URL, CliAnswer, TOKEN};
 
-use crate::{API_URL, TOKEN};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct User {
-    pub uuid: String,
-    pub email: String,
-    pub name: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WhoamiPost<'r> {
-    token: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WhoamiAnswer {
-    code: i64,
-    user: Option<User>,
-}
-
-impl Answer for WhoamiAnswer {
+impl CliAnswer for WhoamiAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

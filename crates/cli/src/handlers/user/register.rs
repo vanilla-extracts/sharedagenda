@@ -1,24 +1,13 @@
 use argon2::{Argon2, PasswordHasher};
-use common::{Answer, Call};
+use common::{
+    Answer, Call,
+    struct_user::{RegisterAnswer, RegisterPost},
+};
 use password_hash::{SaltString, rand_core::OsRng};
-use serde::{Deserialize, Serialize};
 
-use crate::API_URL;
+use crate::{API_URL, CliAnswer};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RegisterPost<'r> {
-    name: &'r str,
-    email: &'r str,
-    password: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RegisterAnswer {
-    code: i32,
-    answer: String,
-}
-
-impl Answer for RegisterAnswer {
+impl CliAnswer for RegisterAnswer {
     fn code(&self) -> i32 {
         self.code
     }

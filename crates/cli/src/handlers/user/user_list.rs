@@ -1,22 +1,8 @@
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use common::{Call, struct_user::UserListAnswer};
 
-use crate::API_URL;
+use crate::{API_URL, CliAnswer};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct User {
-    pub uuid: String,
-    pub name: String,
-    pub email: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserListAnswer {
-    code: u16,
-    users: Vec<User>,
-}
-
-impl Answer for UserListAnswer {
+impl CliAnswer for UserListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
