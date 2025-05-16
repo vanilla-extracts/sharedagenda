@@ -1,11 +1,10 @@
+use common::Answer;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     API_URL, TOKEN,
     configuration::loader::{load, write_config},
 };
-
-use super::login::{Answer, call};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DeletePost<'r> {
