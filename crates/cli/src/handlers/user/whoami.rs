@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use common::Answer;
+use common::{Answer, Call};
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, TOKEN};
@@ -50,5 +50,5 @@ pub async fn whoami() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = WhoamiPost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    call::<WhoamiPost<'_>, WhoamiAnswer>(url, Some(&data), "user", "whoami").await;
+    Call::call::<WhoamiPost<'_>, WhoamiAnswer>(url, Some(&data), "user", "whoami").await;
 }

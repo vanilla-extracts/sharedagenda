@@ -1,5 +1,5 @@
 use argon2::{Argon2, PasswordHasher};
-use common::Answer;
+use common::{Answer, Call};
 use password_hash::{SaltString, rand_core::OsRng};
 use serde::{Deserialize, Serialize};
 
@@ -55,5 +55,5 @@ pub async fn register(vec: Vec<String>) {
         password: &password_hashed,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<RegisterPost<'_>, RegisterAnswer>(url, Some(&data), "user", "create").await;
+    Call::call::<RegisterPost<'_>, RegisterAnswer>(url, Some(&data), "user", "create").await;
 }

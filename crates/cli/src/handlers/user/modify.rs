@@ -1,5 +1,5 @@
 use argon2::{Argon2, PasswordHasher};
-use common::Answer;
+use common::{Answer, Call};
 use password_hash::{SaltString, rand_core::OsRng};
 use serde::{Deserialize, Serialize};
 
@@ -58,5 +58,5 @@ pub async fn modify(vec: Vec<String>) {
         password: &password_hashed,
     };
     let url = API_URL.lock().unwrap().to_string();
-    call::<UserModifyPost<'_>, UserModifyAnswer>(url, Some(&data), "user", "modify").await;
+    Call::call::<UserModifyPost<'_>, UserModifyAnswer>(url, Some(&data), "user", "modify").await;
 }

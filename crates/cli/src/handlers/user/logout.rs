@@ -1,4 +1,4 @@
-use common::Answer;
+use common::{Answer, Call};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -41,5 +41,5 @@ pub async fn logout() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = LogoutPost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    call::<LogoutPost<'_>, LogoutAnswer>(url, Some(&data), "user", "logout").await;
+    Call::call::<LogoutPost<'_>, LogoutAnswer>(url, Some(&data), "user", "logout").await;
 }

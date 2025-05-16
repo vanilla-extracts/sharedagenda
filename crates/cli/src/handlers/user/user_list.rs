@@ -1,4 +1,4 @@
-use common::Answer;
+use common::{Answer, Call};
 use serde::{Deserialize, Serialize};
 
 use crate::API_URL;
@@ -37,5 +37,5 @@ impl Answer for UserListAnswer {
 
 pub async fn user_list() {
     let url = API_URL.lock().unwrap().to_string();
-    call::<(), UserListAnswer>(url, None, "user", "list").await
+    Call::call::<(), UserListAnswer>(url, None, "user", "list").await
 }
