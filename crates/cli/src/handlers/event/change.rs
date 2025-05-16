@@ -1,25 +1,12 @@
 use chrono::{Local, NaiveDateTime};
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use common::{
+    Call,
+    struct_event::{EventModifyAnswer, EventModifyPost},
+};
 
-use crate::{API_URL, TOKEN};
+use crate::{API_URL, CliAnswer, TOKEN};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct EventModifyPost<'r> {
-    token: &'r str,
-    event_id: i32,
-    date_start: Option<&'r str>,
-    date_end: Option<&'r str>,
-    name: Option<&'r str>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct EventModifyAnswer {
-    code: i32,
-    body: String,
-}
-
-impl Answer for EventModifyAnswer {
+impl CliAnswer for EventModifyAnswer {
     fn code(&self) -> i32 {
         self.code
     }

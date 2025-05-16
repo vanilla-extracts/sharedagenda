@@ -1,25 +1,13 @@
 use argon2::{Argon2, PasswordHasher};
-use common::{Answer, Call};
+use common::{
+    Answer, Call,
+    struct_user::{UserModifyAnswer, UserModifyPost},
+};
 use password_hash::{SaltString, rand_core::OsRng};
-use serde::{Deserialize, Serialize};
 
-use crate::{API_URL, TOKEN};
+use crate::{API_URL, CliAnswer, TOKEN};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserModifyPost<'r> {
-    token: &'r str,
-    name: &'r str,
-    email: &'r str,
-    password: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserModifyAnswer {
-    code: i32,
-    body: String,
-}
-
-impl Answer for UserModifyAnswer {
+impl CliAnswer for UserModifyAnswer {
     fn code(&self) -> i32 {
         self.code
     }

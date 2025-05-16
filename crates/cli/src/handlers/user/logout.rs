@@ -1,22 +1,14 @@
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use common::{
+    Call,
+    struct_user::{LogoutAnswer, LogoutPost},
+};
 
 use crate::{
-    API_URL, TOKEN,
+    API_URL, CliAnswer, TOKEN,
     configuration::loader::{load, write_config},
 };
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LogoutPost<'r> {
-    token: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LogoutAnswer {
-    code: i32,
-}
-
-impl Answer for LogoutAnswer {
+impl CliAnswer for LogoutAnswer {
     fn code(&self) -> i32 {
         self.code
     }

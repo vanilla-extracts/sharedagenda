@@ -1,32 +1,12 @@
-use chrono::{DateTime, FixedOffset, Local, NaiveDateTime};
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use chrono::{Local, NaiveDateTime};
+use common::{
+    Call,
+    struct_event::{ListAnswer, ListPost},
+};
 
-use crate::{API_URL, TOKEN};
+use crate::{API_URL, CliAnswer, TOKEN};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ListPost<'r> {
-    token: &'r str,
-    date_start: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Event {
-    pub id: i32,
-    pub name: String,
-    pub owner: String,
-    pub date_start: DateTime<FixedOffset>,
-    pub date_end: DateTime<FixedOffset>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ListAnswer {
-    code: u16,
-    body: String,
-    events: Vec<Event>,
-}
-
-impl Answer for ListAnswer {
+impl CliAnswer for ListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

@@ -2,6 +2,7 @@ use std::{env, io::BufRead, process::exit, str::Chars, sync::Mutex};
 
 use crate::handlers::api::api;
 use atty::Stream;
+use common::Answer;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
     event::{change::change, create::create, delete::remove, list::list},
@@ -12,6 +13,12 @@ use handlers::{
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
+
+trait CliAnswer: Answer {
+    fn code(&self) -> i32;
+    fn process_error(&self);
+    fn process(&mut self);
+}
 
 static VERSION: &str = "v3.0.0-dev";
 lazy_static! {

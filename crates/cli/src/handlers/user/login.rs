@@ -1,25 +1,13 @@
 use crate::{
-    API_URL, TOKEN,
+    API_URL, CliAnswer, TOKEN,
     configuration::loader::{load, write_config},
 };
-use chrono::{DateTime, Utc};
-use common::{Answer, Call};
-use serde::{Deserialize, Serialize};
+use common::{
+    Call,
+    struct_user::{LoginAnswer, LoginPost},
+};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LoginPost<'r> {
-    email: &'r str,
-    password: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LoginAnswer {
-    code: i64,
-    token: String,
-    expiration: Option<DateTime<Utc>>,
-}
-
-impl Answer for LoginAnswer {
+impl CliAnswer for LoginAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
