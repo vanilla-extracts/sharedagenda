@@ -1,9 +1,9 @@
-use common::{Answer, call};
+use common::structs::struct_user::{LogoutAnswer, LogoutPost};
 
 use crate::{
     API_URL, TOKEN,
+    call::{Answer, call},
     configuration::loader::{load, write_config},
-    structs::struct_user::{LogoutAnswer, LogoutPost},
 };
 
 impl Answer for LogoutAnswer {

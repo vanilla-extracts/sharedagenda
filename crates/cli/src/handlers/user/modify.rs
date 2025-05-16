@@ -1,10 +1,10 @@
 use argon2::{Argon2, PasswordHasher};
-use common::{Answer, call};
+use common::structs::struct_user::{UserModifyAnswer, UserModifyPost};
 use password_hash::{SaltString, rand_core::OsRng};
 
 use crate::{
     API_URL, TOKEN,
-    structs::struct_user::{UserModifyAnswer, UserModifyPost},
+    call::{Answer, call},
 };
 
 impl Answer for UserModifyAnswer {

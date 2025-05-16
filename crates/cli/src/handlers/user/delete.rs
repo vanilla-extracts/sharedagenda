@@ -1,9 +1,9 @@
-use common::{Answer, call};
+use common::structs::struct_event::{DeleteAnswer, DeletePost};
 
 use crate::{
     API_URL, TOKEN,
+    call::{Answer, call},
     configuration::loader::{load, write_config},
-    structs::struct_event::{DeleteAnswer, DeletePost},
 };
 
 impl Answer for DeleteAnswer {

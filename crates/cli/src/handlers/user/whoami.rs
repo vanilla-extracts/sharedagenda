@@ -1,8 +1,8 @@
-use common::{Answer, call};
+use common::structs::struct_event::{WhoamiAnswer, WhoamiPost};
 
 use crate::{
     API_URL, TOKEN,
-    structs::struct_event::{WhoamiAnswer, WhoamiPost},
+    call::{Answer, call},
 };
 
 impl Answer for WhoamiAnswer {
