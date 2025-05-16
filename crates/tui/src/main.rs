@@ -15,6 +15,8 @@ use ui::ui;
 mod app;
 mod ui;
 
+mod call;
+
 fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
     let mut stderr = io::stderr();
