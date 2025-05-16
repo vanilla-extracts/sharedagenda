@@ -1,4 +1,4 @@
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{API_URL, structs::struct_user::UserListAnswer};
 
@@ -23,5 +23,5 @@ impl Answer for UserListAnswer {
 
 pub async fn user_list() {
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<(), UserListAnswer>(url, None, "user", "list").await
+    call::<(), UserListAnswer>(url, None, "user", "list").await
 }

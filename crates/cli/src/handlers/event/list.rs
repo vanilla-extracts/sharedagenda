@@ -1,5 +1,5 @@
 use chrono::{Local, NaiveDateTime};
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -51,5 +51,5 @@ pub async fn list(line: String) {
         date_start: date,
     };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<ListPost<'_>, ListAnswer>(url, Some(&data), "event", "list").await
+    call::<ListPost<'_>, ListAnswer>(url, Some(&data), "event", "list").await
 }

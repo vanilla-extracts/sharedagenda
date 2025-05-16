@@ -1,4 +1,4 @@
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -32,5 +32,5 @@ pub async fn whoami() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = WhoamiPost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<WhoamiPost<'_>, WhoamiAnswer>(url, Some(&data), "user", "whoami").await;
+    call::<WhoamiPost<'_>, WhoamiAnswer>(url, Some(&data), "user", "whoami").await;
 }

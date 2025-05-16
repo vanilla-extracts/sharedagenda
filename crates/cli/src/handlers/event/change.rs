@@ -1,5 +1,5 @@
 use chrono::{Local, NaiveDateTime};
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -87,5 +87,5 @@ pub async fn change(vec: Vec<String>) {
         event_id,
     };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<EventModifyPost<'_>, EventModifyAnswer>(url, Some(&data), "event", "modify").await;
+    call::<EventModifyPost<'_>, EventModifyAnswer>(url, Some(&data), "event", "modify").await;
 }

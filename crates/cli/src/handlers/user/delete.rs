@@ -1,4 +1,4 @@
-use common::{Answer, Call};
+use common::{Answer, call};
 
 use crate::{
     API_URL, TOKEN,
@@ -37,5 +37,5 @@ pub async fn delete() {
     let token = TOKEN.lock().unwrap().to_string();
     let data = DeletePost { token: &token };
     let url = API_URL.lock().unwrap().to_string();
-    Call::call::<DeletePost<'_>, DeleteAnswer>(url, Some(&data), "user", "delete").await;
+    call::<DeletePost<'_>, DeleteAnswer>(url, Some(&data), "user", "delete").await;
 }
