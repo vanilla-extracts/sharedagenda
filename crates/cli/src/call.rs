@@ -40,11 +40,11 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
                 }
             }
             Err(e) => {
-                println!("Error while deserializing answer: {e}");
+                eprintln!("Error while deserializing answer: {e}");
             }
         },
         Err(e) => {
-            println!("Error while sending the resquest: {e}");
+            eprintln!("Error while sending the resquest: {e}");
         }
     }
 }
