@@ -22,16 +22,15 @@ impl Answer for DeleteAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        if self.code == 200 {
-            "Your account has been deleted".to_string()
-        } else {
-            "Error while deleting your account".to_string()
-        }
+    fn process_error(&self) {
+        println!(
+            "Error while deleting your account, code {}, error {}",
+            self.code, self.body
+        );
     }
     fn process(&mut self) {
         *TOKEN.lock().unwrap() = "".to_string();
-
+        println!("Your account has successfully been deleted");
         let mut config = load().unwrap_or_default();
         config.token = "".to_string();
 

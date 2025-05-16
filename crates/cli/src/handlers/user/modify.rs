@@ -24,10 +24,15 @@ impl Answer for UserModifyAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        self.body.clone()
+    fn process_error(&self) {
+        println!(
+            "Error while modifying user account, code {}, message {}",
+            self.code, self.body
+        );
     }
-    fn process(&mut self) {}
+    fn process(&mut self) {
+        println!("Your account has been modified succesfully");
+    }
 }
 
 pub async fn modify(vec: Vec<String>) {

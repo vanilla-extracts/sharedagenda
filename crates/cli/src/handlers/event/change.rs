@@ -25,10 +25,15 @@ impl Answer for EventModifyAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        self.body.clone()
+    fn process_error(&self) {
+        println!(
+            "Error while modifiying an event, code {}, message {}",
+            self.code, self.body
+        );
     }
-    fn process(&mut self) {}
+    fn process(&mut self) {
+        println!("The event has been modified successfully.")
+    }
 }
 
 pub async fn change(vec: Vec<String>) {

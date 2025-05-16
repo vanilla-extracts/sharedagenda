@@ -24,7 +24,7 @@ pub struct LoginAnswer {
 
 pub trait Answer {
     fn code(&self) -> i32;
-    fn answer(&self) -> String;
+    fn process_error(&self);
     fn process(&mut self);
 }
 
@@ -32,23 +32,15 @@ impl Answer for LoginAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        if self.code == 200 {
-            format!(
-                "Login is successfull, token is {} which expires at {}",
-                self.token,
-                self.expiration.unwrap()
-            )
-        } else {
-            self.token.to_string()
-        }
+    fn process_error(&self) {
+        println!("Error on login, code {}, message {}", self.code, self.token);
     }
 
     fn process(&mut self) {
         *TOKEN.lock().unwrap() = self.token.clone();
         let mut config = load().unwrap_or_default();
         config.token = self.token.clone();
-
+        println!("Login is successful");
         match write_config(&config) {
             Ok(_) => {
                 println!("Configuration has been updated")
@@ -85,13 +77,8 @@ pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
         Ok(e) => match e.json::<V>().await {
             Ok(mut answer) => {
                 if answer.code() != 200 {
-                    println!(
-                        "Error while sending the request \nCode: {} \nMessage: {} ",
-                        answer.code(),
-                        answer.answer()
-                    );
+                    answer.process_error();
                 } else {
-                    println!("{}", answer.answer());
                     answer.process();
                 }
             }

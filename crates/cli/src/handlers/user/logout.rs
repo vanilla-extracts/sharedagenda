@@ -21,15 +21,13 @@ impl Answer for LogoutAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        if self.code != 200 {
-            "Error while login in".to_string()
-        } else {
-            "You have successfully logout".to_string()
-        }
+    fn process_error(&self) {
+        println!("Error while logging out, code {}", self.code);
     }
     fn process(&mut self) {
         *TOKEN.lock().unwrap() = "".to_string();
+
+        println!("You successfully logged out");
 
         let mut config = load().unwrap_or_default();
         config.token = "".to_string();

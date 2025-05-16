@@ -25,10 +25,15 @@ impl Answer for EventCreateAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        self.body.clone()
+    fn process_error(&self) {
+        println!(
+            "Error while creating the event, code {}, message {}",
+            self.code, self.body
+        );
     }
-    fn process(&mut self) {}
+    fn process(&mut self) {
+        println!("The event has been created successfully.");
+    }
 }
 
 pub async fn create(vec: Vec<String>) {

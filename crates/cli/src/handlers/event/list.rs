@@ -32,8 +32,11 @@ impl Answer for ListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        self.body.clone()
+    fn process_error(&self) {
+        println!(
+            "Error while fetching the list of events, code {}, message {}",
+            self.code, self.body
+        );
     }
     fn process(&mut self) {
         self.events.sort_by_key(|f| f.date_start);

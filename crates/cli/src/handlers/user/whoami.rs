@@ -28,12 +28,8 @@ impl Answer for WhoamiAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        if self.code == 200 {
-            String::new()
-        } else {
-            format!("{}", self.code)
-        }
+    fn process_error(&self) {
+        println!("Error while fetching user information, code {}", self.code);
     }
     fn process(&mut self) {
         match &self.user {
