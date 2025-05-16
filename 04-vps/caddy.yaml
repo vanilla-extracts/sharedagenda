@@ -23,6 +23,25 @@
       ansible.builtin.template:
         src: grafana.caddyfile.j2
         dest: /etc/caddy/Caddyfile.d/grafana.caddyfile
+        owner: caddy
+        group: caddy
+    - name: Upload cockpit config
+      ansible.builtin.copy:
+        src: cockpit.conf
+        dest: /etc/cockpit/cockpit.conf
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Upload dashboard Caddyfil
+      ansible.builtin.copy:
+        src: dash.caddyfile
+        dest: /etc/caddy/Caddyfile.d/dash.caddyfile
+        owner: caddy
+        group: caddy
+    - name: Restart Cockpit
+      ansible.builtin.systemd:
+        name: cockpit.service
+        state: restarted
     - name: Restart Caddy
       ansible.builtin.systemd:
         name: caddy.service
