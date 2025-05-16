@@ -1,13 +1,10 @@
-use std::fmt::Debug;
-
-use chrono::{DateTime, Utc};
-use reqwest::Client;
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
-
 use crate::{
     API_URL, TOKEN,
     configuration::loader::{load, write_config},
 };
+use chrono::{DateTime, Utc};
+use common::Answer;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LoginPost<'r> {
@@ -20,12 +17,6 @@ pub struct LoginAnswer {
     code: i64,
     token: String,
     expiration: Option<DateTime<Utc>>,
-}
-
-pub trait Answer {
-    fn code(&self) -> i32;
-    fn process_error(&self);
-    fn process(&mut self);
 }
 
 impl Answer for LoginAnswer {
@@ -48,46 +39,6 @@ impl Answer for LoginAnswer {
             Err(_) => {
                 println!("Error while updating configuration")
             }
-        }
-    }
-}
-
-pub async fn call<U: Serialize + Debug, V: DeserializeOwned + Answer>(
-    url: String,
-    data: Option<&U>,
-    first_route: &str,
-    second_route: &str,
-) {
-    let client = match data {
-        Some(js) => Client::builder()
-            .danger_accept_invalid_certs(true)
-            .build()
-            .unwrap()
-            .post(format!("{}/{}/{}", url, first_route, second_route))
-            .json(js)
-            .send(),
-        None => Client::builder()
-            .danger_accept_invalid_certs(true)
-            .build()
-            .unwrap()
-            .get(format!("{}/{}/{}", url, first_route, second_route))
-            .send(),
-    };
-    match client.await {
-        Ok(e) => match e.json::<V>().await {
-            Ok(mut answer) => {
-                if answer.code() != 200 {
-                    answer.process_error();
-                } else {
-                    answer.process();
-                }
-            }
-            Err(e) => {
-                println!("Error while deserializing answer: {e}");
-            }
-        },
-        Err(e) => {
-            println!("Error while sending the resquest: {e}");
         }
     }
 }
