@@ -11,7 +11,7 @@ impl Answer for LogoutAnswer {
         self.code
     }
     fn process_error(&self) {
-        println!("Error while logging out, code {}", self.code);
+        eprintln!("Error while logging out, code {}", self.code);
     }
     fn process(&mut self) {
         *TOKEN.lock().unwrap() = "".to_string();
@@ -22,7 +22,7 @@ impl Answer for LogoutAnswer {
         config.token = "".to_string();
 
         if write_config(&config).is_err() {
-            println!("Error while updating configuration");
+            eprintln!("Error while updating configuration");
         }
     }
 }

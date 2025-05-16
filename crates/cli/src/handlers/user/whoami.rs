@@ -10,7 +10,7 @@ impl Answer for WhoamiAnswer {
         self.code as i32
     }
     fn process_error(&self) {
-        println!("Error while fetching user information, code {}", self.code);
+        eprintln!("Error while fetching user information, code {}", self.code);
     }
     fn process(&mut self) {
         match &self.user {

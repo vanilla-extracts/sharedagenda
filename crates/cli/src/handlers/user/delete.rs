@@ -11,7 +11,7 @@ impl Answer for DeleteAnswer {
         self.code as i32
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while deleting your account, code {}, error {}",
             self.code, self.body
         );
@@ -27,7 +27,7 @@ impl Answer for DeleteAnswer {
                 println!("{}", self.body);
             }
             Err(_) => {
-                println!("Error while updating configuration");
+                eprintln!("Error while updating configuration");
             }
         }
     }

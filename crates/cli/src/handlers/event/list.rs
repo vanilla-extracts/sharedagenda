@@ -10,7 +10,7 @@ impl Answer for ListAnswer {
         self.code as i32
     }
     fn process_error(&self) {
-        println!(
+        eprintln!(
             "Error while fetching the list of events, code {}, message {}",
             self.code, self.body
         );
@@ -37,7 +37,7 @@ pub async fn list(line: String) {
         date = match NaiveDateTime::parse_from_str(&date, "%Y-%m-%d %H:%M") {
             Ok(e) => e.and_local_timezone(Local::now().fixed_offset().timezone()),
             Err(e) => {
-                println!("Error while parsing time, format must be %Y-%m-%d %H:%M, {e}");
+                eprintln!("Error while parsing time, format must be %Y-%m-%d %H:%M, {e}");
                 return;
             }
         }
