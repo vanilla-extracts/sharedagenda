@@ -1,8 +1,7 @@
+use common::Answer;
 use serde::{Deserialize, Serialize};
 
 use crate::API_URL;
-
-use super::login::{Answer, call};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {

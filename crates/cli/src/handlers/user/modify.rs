@@ -1,10 +1,9 @@
 use argon2::{Argon2, PasswordHasher};
+use common::Answer;
 use password_hash::{SaltString, rand_core::OsRng};
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, TOKEN};
-
-use super::login::{Answer, call};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserModifyPost<'r> {

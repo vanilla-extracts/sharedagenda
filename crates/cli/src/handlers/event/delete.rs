@@ -1,9 +1,7 @@
+use common::Answer;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    API_URL, TOKEN,
-    handlers::user::login::{Answer, call},
-};
+use crate::{API_URL, TOKEN};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct EventDeletionPost<'r> {

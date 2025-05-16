@@ -1,10 +1,9 @@
 use std::fmt::Debug;
 
+use common::Answer;
 use serde::{Deserialize, Serialize};
 
 use crate::{API_URL, TOKEN};
-
-use super::login::{Answer, call};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
