@@ -21,8 +21,8 @@ impl Answer for UserListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        String::new()
+    fn process_error(&self) {
+        println!("Error while fetching user list, code {}", self.code);
     }
     fn process(&mut self) {
         self.users.sort_by_key(|f| f.name.clone());

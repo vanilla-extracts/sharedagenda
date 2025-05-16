@@ -21,8 +21,11 @@ impl Answer for EventDeletionAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        self.body.clone()
+    fn process_error(&self) {
+        println!(
+            "Error while deleting an event, code {}, message {}",
+            self.code, self.body
+        );
     }
     fn process(&mut self) {}
 }

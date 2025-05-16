@@ -23,10 +23,15 @@ impl Answer for RegisterAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        self.answer.clone()
+    fn process_error(&self) {
+        println!(
+            "Error while registering, code {}, message {}",
+            self.code, self.answer
+        );
     }
-    fn process(&mut self) {}
+    fn process(&mut self) {
+        println!("Your account has been created successfully, you can now log in");
+    }
 }
 
 pub async fn register(vec: Vec<String>) {
