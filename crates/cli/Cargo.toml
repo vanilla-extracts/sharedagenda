@@ -11,7 +11,7 @@ lazy_static = "1.5.0"
 atty = "0.2"
 password-hash = { version = "0.5.0", features = ["getrandom"] }
 argon2 = { version = "0.5.3", features = ["alloc","password-hash"] }
-reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0.192", features = ["derive"] }
 chrono = { version="0.4.40", features = ["serde"] }
+common = { workspace = true }
