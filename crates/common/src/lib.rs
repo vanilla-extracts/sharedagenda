@@ -3,9 +3,6 @@ use std::fmt::Debug;
 use reqwest::Client;
 use serde::{Serialize, de::DeserializeOwned};
 
-pub mod struct_event;
-pub mod struct_user;
-
 pub trait Answer {
     fn code(&self) -> i32;
     fn process_error(&self);

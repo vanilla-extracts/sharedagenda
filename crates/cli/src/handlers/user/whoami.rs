@@ -1,11 +1,11 @@
-use common::{
-    Call,
-    struct_event::{WhoamiAnswer, WhoamiPost},
+use common::{Answer, Call};
+
+use crate::{
+    API_URL, TOKEN,
+    structs::struct_event::{WhoamiAnswer, WhoamiPost},
 };
 
-use crate::{API_URL, CliAnswer, TOKEN};
-
-impl CliAnswer for WhoamiAnswer {
+impl Answer for WhoamiAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

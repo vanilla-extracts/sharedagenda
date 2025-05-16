@@ -1,8 +1,8 @@
-use common::{Call, struct_user::UserListAnswer};
+use common::{Answer, Call};
 
-use crate::{API_URL, CliAnswer};
+use crate::{API_URL, structs::struct_user::UserListAnswer};
 
-impl CliAnswer for UserListAnswer {
+impl Answer for UserListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

@@ -1,11 +1,11 @@
-use common::{
-    Answer, Call,
-    struct_event::{EventDeletionAnswer, EventDeletionPost},
+use common::{Answer, Call};
+
+use crate::{
+    API_URL, TOKEN,
+    structs::struct_event::{EventDeletionAnswer, EventDeletionPost},
 };
 
-use crate::{API_URL, CliAnswer, TOKEN};
-
-impl CliAnswer for EventDeletionAnswer {
+impl Answer for EventDeletionAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

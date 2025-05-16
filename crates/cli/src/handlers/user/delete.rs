@@ -1,14 +1,12 @@
-use common::{
-    Call,
-    struct_event::{DeleteAnswer, DeletePost},
-};
+use common::{Answer, Call};
 
 use crate::{
-    API_URL, CliAnswer, TOKEN,
+    API_URL, TOKEN,
     configuration::loader::{load, write_config},
+    structs::struct_event::{DeleteAnswer, DeletePost},
 };
 
-impl CliAnswer for DeleteAnswer {
+impl Answer for DeleteAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }

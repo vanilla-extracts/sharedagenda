@@ -60,6 +60,6 @@ pub struct User {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserListAnswer {
-    code: u16,
-    users: Vec<User>,
+    pub code: u16,
+    pub users: Vec<User>,
 }
