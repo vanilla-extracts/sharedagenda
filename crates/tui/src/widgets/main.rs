@@ -1,7 +1,8 @@
+use color_eyre::owo_colors::OwoColorize;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Style, Stylize},
-    text::Line,
+    text::{Line, Span},
     widgets::{Block, Paragraph, Widget, Wrap},
 };
 
@@ -25,12 +26,12 @@ impl Widget for MainWidget<'_> {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Length(3),
+                Constraint::Length(5),
                 Constraint::Min(1),
                 Constraint::Length(2),
             ])
             .split(area);
-        let title = Block::new()
+        let title = Block::bordered()
             .title("SharedAgenda TUI")
             .fg(Color::Yellow)
             .title_alignment(Alignment::Center)
@@ -43,7 +44,10 @@ impl Widget for MainWidget<'_> {
         let paragraph = Paragraph::new(vec![
             Line::from(logged_in),
             Line::from(""),
-            Line::from(format!("API Link: {}", self.api_link)),
+            Line::from_iter([
+                "API Link: ".into(),
+                Span::styled(self.api_link, Style::default().fg(Color::Red).bold()),
+            ]),
         ])
         .block(title)
         .style(Style::default().fg(Color::Green))
