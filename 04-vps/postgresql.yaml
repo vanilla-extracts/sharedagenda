@@ -1,0 +1,8 @@
+- name: Install postgresql
+  hosts: dev
+  become: true
+  vars_files:
+    - "vars/password.yaml"
+    - "vars/postgresql.yaml"
+  roles:
+    - postgresql

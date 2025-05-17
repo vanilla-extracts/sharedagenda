@@ -4,6 +4,7 @@ podman_all:
 podman_server:
 	./builder build --release --bin server
 	cp target/release/server 02-configuration/files/server
+	cp target/release/server 04-vps/files/server
 podman_cli:
 	./builder build --release --bin cli
 	cp target/release/cli assets/cli

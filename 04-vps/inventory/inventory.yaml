@@ -1,0 +1,11 @@
+---
+all:
+  hosts:
+    nova:
+    ambassador:
+dev:
+  hosts:
+    nova:
+prod:
+  hosts:
+    ambassador:
