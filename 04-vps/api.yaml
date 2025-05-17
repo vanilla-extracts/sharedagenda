@@ -2,6 +2,8 @@
 - name: "Install and configure the API"
   hosts: dev
   gather_facts: no 
+  vars_files:
+    - "vars/password.yaml"
   tasks:
     - name: Create group of user to run the API
       become: true
