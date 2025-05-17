@@ -1,7 +1,6 @@
-use crate::{
-    API_URL,
-    configuration::loader::{load, write_config},
-};
+use common::configuration::loader::{load, write_config};
+
+use crate::API_URL;
 
 pub fn api(url: &str) {
     let mut config = load().unwrap_or_default();

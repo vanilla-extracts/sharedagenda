@@ -2,7 +2,10 @@ use std::{env, io::BufRead, process::exit, str::Chars, sync::Mutex};
 
 use crate::handlers::api::api;
 use atty::Stream;
-use configuration::loader::{load, load_config, write_default_config};
+use common::{
+    VERSION,
+    configuration::loader::{load, load_config, write_default_config},
+};
 use handlers::{
     event::{change::change, create::create, delete::remove, list::list},
     user::{
@@ -13,7 +16,6 @@ use handlers::{
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v3.0.0-dev";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
@@ -22,7 +24,6 @@ lazy_static! {
 }
 
 mod call;
-mod configuration;
 mod handlers;
 
 pub fn parse_line_into_arguments(line: &str) -> Vec<String> {
@@ -102,7 +103,7 @@ async fn main() {
         let first = a.remove(0);
 
         match first.as_str() {
-            "-v" | "version" => println!("SharedAgenda CLI {VERSION}"),
+            "-v" | "version" => println!("SharedAgenda CLI {}", VERSION),
             "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
             "token" => println!("Current Token is: {}", TOKEN.lock().unwrap()),
             "api" => api(&a.join("")),
@@ -183,7 +184,7 @@ async fn main() {
 
     while let ReadResult::Input(line) = interface.read_line().unwrap() {
         match line.as_str().trim() {
-            "version" => println!("SharedAgenda CLI REPL {VERSION}"),
+            "version" => println!("SharedAgenda CLI REPL {}", VERSION),
             "config" => println!("$HOME/.config/sharedagenda/cli.toml"),
             "token" => println!("Current Token is: {}", TOKEN.lock().unwrap()),
             "exit" => break,

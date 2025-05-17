@@ -1,3 +1,5 @@
+use common::configuration::loader::Loaded;
+
 pub enum UserRegisteringCurrentlyEditing {
     Name,
     Email,
@@ -46,6 +48,6 @@ pub enum CurrentScreen {
 
 pub struct App<'a> {
     pub api_link: &'a str,
-    pub config: Config,
+    pub config: Loaded<'a>,
     pub current_screen: CurrentScreen,
 }
