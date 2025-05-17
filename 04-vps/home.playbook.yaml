@@ -14,6 +14,8 @@
   vars:
     postgres_exporter_username: agenda
     postgres_exporter_password: "{{ vault_pgsql_agenda_user_password }}"
+    postgres_exporter_name: ""
+    postgres_exporter_uri: "localhost:5432/agenda?sslmode=disable"
   roles:
     - prometheus.prometheus.postgres_exporter
 - name: Install prometheus on nova
