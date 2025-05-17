@@ -25,5 +25,11 @@
   roles:
     - role: grafana.grafana.grafana
 
+- name: Install and Configure Postgresql
+  import_playbook: postgresql.yaml
+
+- name: Install and Configure API
+  import_playbook: api.yaml
+
 - name: Install and Configure Caddy
   ansible.builtin.import_playbook: caddy.yaml
