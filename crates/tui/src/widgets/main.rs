@@ -1,10 +1,11 @@
-use color_eyre::owo_colors::OwoColorize;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Paragraph, Widget, Wrap},
 };
+
+use super::navigation_bar::NavigationBar;
 
 pub struct MainWidget<'a> {
     pub token: &'a str,
@@ -28,14 +29,13 @@ impl Widget for MainWidget<'_> {
             .constraints([
                 Constraint::Length(5),
                 Constraint::Min(1),
-                Constraint::Length(2),
+                Constraint::Length(3),
             ])
             .split(area);
         let title = Block::bordered()
             .title("SharedAgenda TUI")
             .fg(Color::Yellow)
-            .title_alignment(Alignment::Center)
-            .bold();
+            .title_alignment(Alignment::Center);
         let logged_in = if self.token.trim().is_empty() {
             "You are not logged in.".to_string()
         } else {
@@ -46,14 +46,16 @@ impl Widget for MainWidget<'_> {
             Line::from(""),
             Line::from_iter([
                 "API Link: ".into(),
-                Span::styled(self.api_link, Style::default().fg(Color::Red).bold()),
+                Span::styled(self.api_link, Style::default().fg(Color::Blue).bold()),
             ]),
         ])
         .block(title)
-        .style(Style::default().fg(Color::Green))
+        .style(Style::default().fg(Color::White))
         .alignment(Alignment::Center)
         .wrap(Wrap { trim: true });
 
         paragraph.render(chunks[0], buf);
+        let navigation_bar = NavigationBar {};
+        navigation_bar.render(chunks[2], buf);
     }
 }

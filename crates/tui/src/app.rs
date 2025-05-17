@@ -1,7 +1,7 @@
 use core::panic;
-use std::{hash::DefaultHasher, io};
+use std::io;
 
-use common::configuration::loader::{self, Loaded, load, load_config};
+use common::configuration::loader::{Loaded, load, load_config};
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
