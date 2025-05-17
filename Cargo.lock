@@ -309,7 +309,6 @@ dependencies = [
  "atty",
  "chrono",
  "common",
- "confy",
  "lazy_static",
  "linefeed",
  "password-hash",
@@ -349,7 +348,9 @@ dependencies = [
 name = "common"
 version = "0.1.0"
 dependencies = [
+ "ansi_term",
  "chrono",
+ "confy",
  "serde",
 ]
 
