@@ -1,6 +1,7 @@
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Style, Stylize},
+    text::Line,
     widgets::{Block, Paragraph, Widget, Wrap},
 };
 
@@ -32,6 +33,7 @@ impl Widget for MainWidget<'_> {
         let title = Block::new()
             .title("SharedAgenda TUI")
             .fg(Color::Yellow)
+            .title_alignment(Alignment::Center)
             .bold();
         let logged_in = if self.token.trim().is_empty() {
             "You are not logged in.".to_string()
@@ -39,9 +41,9 @@ impl Widget for MainWidget<'_> {
             format!("Hello {}.", self.token)
         };
         let paragraph = Paragraph::new(vec![
-            logged_in.into(),
-            "".into(),
-            format!("API Link: {}", self.api_link).into(),
+            Line::from(logged_in),
+            Line::from(""),
+            Line::from(format!("API Link: {}", self.api_link)),
         ])
         .block(title)
         .style(Style::default().fg(Color::Green))
