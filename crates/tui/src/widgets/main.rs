@@ -1,3 +1,6 @@
+use std::process::exit;
+
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     layout::Alignment,
     style::{Color, Style, Stylize},
@@ -56,51 +59,37 @@ impl Action {
 }
 
 impl MainWidget {
+    pub fn select_none(&mut self) {
+        self.actions.state.select(None);
+    }
+
+    pub fn select_next(&mut self) {
+        self.actions.state.select_next();
+    }
+    pub fn select_previous(&mut self) {
+        self.actions.state.select_previous();
+    }
+
+    pub fn select_first(&mut self) {
+        self.actions.state.select_first();
+    }
+
+    pub fn select_last(&mut self) {
+        self.actions.state.select_last();
+    }
     pub fn new() -> Self {
         let mut new_widget = MainWidget {
             actions: ActionList {
-                actions: vec![],
+                actions: vec![
+                    Action::new(ActionType::ChangeApiUrl, "Change API URL"),
+                    Action::new(ActionType::RegisterAccount, "Register new account"),
+                    Action::new(ActionType::Login, "Login into your account"),
+                ],
                 state: ListState::default(),
             },
         };
-        new_widget.actions();
+        new_widget.actions.state.select(Some(1));
         new_widget
-    }
-    fn actions(&mut self) {
-        self.actions
-            .actions
-            .push(Action::new(ActionType::ChangeApiUrl, "Change the api url"));
-        self.actions.actions.push(Action::new(
-            ActionType::RegisterAccount,
-            "Register a new account",
-        ));
-        self.actions
-            .actions
-            .push(Action::new(ActionType::Login, "Login into your account"));
-        self.actions
-            .actions
-            .push(Action::new(ActionType::Logout, "Logout of your account"));
-        self.actions
-            .actions
-            .push(Action::new(ActionType::Delete, "Delete your account"));
-        self.actions.actions.push(Action::new(
-            ActionType::ModifyAccount,
-            "Modify your account data",
-        ));
-        self.actions.actions.push(Action::new(
-            ActionType::ShowInformation,
-            "Show your account data",
-        ));
-        self.actions
-            .actions
-            .push(Action::new(ActionType::ListUsers, "List all users"));
-        self.actions
-            .actions
-            .push(Action::new(ActionType::CreateEvent, "Create a new event"));
-        self.actions.actions.push(Action::new(
-            ActionType::ShowEvents,
-            "List all events in your calendar",
-        ));
     }
 }
 
@@ -130,7 +119,7 @@ impl Widget for &mut MainWidget {
         let list = List::new(ls)
             .block(block)
             .style(Style::default().fg(Color::White))
-            .highlight_symbol(">")
+            .highlight_symbol("> ")
             .highlight_style(Style::default().fg(Color::Blue).bold());
 
         StatefulWidget::render(list, area, buf, &mut self.actions.state);
