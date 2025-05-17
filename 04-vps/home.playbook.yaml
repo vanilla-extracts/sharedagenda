@@ -6,6 +6,16 @@
     node_exporter_web_listen_address: 127.0.0.1:9100
   roles:
     - prometheus.prometheus.node_exporter
+- name: Install psql_exporter
+  hosts: dev
+  become: true
+  vars_files:
+    - "vars/password.yaml"
+  vars:
+    postgres_exporter_username: agenda
+    postgres_exporter_password: "{{ vault_pgsql_agenda_user_password }}"
+  roles:
+    - prometheus.prometheus.postgres_exporter
 - name: Install prometheus on nova
   hosts: dev
   become: true
