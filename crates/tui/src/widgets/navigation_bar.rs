@@ -5,33 +5,40 @@ use ratatui::{
     widgets::{Block, Paragraph, Widget},
 };
 
-pub struct NavigationBar {}
+pub struct NavigationBar<'a> {
+    instructions: Line<'a>,
+}
 
-impl Widget for NavigationBar {
+impl Default for NavigationBar<'_> {
+    fn default() -> Self {
+        Self {
+            instructions: Line::from(vec![
+                "↑ ".blue().bold(),
+                "← ".blue().bold(),
+                " Up ".white(),
+                "↓ ".blue().bold(),
+                "→ ".blue().bold(),
+                " Down ".white(),
+                " q ".blue().bold(),
+                " Quit ".white(),
+                " ENT ".blue().bold(),
+                " Execute ".white(),
+            ]),
+        }
+    }
+}
+
+impl Widget for NavigationBar<'_> {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     where
         Self: Sized,
     {
-        let instructions = Line::from(vec![
-            " ↑ ".blue().bold(),
-            " Up ".white(),
-            " ↓ ".blue().bold(),
-            " Down ".white(),
-            " ← ".blue().bold(),
-            " Left ".white(),
-            " → ".blue().bold(),
-            " Right ".white(),
-            " q ".blue().bold(),
-            " Quit ".white(),
-            " ENT ".blue().bold(),
-            " Execute ".white(),
-        ]);
         let block = Block::bordered()
             .style(Style::default().fg(Color::Yellow))
             .title_bottom("Navigation Bar")
             .title_alignment(Alignment::Center);
 
-        let footer = Paragraph::new(instructions).block(block).centered();
+        let footer = Paragraph::new(self.instructions).block(block).centered();
 
         footer.render(area, buf);
     }
