@@ -36,7 +36,9 @@ impl<T: Widget> Widget for TemplateWidget<'_, T> {
             api_link: self.api_link,
         };
         top_bar.render(chunks[0], buf);
+
         self.middle.render(chunks[1], buf);
+
         let navigation_bar = NavigationBar {};
         navigation_bar.render(chunks[2], buf);
     }
