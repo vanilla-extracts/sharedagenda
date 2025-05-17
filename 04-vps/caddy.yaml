@@ -32,10 +32,16 @@
         owner: root
         group: root
         mode: '0644'
-    - name: Upload dashboard Caddyfil
+    - name: Upload dashboard Caddyfile
       ansible.builtin.copy:
         src: dash.caddyfile
         dest: /etc/caddy/Caddyfile.d/dash.caddyfile
+        owner: caddy
+        group: caddy
+    - name: Upload api Caddyfile
+      ansible.builtin.copy:
+        src: api.caddyfile
+        dest: /etc/caddy/Caddyfile.d/api.caddyfile
         owner: caddy
         group: caddy
     - name: Restart Cockpit

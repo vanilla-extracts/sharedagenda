@@ -6,6 +6,18 @@
     node_exporter_web_listen_address: 127.0.0.1:9100
   roles:
     - prometheus.prometheus.node_exporter
+- name: Install psql_exporter
+  hosts: dev
+  become: true
+  vars_files:
+    - "vars/password.yaml"
+  vars:
+    postgres_exporter_username: agenda
+    postgres_exporter_password: "{{ vault_pgsql_agenda_user_password }}"
+    postgres_exporter_name: ""
+    postgres_exporter_uri: "localhost:5432/agenda?sslmode=disable"
+  roles:
+    - prometheus.prometheus.postgres_exporter
 - name: Install prometheus on nova
   hosts: dev
   become: true
@@ -24,6 +36,12 @@
     - "vars/monitoring.yaml"
   roles:
     - role: grafana.grafana.grafana
+
+- name: Install and Configure Postgresql
+  import_playbook: postgresql.yaml
+
+- name: Install and Configure API
+  import_playbook: api.yaml
 
 - name: Install and Configure Caddy
   ansible.builtin.import_playbook: caddy.yaml
