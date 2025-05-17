@@ -5,4 +5,4 @@ run:
 release:
 	cargo build --release
 watch:
-	cargo watch -x fmt -x run
+	cargo watch -x fmt -x build
