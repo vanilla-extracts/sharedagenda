@@ -1,9 +1,11 @@
-use common::structs::struct_user::{LoginAnswer, LoginPost};
+use common::{
+    configuration::loader::{load, write_config},
+    structs::struct_user::{LoginAnswer, LoginPost},
+};
 
 use crate::{
     API_URL, TOKEN,
     call::{Answer, call},
-    configuration::loader::{load, write_config},
 };
 
 impl Answer for LoginAnswer {
