@@ -113,11 +113,7 @@ impl App<'_> {
                     KeyCode::Char('q') => self.exit(),
                     KeyCode::Char('j') | KeyCode::Down => w.select_next(),
                     KeyCode::Char('k') | KeyCode::Up => w.select_previous(),
-                    KeyCode::Right => {
-                        w.select_next();
-
-                        println!("{:?}", w.actions.state.selected());
-                    }
+                    KeyCode::Right => w.select_next(),
                     KeyCode::Left => w.select_previous(),
                     KeyCode::Char('g') => w.select_first(),
                     KeyCode::Char('G') => w.select_last(),
