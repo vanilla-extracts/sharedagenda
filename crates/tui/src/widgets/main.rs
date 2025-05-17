@@ -1,8 +1,8 @@
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout},
-    style::{Color, Style, Stylize, palette::material::AccentedPalette},
-    text::{Line, Text},
-    widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget, Wrap},
+    layout::Alignment,
+    style::{Color, Style, Stylize},
+    text::Line,
+    widgets::{Block, List, ListItem, ListState, StatefulWidget, Widget},
 };
 
 #[derive(Clone, Debug)]
@@ -35,9 +35,9 @@ pub enum ActionType {
 }
 
 #[derive(Clone, Debug)]
-struct ActionList {
-    actions: Vec<Action>,
-    state: ListState,
+pub struct ActionList {
+    pub actions: Vec<Action>,
+    pub state: ListState,
 }
 
 #[derive(Clone, Debug)]
@@ -116,7 +116,7 @@ impl Widget for &mut MainWidget {
         Self: Sized,
     {
         let block = Block::bordered()
-            .title("Action")
+            .title("Actions")
             .title_alignment(Alignment::Center)
             .style(Style::default().fg(Color::Yellow));
 
