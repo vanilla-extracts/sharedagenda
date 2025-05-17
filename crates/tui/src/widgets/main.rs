@@ -1,0 +1,53 @@
+use ratatui::{
+    layout::{Alignment, Constraint, Direction, Layout},
+    style::{Color, Style, Stylize},
+    widgets::{Block, Paragraph, Widget, Wrap},
+};
+
+pub struct MainWidget<'a> {
+    pub token: &'a str,
+    pub api_link: &'a str,
+}
+/*
+layout:
+--------
+
+
+
+
+*/
+impl Widget for MainWidget<'_> {
+    fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
+    where
+        Self: Sized,
+    {
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Min(1),
+                Constraint::Length(2),
+            ])
+            .split(area);
+        let title = Block::new()
+            .title("SharedAgenda TUI")
+            .fg(Color::Yellow)
+            .bold();
+        let logged_in = if self.token.trim().is_empty() {
+            "You are not logged in.".to_string()
+        } else {
+            format!("Hello {}.", self.token)
+        };
+        let paragraph = Paragraph::new(vec![
+            logged_in.into(),
+            "".into(),
+            format!("API Link: {}", self.api_link).into(),
+        ])
+        .block(title)
+        .style(Style::default().fg(Color::Green))
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+        paragraph.render(chunks[0], buf);
+    }
+}
