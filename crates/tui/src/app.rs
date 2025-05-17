@@ -1,4 +1,10 @@
-use common::configuration::loader::Loaded;
+use core::panic;
+use std::{hash::DefaultHasher, io};
+
+use common::configuration::loader::{self, Loaded, load, load_config};
+use ratatui::{DefaultTerminal, Frame};
+
+use crate::ui::ui;
 
 pub enum UserRegisteringCurrentlyEditing {
     Name,
@@ -47,7 +53,36 @@ pub enum CurrentScreen {
 }
 
 pub struct App<'a> {
-    pub api_link: &'a str,
     pub config: Loaded<'a>,
     pub current_screen: CurrentScreen,
+    pub exit: bool,
+}
+
+impl Default for App<'_> {
+    fn default() -> Self {
+        let config = match load() {
+            Ok(c) => load_config(c),
+            Err(_) => {
+                panic!("Could not load config")
+            }
+        };
+        Self {
+            config,
+            current_screen: CurrentScreen::Main,
+            exit: false,
+        }
+    }
+}
+
+impl App<'_> {
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+        while !self.exit {
+            terminal.draw(|frame| self.draw(frame))?;
+            //TODO: event handling
+        }
+        Ok(())
+    }
+    pub fn draw(&mut self, frame: &mut Frame) {
+        ui(frame, self);
+    }
 }
