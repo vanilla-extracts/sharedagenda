@@ -1,11 +1,9 @@
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout},
-    style::{Color, Style, Stylize},
-    text::{Line, Span},
-    widgets::{Block, Paragraph, Widget, Wrap},
+    layout::{Constraint, Direction, Layout},
+    widgets::Widget,
 };
 
-use super::navigation_bar::NavigationBar;
+use super::{navigation_bar::NavigationBar, top::Top};
 
 pub struct MainWidget<'a> {
     pub token: &'a str,
@@ -32,29 +30,11 @@ impl Widget for MainWidget<'_> {
                 Constraint::Length(3),
             ])
             .split(area);
-        let title = Block::bordered()
-            .title("SharedAgenda TUI")
-            .fg(Color::Yellow)
-            .title_alignment(Alignment::Center);
-        let logged_in = if self.token.trim().is_empty() {
-            "You are not logged in.".to_string()
-        } else {
-            format!("Hello {}.", self.token)
+        let top_bar = Top {
+            token: self.token,
+            api_link: self.api_link,
         };
-        let paragraph = Paragraph::new(vec![
-            Line::from(logged_in),
-            Line::from(""),
-            Line::from_iter([
-                "API Link: ".into(),
-                Span::styled(self.api_link, Style::default().fg(Color::Blue).bold()),
-            ]),
-        ])
-        .block(title)
-        .style(Style::default().fg(Color::White))
-        .alignment(Alignment::Center)
-        .wrap(Wrap { trim: true });
-
-        paragraph.render(chunks[0], buf);
+        top_bar.render(chunks[0], buf);
         let navigation_bar = NavigationBar {};
         navigation_bar.render(chunks[2], buf);
     }
