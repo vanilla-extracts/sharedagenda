@@ -3,12 +3,10 @@ use ratatui::{
     widgets::Widget,
 };
 
-use super::{navigation_bar::NavigationBar, top::Top};
-
-pub struct TemplateWidget<'a, T: Widget> {
-    pub token: &'a str,
-    pub api_link: &'a str,
+pub struct TemplateWidget<U: Widget, V: Widget, T: Widget> {
+    pub top_bar: U,
     pub middle: T,
+    pub navigation_bar: V,
 }
 /*
 layout:
@@ -18,7 +16,7 @@ layout:
 
 
 */
-impl<T: Widget> Widget for TemplateWidget<'_, T> {
+impl<U: Widget, V: Widget, T: Widget> Widget for TemplateWidget<U, V, T> {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     where
         Self: Sized,
@@ -31,15 +29,10 @@ impl<T: Widget> Widget for TemplateWidget<'_, T> {
                 Constraint::Length(3),
             ])
             .split(area);
-        let top_bar = Top {
-            token: self.token,
-            api_link: self.api_link,
-        };
-        top_bar.render(chunks[0], buf);
+        self.top_bar.render(chunks[0], buf);
 
         self.middle.render(chunks[1], buf);
 
-        let navigation_bar = NavigationBar {};
-        navigation_bar.render(chunks[2], buf);
+        self.navigation_bar.render(chunks[2], buf);
     }
 }
