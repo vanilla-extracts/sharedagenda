@@ -71,6 +71,7 @@ impl MainWidget {
     }
 
     pub fn select_first(&mut self) {
+        println!("Selected");
         self.actions.state.select_first();
     }
 
@@ -78,6 +79,7 @@ impl MainWidget {
         self.actions.state.select_last();
     }
     pub fn new() -> Self {
+        println!("New!");
         let mut new_widget = MainWidget {
             actions: ActionList {
                 actions: vec![
@@ -88,7 +90,7 @@ impl MainWidget {
                 state: ListState::default(),
             },
         };
-        new_widget.actions.state.select(Some(1));
+        new_widget.select_first();
         new_widget
     }
 }
@@ -121,7 +123,6 @@ impl Widget for &mut MainWidget {
             .style(Style::default().fg(Color::White))
             .highlight_symbol("> ")
             .highlight_style(Style::default().fg(Color::Blue).bold());
-
         StatefulWidget::render(list, area, buf, &mut self.actions.state);
     }
 }
