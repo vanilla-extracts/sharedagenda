@@ -1,6 +1,7 @@
 roles:
-  - name: geerlingguy.postgresql
-    version: 4.0.0
+  - src: git+https://github.com/vanilla-extracts/ansible-role-postgresql
+    version: 4.0.1
+    name: postgresql
 collections:
   - name: prometheus.prometheus
     version: 0.26.2
