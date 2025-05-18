@@ -62,7 +62,7 @@ pub enum CurrentScreen {
 }
 
 pub trait TuiWidget: Widget {
-    fn handle_key_event(&mut self, key: KeyEvent);
+    fn handle_key_event<T: TuiWidget + Default + Clone>(&mut self, key: KeyEvent);
 }
 
 #[derive(Clone, Debug)]
@@ -98,6 +98,22 @@ impl<T: TuiWidget + Default + Clone> App<'_, T> {
         }
         Ok(())
     }
+
+    pub fn new(widget: T, current_screen: CurrentScreen) -> Self {
+        let config = match load() {
+            Ok(c) => load_config(c),
+            Err(_) => {
+                panic!("Could not load config")
+            }
+        };
+        Self {
+            config,
+            exit: false,
+            current_screen,
+            current_widget: widget,
+        }
+    }
+
     pub fn draw(&mut self, frame: &mut Frame) {
         let wid = TemplateWidget {
             top_bar: Top {
@@ -121,6 +137,6 @@ impl<T: TuiWidget + Default + Clone> App<'_, T> {
     }
 
     fn handle_key_event(&mut self, key: KeyEvent) {
-        self.current_widget.handle_key_event(key);
+        self.current_widget.handle_key_event::<T>(key);
     }
 }

@@ -19,7 +19,7 @@ impl Default for NavigationBar<'_> {
                 "↓ ".blue().bold(),
                 "→ ".blue().bold(),
                 " Down ".white(),
-                " q ".blue().bold(),
+                " ESC ".blue().bold(),
                 " Quit ".white(),
                 " ENT ".blue().bold(),
                 " Execute ".white(),
