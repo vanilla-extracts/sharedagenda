@@ -11,7 +11,8 @@ use ratatui::{
 use crate::app::{App, CurrentScreen, TuiWidget};
 
 use super::{
-    api::ApiUrlWidget, delete::DeleteWidget, login::LoginWidget, register::RegisterWidget,
+    api::ApiUrlWidget, delete::DeleteWidget, login::LoginWidget, modify::ModifyWidget,
+    register::RegisterWidget,
 };
 
 #[derive(Clone, Debug)]
@@ -112,6 +113,9 @@ impl TuiWidget for MainWidget {
                         }
                         ActionType::Delete => {
                             switch_screen::<DeleteWidget>();
+                        }
+                        ActionType::ModifyAccount => {
+                            switch_screen::<ModifyWidget>();
                         }
                         _ => {}
                     }
