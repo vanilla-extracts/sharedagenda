@@ -10,7 +10,7 @@ use ratatui::{
 
 use crate::app::{App, CurrentScreen, TuiWidget};
 
-use super::api::ApiUrlWidget;
+use super::{api::ApiUrlWidget, register::RegisterWidget};
 
 #[derive(Clone, Debug)]
 pub struct MainWidget {
@@ -97,17 +97,10 @@ impl TuiWidget for MainWidget {
                     let action = &self.actions.actions[i];
                     match action.action_type {
                         ActionType::ChangeApiUrl => {
-                            ratatui::restore();
-                            let mut terminal = ratatui::init();
-                            let res = App::new(ApiUrlWidget::default(), CurrentScreen::ApiEditing)
-                                .run(&mut terminal);
-                            match res {
-                                Ok(_) => {}
-                                Err(e) => {
-                                    panic!("Error: {e}")
-                                }
-                            }
-                            ratatui::restore();
+                            switch_screen::<ApiUrlWidget>();
+                        }
+                        ActionType::RegisterAccount => {
+                            switch_screen::<RegisterWidget>();
                         }
                         _ => {}
                     }
@@ -117,6 +110,19 @@ impl TuiWidget for MainWidget {
             _ => {}
         }
     }
+}
+
+pub fn switch_screen<T: TuiWidget + Default + Clone>() {
+    ratatui::restore();
+    let mut terminal = ratatui::init();
+    let res = App::new(T::default(), CurrentScreen::ApiEditing).run(&mut terminal);
+    match res {
+        Ok(_) => {}
+        Err(e) => {
+            panic!("Error: {e}")
+        }
+    }
+    ratatui::restore();
 }
 
 impl MainWidget {
