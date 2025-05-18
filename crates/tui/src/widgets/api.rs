@@ -2,7 +2,7 @@ use common::configuration::loader::{load, write_config};
 use crossterm::event::KeyCode;
 use ratatui::{
     layout::{Alignment, Constraint, Layout},
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     widgets::{Block, Widget},
 };
 use tui_textarea::TextArea;
@@ -95,6 +95,7 @@ impl Widget for ApiUrlWidget<'_> {
 
         self.text.set_block(block);
         self.text.set_placeholder_text("http://localhost:8008");
+        self.text.set_style(Style::default().fg(Color::Blue).bold());
 
         self.text.render(chunks[0], buf);
     }
