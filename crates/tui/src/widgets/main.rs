@@ -8,7 +8,9 @@ use ratatui::{
     widgets::{Block, List, ListItem, ListState, StatefulWidget, Widget},
 };
 
-use crate::app::TuiWidget;
+use crate::app::{App, CurrentScreen, TuiWidget};
+
+use super::api::ApiUrlWidget;
 
 #[derive(Clone, Debug)]
 pub struct MainWidget {
@@ -80,14 +82,38 @@ impl Default for MainWidget {
 }
 
 impl TuiWidget for MainWidget {
-    fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
+    fn handle_key_event<T: TuiWidget + Default + Clone>(
+        &mut self,
+        key: crossterm::event::KeyEvent,
+    ) {
         match key.code {
             KeyCode::Char('g') => self.select_first(),
             KeyCode::Char('G') => self.select_last(),
-            KeyCode::Esc => self.select_none(),
             KeyCode::Down | KeyCode::Right => self.select_next(),
             KeyCode::Up | KeyCode::Left => self.select_previous(),
-            KeyCode::Char('q') => exit(0),
+            KeyCode::Char('q') | KeyCode::Esc => exit(0),
+            KeyCode::Enter => match self.actions.state.selected() {
+                Some(i) => {
+                    let action = &self.actions.actions[i];
+                    match action.action_type {
+                        ActionType::ChangeApiUrl => {
+                            ratatui::restore();
+                            let mut terminal = ratatui::init();
+                            let res = App::new(ApiUrlWidget::default(), CurrentScreen::ApiEditing)
+                                .run(&mut terminal);
+                            match res {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    panic!("Error: {e}")
+                                }
+                            }
+                            ratatui::restore();
+                        }
+                        _ => {}
+                    }
+                }
+                None => {}
+            },
             _ => {}
         }
     }
