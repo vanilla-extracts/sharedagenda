@@ -1,12 +1,16 @@
+use common::configuration::loader::{load, write_config};
 use crossterm::event::KeyCode;
 use ratatui::{
-    layout::Alignment,
+    layout::{Alignment, Constraint, Layout},
     style::{Color, Style},
     widgets::{Block, Widget},
 };
 use tui_textarea::TextArea;
 
-use crate::app::{App, CurrentScreen, TuiWidget};
+use crate::{
+    API_URL,
+    app::{App, CurrentScreen, TuiWidget},
+};
 
 use super::main::MainWidget;
 
@@ -42,6 +46,33 @@ impl TuiWidget for ApiUrlWidget<'_> {
                 }
                 ratatui::restore();
             }
+            KeyCode::Enter => {
+                let url = self.text.clone().into_lines().join("");
+                if url.trim() == "" {
+                    return;
+                }
+
+                let mut config = load().unwrap_or_default();
+                config.api_link = url.clone();
+                *API_URL.lock().unwrap() = url.clone();
+                match write_config(&config) {
+                    Ok(_) => {}
+                    Err(_) => {
+                        panic!("Error while updating configuration")
+                    }
+                }
+
+                ratatui::restore();
+                let mut terminal = ratatui::init();
+                let res = App::new(MainWidget::default(), CurrentScreen::Main).run(&mut terminal);
+                match res {
+                    Ok(_) => {}
+                    Err(e) => {
+                        panic!("Error: {e}")
+                    }
+                }
+                ratatui::restore();
+            }
             _ => {}
         }
     }
@@ -52,6 +83,11 @@ impl Widget for ApiUrlWidget<'_> {
     where
         Self: Sized,
     {
+        let chunks = Layout::default()
+            .direction(ratatui::layout::Direction::Vertical)
+            .constraints([Constraint::Length(3), Constraint::Min(1)])
+            .split(area);
+
         let block = Block::bordered()
             .title("API URL")
             .title_alignment(Alignment::Center)
@@ -60,6 +96,6 @@ impl Widget for ApiUrlWidget<'_> {
         self.text.set_block(block);
         self.text.set_placeholder_text("http://localhost:8008");
 
-        self.text.render(area, buf);
+        self.text.render(chunks[0], buf);
     }
 }

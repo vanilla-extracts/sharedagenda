@@ -3002,6 +3002,7 @@ dependencies = [
  "color-eyre",
  "common",
  "crossterm",
+ "lazy_static",
  "password-hash",
  "ratatui",
  "reqwest",
