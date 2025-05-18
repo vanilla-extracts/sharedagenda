@@ -1,9 +1,6 @@
-use core::panic;
-use std::io;
-
-use common::configuration::loader::{Loaded, load, load_config};
 use crossterm::event::{self, Event, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame, widgets::Widget};
+use std::io;
 
 use crate::widgets::{
     main::MainWidget, navigation_bar::NavigationBar, template::TemplateWidget, top::Top,
@@ -66,23 +63,15 @@ pub trait TuiWidget: Widget {
 }
 
 #[derive(Clone, Debug)]
-pub struct App<'a, T: TuiWidget + Default + Clone> {
-    pub config: Loaded<'a>,
+pub struct App<T: TuiWidget + Default + Clone> {
     pub exit: bool,
     pub current_screen: CurrentScreen,
     pub current_widget: T,
 }
 
-impl Default for App<'_, MainWidget> {
+impl Default for App<MainWidget> {
     fn default() -> Self {
-        let config = match load() {
-            Ok(c) => load_config(c),
-            Err(_) => {
-                panic!("Could not load config")
-            }
-        };
         Self {
-            config,
             exit: false,
             current_screen: CurrentScreen::Main,
             current_widget: MainWidget::default(),
@@ -90,7 +79,7 @@ impl Default for App<'_, MainWidget> {
     }
 }
 
-impl<T: TuiWidget + Default + Clone> App<'_, T> {
+impl<T: TuiWidget + Default + Clone> App<T> {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
@@ -100,14 +89,7 @@ impl<T: TuiWidget + Default + Clone> App<'_, T> {
     }
 
     pub fn new(widget: T, current_screen: CurrentScreen) -> Self {
-        let config = match load() {
-            Ok(c) => load_config(c),
-            Err(_) => {
-                panic!("Could not load config")
-            }
-        };
         Self {
-            config,
             exit: false,
             current_screen,
             current_widget: widget,
@@ -116,10 +98,7 @@ impl<T: TuiWidget + Default + Clone> App<'_, T> {
 
     pub fn draw(&mut self, frame: &mut Frame) {
         let wid = TemplateWidget {
-            top_bar: Top {
-                token: &self.clone().config.token,
-                api_link: &self.clone().config.api_link,
-            },
+            top_bar: Top::default(),
             middle: self.current_widget.clone(),
             navigation_bar: NavigationBar::default(),
         };

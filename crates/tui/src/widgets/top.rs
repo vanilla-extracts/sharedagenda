@@ -5,12 +5,23 @@ use ratatui::{
     widgets::{Block, Paragraph, Widget, Wrap},
 };
 
-pub struct Top<'a> {
-    pub token: &'a str,
-    pub api_link: &'a str,
+use crate::{API_URL, TOKEN};
+
+pub struct Top {
+    pub token: String,
+    pub api_link: String,
 }
 
-impl Widget for Top<'_> {
+impl Default for Top {
+    fn default() -> Self {
+        Self {
+            token: TOKEN.lock().unwrap().to_string(),
+            api_link: API_URL.lock().unwrap().to_string(),
+        }
+    }
+}
+
+impl Widget for Top {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     where
         Self: Sized,
