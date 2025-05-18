@@ -130,12 +130,7 @@ impl Widget for MainWidget {
             .title_alignment(Alignment::Center)
             .style(Style::default().fg(Color::Yellow));
 
-        let ls: Vec<ListItem> = self
-            .actions
-            .actions
-            .iter()
-            .map(|f| ListItem::from(f))
-            .collect();
+        let ls: Vec<ListItem> = self.actions.actions.iter().map(ListItem::from).collect();
 
         let list = List::new(ls)
             .block(block)
