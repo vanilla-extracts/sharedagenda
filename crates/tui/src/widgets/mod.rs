@@ -1,4 +1,6 @@
 pub mod api;
+pub mod delete;
+pub mod login;
 pub mod main;
 pub mod navigation_bar;
 pub mod register;

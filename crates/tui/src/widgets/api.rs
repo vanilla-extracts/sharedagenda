@@ -7,12 +7,9 @@ use ratatui::{
 };
 use tui_textarea::TextArea;
 
-use crate::{
-    API_URL,
-    app::{App, CurrentScreen, TuiWidget},
-};
+use crate::{API_URL, app::TuiWidget};
 
-use super::main::MainWidget;
+use super::main::{MainWidget, switch_screen};
 
 #[derive(Clone, Debug)]
 pub struct ApiUrlWidget<'a> {
@@ -35,16 +32,7 @@ impl TuiWidget for ApiUrlWidget<'_> {
         self.text.input(key);
         match key.code {
             KeyCode::Esc => {
-                ratatui::restore();
-                let mut terminal = ratatui::init();
-                let res = App::new(MainWidget::default(), CurrentScreen::Main).run(&mut terminal);
-                match res {
-                    Ok(_) => {}
-                    Err(e) => {
-                        panic!("Error: {e}")
-                    }
-                }
-                ratatui::restore();
+                switch_screen::<MainWidget>();
             }
             KeyCode::Enter => {
                 let url = self.text.clone().into_lines().join("");
@@ -61,17 +49,7 @@ impl TuiWidget for ApiUrlWidget<'_> {
                         panic!("Error while updating configuration")
                     }
                 }
-
-                ratatui::restore();
-                let mut terminal = ratatui::init();
-                let res = App::new(MainWidget::default(), CurrentScreen::Main).run(&mut terminal);
-                match res {
-                    Ok(_) => {}
-                    Err(e) => {
-                        panic!("Error: {e}")
-                    }
-                }
-                ratatui::restore();
+                switch_screen::<MainWidget>();
             }
             _ => {}
         }

@@ -13,25 +13,21 @@ use super::main::{MainWidget, switch_screen};
 const SELECTED_STYLE: Style = Style::new().fg(Color::Blue).add_modifier(Modifier::BOLD);
 const UNSELECTED_STYLE: Style = Style::new().fg(Color::White);
 #[derive(Clone, Debug)]
-pub struct RegisterWidget<'a> {
+pub struct LoginWidget<'a> {
     pub forms: Vec<TextArea<'a>>,
     pub selected: usize,
 }
 
-impl Default for RegisterWidget<'_> {
+impl Default for LoginWidget<'_> {
     fn default() -> Self {
         Self {
-            forms: vec![
-                TextArea::default(),
-                TextArea::default(),
-                TextArea::default(),
-            ],
+            forms: vec![TextArea::default(), TextArea::default()],
             selected: 0,
         }
     }
 }
 
-impl TuiWidget for RegisterWidget<'_> {
+impl TuiWidget for LoginWidget<'_> {
     fn handle_key_event<T: TuiWidget + Default + Clone>(
         &mut self,
         key: crossterm::event::KeyEvent,
@@ -64,7 +60,7 @@ impl TuiWidget for RegisterWidget<'_> {
     }
 }
 
-impl Widget for RegisterWidget<'_> {
+impl Widget for LoginWidget<'_> {
     fn render(mut self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     where
         Self: Sized,
@@ -74,18 +70,17 @@ impl Widget for RegisterWidget<'_> {
             .constraints([
                 Constraint::Length(3),
                 Constraint::Length(3),
-                Constraint::Length(3),
                 Constraint::Min(1),
             ])
             .split(area);
 
-        let name_block = Block::bordered()
-            .title("Name")
+        let email_block = Block::bordered()
+            .title("Email")
             .title_alignment(Alignment::Center)
             .style(Style::default().fg(Color::Yellow));
 
-        self.forms[0].set_block(name_block);
-        self.forms[0].set_placeholder_text("John DOE");
+        self.forms[0].set_block(email_block);
+        self.forms[0].set_placeholder_text("email@domain.tld");
         if self.selected == 0 {
             self.forms[0].set_style(SELECTED_STYLE);
         } else {
@@ -93,33 +88,19 @@ impl Widget for RegisterWidget<'_> {
         }
         self.forms[0].render(chunks[0], buf);
 
-        let email_block = Block::bordered()
-            .title("Email")
+        let password_block = Block::bordered()
+            .title("Password")
             .title_alignment(Alignment::Center)
             .style(Style::default().fg(Color::Yellow));
 
-        self.forms[1].set_block(email_block);
-        self.forms[1].set_placeholder_text("email@domain.tld");
+        self.forms[1].set_mask_char('*');
+        self.forms[1].set_block(password_block);
+        self.forms[1].set_placeholder_text("Your password");
         if self.selected == 1 {
             self.forms[1].set_style(SELECTED_STYLE);
         } else {
             self.forms[1].set_style(UNSELECTED_STYLE);
         }
         self.forms[1].render(chunks[1], buf);
-
-        let password_block = Block::bordered()
-            .title("Password")
-            .title_alignment(Alignment::Center)
-            .style(Style::default().fg(Color::Yellow));
-
-        self.forms[2].set_mask_char('*');
-        self.forms[2].set_block(password_block);
-        self.forms[2].set_placeholder_text("Your password");
-        if self.selected == 2 {
-            self.forms[2].set_style(SELECTED_STYLE);
-        } else {
-            self.forms[2].set_style(UNSELECTED_STYLE);
-        }
-        self.forms[2].render(chunks[2], buf);
     }
 }

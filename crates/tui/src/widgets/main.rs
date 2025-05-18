@@ -10,7 +10,9 @@ use ratatui::{
 
 use crate::app::{App, CurrentScreen, TuiWidget};
 
-use super::{api::ApiUrlWidget, register::RegisterWidget};
+use super::{
+    api::ApiUrlWidget, delete::DeleteWidget, login::LoginWidget, register::RegisterWidget,
+};
 
 #[derive(Clone, Debug)]
 pub struct MainWidget {
@@ -101,6 +103,15 @@ impl TuiWidget for MainWidget {
                         }
                         ActionType::RegisterAccount => {
                             switch_screen::<RegisterWidget>();
+                        }
+                        ActionType::Login => {
+                            switch_screen::<LoginWidget>();
+                        }
+                        ActionType::Logout => {
+                            todo!()
+                        }
+                        ActionType::Delete => {
+                            switch_screen::<DeleteWidget>();
                         }
                         _ => {}
                     }
