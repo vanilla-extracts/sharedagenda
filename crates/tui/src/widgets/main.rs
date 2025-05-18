@@ -1,6 +1,6 @@
 use std::process::exit;
 
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::KeyCode;
 use ratatui::{
     layout::Alignment,
     style::{Color, Style, Stylize},
@@ -8,21 +8,12 @@ use ratatui::{
     widgets::{Block, List, ListItem, ListState, StatefulWidget, Widget},
 };
 
+use crate::app::TuiWidget;
+
 #[derive(Clone, Debug)]
 pub struct MainWidget {
-    pub actions: ActionList,
+    actions: ActionList,
 }
-/*
-layout:
---------
-What do you wish to do?
--> api
--> users
-->
-
-
-
-*/
 #[derive(Clone, Debug)]
 pub enum ActionType {
     ChangeApiUrl,
@@ -58,6 +49,37 @@ impl Action {
     }
 }
 
+impl Default for MainWidget {
+    fn default() -> Self {
+        let mut wid = MainWidget {
+            actions: ActionList {
+                actions: vec![
+                    Action::new(ActionType::ChangeApiUrl, "Change API URL"),
+                    Action::new(ActionType::RegisterAccount, "Register new account"),
+                    Action::new(ActionType::Login, "Login into your account"),
+                ],
+                state: ListState::default(),
+            },
+        };
+        wid.select_first();
+        wid
+    }
+}
+
+impl TuiWidget for MainWidget {
+    fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
+        match key.code {
+            KeyCode::Char('g') => self.select_first(),
+            KeyCode::Char('G') => self.select_last(),
+            KeyCode::Esc => self.select_none(),
+            KeyCode::Down | KeyCode::Right => self.select_next(),
+            KeyCode::Up | KeyCode::Left => self.select_previous(),
+            KeyCode::Char('q') => exit(0),
+            _ => {}
+        }
+    }
+}
+
 impl MainWidget {
     pub fn select_none(&mut self) {
         self.actions.state.select(None);
@@ -71,27 +93,11 @@ impl MainWidget {
     }
 
     pub fn select_first(&mut self) {
-        println!("Selected");
         self.actions.state.select_first();
     }
 
     pub fn select_last(&mut self) {
         self.actions.state.select_last();
-    }
-    pub fn new() -> Self {
-        println!("New!");
-        let mut new_widget = MainWidget {
-            actions: ActionList {
-                actions: vec![
-                    Action::new(ActionType::ChangeApiUrl, "Change API URL"),
-                    Action::new(ActionType::RegisterAccount, "Register new account"),
-                    Action::new(ActionType::Login, "Login into your account"),
-                ],
-                state: ListState::default(),
-            },
-        };
-        new_widget.select_first();
-        new_widget
     }
 }
 
@@ -101,8 +107,8 @@ impl From<&Action> for ListItem<'_> {
     }
 }
 
-impl Widget for &mut MainWidget {
-    fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
+impl Widget for MainWidget {
+    fn render(mut self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     where
         Self: Sized,
     {

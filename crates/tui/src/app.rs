@@ -2,10 +2,12 @@ use core::panic;
 use std::io;
 
 use common::configuration::loader::{Loaded, load, load_config};
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::{DefaultTerminal, Frame};
+use crossterm::event::{self, Event, KeyEvent, KeyEventKind};
+use ratatui::{DefaultTerminal, Frame, widgets::Widget};
 
-use crate::{ui::ui, widgets::main::MainWidget};
+use crate::widgets::{
+    main::MainWidget, navigation_bar::NavigationBar, template::TemplateWidget, top::Top,
+};
 
 #[derive(Clone, Debug)]
 pub enum UserRegisteringCurrentlyEditing {
@@ -44,7 +46,7 @@ pub enum EventModifyingCurrentlyEditing {
 
 #[derive(Clone, Debug)]
 pub enum CurrentScreen {
-    Main(MainWidget),
+    Main,
     ApiEditing,
     UserRegistering(UserRegisteringCurrentlyEditing),
     UserLoggingIn(UserLoggingInCurrentlyEditing),
@@ -59,14 +61,19 @@ pub enum CurrentScreen {
     EventModifying(EventModifyingCurrentlyEditing),
 }
 
-#[derive(Clone, Debug)]
-pub struct App<'a> {
-    pub config: Loaded<'a>,
-    pub current_screen: CurrentScreen,
-    pub exit: bool,
+pub trait TuiWidget: Widget {
+    fn handle_key_event(&mut self, key: KeyEvent);
 }
 
-impl Default for App<'_> {
+#[derive(Clone, Debug)]
+pub struct App<'a, T: TuiWidget + Default + Clone> {
+    pub config: Loaded<'a>,
+    pub exit: bool,
+    pub current_screen: CurrentScreen,
+    pub current_widget: T,
+}
+
+impl Default for App<'_, MainWidget> {
     fn default() -> Self {
         let config = match load() {
             Ok(c) => load_config(c),
@@ -76,13 +83,14 @@ impl Default for App<'_> {
         };
         Self {
             config,
-            current_screen: CurrentScreen::Main(MainWidget::new()),
             exit: false,
+            current_screen: CurrentScreen::Main,
+            current_widget: MainWidget::default(),
         }
     }
 }
 
-impl App<'_> {
+impl<T: TuiWidget + Default + Clone> App<'_, T> {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
@@ -91,7 +99,16 @@ impl App<'_> {
         Ok(())
     }
     pub fn draw(&mut self, frame: &mut Frame) {
-        ui(frame, self);
+        let wid = TemplateWidget {
+            top_bar: Top {
+                token: &self.clone().config.token,
+                api_link: &self.clone().config.api_link,
+            },
+            middle: self.current_widget.clone(),
+            navigation_bar: NavigationBar::default(),
+        };
+
+        frame.render_widget(wid, frame.area());
     }
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {
@@ -104,31 +121,6 @@ impl App<'_> {
     }
 
     fn handle_key_event(&mut self, key: KeyEvent) {
-        match self.clone().current_screen {
-            CurrentScreen::Main(mut w) => {
-                if key.kind != KeyEventKind::Press {
-                    return;
-                }
-                match key.code {
-                    KeyCode::Char('q') => self.exit(),
-                    KeyCode::Char('j') | KeyCode::Down => w.select_next(),
-                    KeyCode::Char('k') | KeyCode::Up => w.select_previous(),
-                    KeyCode::Right => w.select_next(),
-                    KeyCode::Left => w.select_previous(),
-                    KeyCode::Char('g') => w.select_first(),
-                    KeyCode::Char('G') => w.select_last(),
-                    KeyCode::Esc => w.select_none(),
-                    KeyCode::Enter => {
-                        println!("{:?}", w.actions.state.selected());
-                    }
-                    _ => {}
-                }
-            }
-            _ => {}
-        }
-    }
-
-    fn exit(&mut self) {
-        self.exit = true;
+        self.current_widget.handle_key_event(key);
     }
 }
