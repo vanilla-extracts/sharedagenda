@@ -2,7 +2,6 @@ use app::App;
 
 pub mod app;
 pub mod call;
-pub mod ui;
 pub mod widgets;
 
 #[tokio::main]
