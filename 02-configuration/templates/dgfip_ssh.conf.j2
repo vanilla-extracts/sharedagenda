@@ -83,3 +83,38 @@ Host {{ hostvars[vm_grafana_01]['openstack']['description'] }} {{ hostvars[vm_gr
    ServerAliveInterval 120
    StrictHostKeyChecking no  
    UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+
+{# Serveur ETCD 01 #}
+Host {{ hostvars[vm_etcds_01]['openstack']['description'] }} {{ hostvars[vm_etcds_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes 
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_etcds_01]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
+   ServerAliveInterval 120
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+
+{# Serveur ETCD 02 #}
+Host {{ hostvars[vm_etcds_02]['openstack']['description'] }} {{ hostvars[vm_etcds_02]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes 
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_etcds_02]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
+   ServerAliveInterval 120
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+
+{# Serveur ETCD 01 #}
+Host {{ hostvars[vm_etcds_03]['openstack']['description'] }} {{ hostvars[vm_etcds_03]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   IdentityFile "~/.ssh/id_sharedagenda" 
+   IdentitiesOnly yes 
+   User {{ ansible_user }}
+   Hostname  {{ hostvars[vm_etcds_03]['openstack']['addresses'][network_adm_name][0]['addr'] }}
+   ProxyJump {{ hostvars[vm_bastion]['openstack']['description'] }}
+   ServerAliveInterval 120
+   StrictHostKeyChecking no  
+   UserKnownHostsFile ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+
+

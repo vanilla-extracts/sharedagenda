@@ -136,6 +136,7 @@ module "vm-bdds" {
   pf_prefixe        = var.pf_prefixe
   bdd_server_count  = local.number_of_database_servers
   bdd_flavor_name   = var.bdd_flavor_name
+  etcd_image_name   = var.image_name
   key_pair          = openstack_compute_keypair_v2.ssh_keypair.name
   admin_network_id  = module.networks.admin_network_id
   data_network_id   = module.networks.data_network_id
@@ -148,8 +149,8 @@ module "vm-bdds" {
   }
   additional_etcd_metadata = {
     pf_prefixe = var.pf_prefixe
-    group = "bdds"
-    phase = var.phase
+    group      = "bdds"
+    phase      = var.phase
   }
 }
 
