@@ -25,7 +25,7 @@ See their different README for more information and documentation.
 For the DGFiP's Network the live API is available until june at
 
 ```
-http://api-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr
+https://api-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr
 ````
 
 ### Internet
