@@ -5,7 +5,7 @@ locals {
   # pf_prefixe = var.pf_prefixe
 
   number_of_api_servers      = 3
-  number_of_database_servers = 2
+  number_of_database_servers = 3
   number_of_caddy_servers    = 1
   number_of_bastion          = 1
   # Définition des réseau IP internes (Norme DGFiP)
