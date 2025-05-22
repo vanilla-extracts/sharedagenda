@@ -2,7 +2,7 @@ listen_address = "{{ apis_pub_ips[inventory_hostname] }}"
 listen_port = 8000
 
 [database]
-host = "{{ vm_bdds_01_data_ip }}"
+host = "{{ vip_data }}"
 port = "5432"
 user = "agenda"
 password = "agenda"
