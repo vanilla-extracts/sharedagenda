@@ -1,0 +1,25 @@
+cloud: "openstack"
+use_ssl: false
+keepalived_vrrp_net_interface: "ens4"
+keepalived_vip_name: "{{ deploy.pf_prefixe }}-port-data-vip-bdd-01-{{ deploy.phase }}"
+keepalived_check_cmd: "/usr/bin/curl {{ (use_ssl is defined and use_ssl == true) | ternary ('-k','') }} -X GET -I --fail"
+keepalived_check_primary_script: "{{ keepalived_check_cmd }} {{ (use_ssl is defined and use_ssl == true) | ternary ('https','http') }}://{{ hostvars[inventory_hostname]['openstack']['addresses'][network_adm_name][0]['addr'] }}:8008/primary"
+keepalived_check_binaries: ["curl"]
+keepalived_instances:
+  internal:
+    interface: "{{ keepalived_vrrp_net_interface }}"
+    state: "{{(play_hosts.index(inventory_hostname) == 0) | ternary('MASTER','BACKUP')}}"
+    virtual_router_id: 42
+    priority: "{{(play_hosts.index(inventory_hostname) == 0) | ternary('100','99')}}"
+    vips:
+      - "{{ keepalived_vip }}/24 dev {{ keepalived_vrrp_net_interface }} label {{ keepalived_vrrp_net_interface }}:1"
+    track_scripts:
+      - check_primary_script
+keepalived_scripts:
+  check_primary_script:
+    check_script: "{{ keepalived_check_primary_script }}"
+    interval: 2
+    fall: 3
+    rise: 6
+    weight: 2
+    timeout: 2

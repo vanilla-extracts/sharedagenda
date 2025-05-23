@@ -1,0 +1,73 @@
+---
+
+- name: Display postgresql service state
+  ansible.builtin.debug:
+    msg: "{{ ansible_facts.services[postgresql_service_name + \".service\"] }}"
+
+- name: Configure master as bootstrap
+  when: ansible_facts.services[postgresql_service_name + ".service"].state == "running"
+  block:
+    - name: Make sure the user is present, and password does not differ from the specified - {{ patroni_superuser_username }}
+      community.general.postgresql_user:
+        db: postgres
+        login_host: "{{ postgresql_combined_config.listen_addresses }}"
+        port: "{{ postgresql_combined_config.port }}"
+        name: "{{ patroni_superuser_username }}"
+        password: "{{ patroni_superuser_password }}"
+        login_password: "{{ postgresql_root_password }}"
+        login_user: "postgres"
+        encrypted: true
+        role_attr_flags: "SUPERUSER"
+        state: present
+      become: true
+      become_user: postgres
+
+    - name: "Make sure the users are present, and password does not differ from the specified - {{ item.username }}"
+      community.general.postgresql_user:
+        db: postgres
+        login_host: "{{ postgresql_combined_config.listen_addresses }}"
+        port: "{{ postgresql_combined_config.port }}"
+        name: "{{ item.username }}"
+        password: "{{ item.password }}"
+        login_password: "{{ postgresql_root_password }}"
+        login_user: "postgres"
+        encrypted: true
+        role_attr_flags: "{{ item.role }}"
+        state: present
+      become: true
+      no_log: "{{ postgresql_users_no_log }}"
+      become_user: postgres
+      with_items:
+        - { username: "{{ patroni_replication_username }}", password: "{{ patroni_replication_password }}", role: "LOGIN,REPLICATION" }
+ # end block 
+- name: Stop PostgreSQL, if running ...
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: stopped
+    enabled: false
+  ignore_errors: true
+  register: stopped_result
+
+- name: Starting and enabling the service on master host ...
+  ansible.builtin.systemd:
+    name: patroni
+    state: started
+    enabled: true
+
+- name: Wait for port 8008 to become open on the master host ...
+  ansible.builtin.wait_for:
+    port: 8008
+    host: "{{ admin_inet_addr }}"
+    state: started
+    timeout: 60
+    delay: 5
+
+- name: Check that the patroni is healthy on the master host ...
+  ansible.builtin.uri:
+    url: "{{ (patroni_use_ssl == true) | ternary('https', 'http') }}://{{ admin_inet_addr }}:8008/health"
+    status_code: 200
+    validate_certs: false
+  register: replica_result
+  until: replica_result.status == 200
+  retries: 10
+  delay: 10

@@ -14,6 +14,13 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserWithoutPassword {
+    pub uuid: String,
+    pub email: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Token {
     pub token: String,
     pub owner: String,
@@ -48,6 +55,20 @@ impl QueriedData for Token {
     }
 }
 
+impl QueriedData for UserWithoutPassword {
+    fn len() -> usize {
+        3_usize
+    }
+
+    fn create_from_row(row: &Row) -> Self {
+        Self {
+            uuid: row.get(0),
+            email: row.get(1),
+            name: row.get(2),
+        }
+    }
+}
+
 impl Token {
     pub fn new(owner: String) -> Self {
         Self {
@@ -57,6 +78,16 @@ impl Token {
                 Some(date) => date,
                 None => Utc::now(),
             },
+        }
+    }
+}
+
+impl UserWithoutPassword {
+    pub fn from_user(user: &User) -> Self {
+        Self {
+            name: user.name.clone(),
+            email: user.email.clone(),
+            uuid: user.uuid.clone(),
         }
     }
 }

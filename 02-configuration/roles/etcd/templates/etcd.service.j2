@@ -1,0 +1,22 @@
+{# file: roles/etcd/templates/etc/etcd.service.j2 #}
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+  
+[Service]
+Type=notify
+WorkingDirectory={{ etcd_data_directory }}/
+EnvironmentFile=-/etc/etcd/etcd.conf
+User=etcd
+# set GOMAXPROCS to number of processors
+ExecStart=/bin/bash -c "GOMAXPROCS=$(nproc) /usr/bin/etcd"
+Restart=on-failure
+LimitNOFILE=65536
+IOSchedulingClass=realtime
+IOSchedulingPriority=0
+Nice=-20
+ 
+[Install]
+WantedBy=multi-user.target

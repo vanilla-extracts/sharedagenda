@@ -4,13 +4,16 @@ use crate::handlers::api::api;
 use atty::Stream;
 use configuration::loader::{load, load_config, write_default_config};
 use handlers::{
-    create::create, delete::delete, event_deletion::remove, list::list, login::login,
-    logout::logout, modify::modify, register::register, whoami::whoami,
+    event::{change::change, create::create, delete::remove, list::list},
+    user::{
+        delete::delete, login::login, logout::logout, modify::modify, register::register,
+        user_list::user_list, whoami::whoami,
+    },
 };
 use lazy_static::lazy_static;
 use linefeed::{Interface, ReadResult};
 
-static VERSION: &str = "v2.3.0-prod";
+static VERSION: &str = "v3.0.0-dev";
 lazy_static! {
     static ref TOKEN: Mutex<String> = Mutex::new(String::new());
 }
@@ -92,7 +95,7 @@ async fn main() {
                 a.push(line.unwrap());
             }
         } else {
-            args.nth(0);
+            args.next();
             args.for_each(|f| a.push(f));
         }
         let first = a.remove(0);
@@ -109,8 +112,10 @@ async fn main() {
             "remove" => remove(&a.join("")).await,
             "new" | "create" => create(a).await,
             "list" => list(a.join("")).await,
+            "users" => user_list().await,
             "whoami" => whoami().await,
             "modify" => modify(a).await,
+            "change" => change(a).await,
             _ => {
                 println!("-----SharedAgenda CLI Help-----");
                 println!(
@@ -142,6 +147,9 @@ async fn main() {
                 );
                 println!(
                     "sharedagenda new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "sharedagenda change <id> <name> <date_start> <date_end>            > modifies an event"
                 );
                 println!(
                     "sharedagenda list <date>                                           > prints out the list of events"
@@ -205,6 +213,7 @@ async fn main() {
             str if str.starts_with("logout") => logout().await,
             str if str.starts_with("whoami") => whoami().await,
             str if str.starts_with("delete") => delete().await,
+            str if str.starts_with("users") => user_list().await,
             str if str.starts_with("list") => match str.strip_prefix("list") {
                 Some(time) => list(time.trim().to_string()).await,
                 _ => list("".to_string()).await,
@@ -220,6 +229,10 @@ async fn main() {
             str if str.starts_with("remove") => match str.strip_prefix("remove") {
                 Some(s) if s.trim() != "" => remove(s.trim()).await,
                 _ => println!("Usage: remove <id>"),
+            },
+            str if str.starts_with("change") => match str.strip_prefix("change") {
+                Some(s) if s.trim() != "" => change(parse_line_into_arguments(s.trim())).await,
+                _ => println!("Usage: change <id> <name> <date_start> <date_end>"),
             },
             _ => {
                 println!("-----SharedAgenda CLI REPL Help-----");
@@ -245,6 +258,9 @@ async fn main() {
                     "> logout                                                > logout of your account"
                 );
                 println!(
+                    "> users                                                 > prints the list of users"
+                );
+                println!(
                     "> delete                                                > deletes your account"
                 );
                 println!(
@@ -252,6 +268,9 @@ async fn main() {
                 );
                 println!(
                     "> new|create <name> <date_start> <date_end> [invitees]  > creates a new event"
+                );
+                println!(
+                    "> change <id> <name> <date_start> <date_end>            > creates a new event"
                 );
                 println!(
                     "> list <date>                                           > prints out the list of events"

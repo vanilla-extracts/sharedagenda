@@ -1,0 +1,7 @@
+---
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Include ETCD installation tasks
+  ansible.builtin.include_tasks: install.yml
+  when: ("etcd.service" not in ansible_facts.services) or (force_install | bool)

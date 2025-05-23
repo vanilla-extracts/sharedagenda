@@ -1,0 +1,8 @@
+export ETCDCTL_API=3
+{% if etcd_use_ssl == true %}
+alias etcdctl='etcdctl \
+              --ca-file={{ certs_path }}/{{ root_ca_cert_name }} \
+              --cert-file={{ certs_path }}/{{ ansible_hostname }}.pem \
+              --key-file={{ certs_path }}/{{ ansible_hostname }}.key \
+              --endpoints=https://{{ data_inet_addr }}:2379'
+{% endif %}

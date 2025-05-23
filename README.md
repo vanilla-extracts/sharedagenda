@@ -25,7 +25,7 @@ See their different README for more information and documentation.
 For the DGFiP's Network the live API is available until june at
 
 ```
-http://api-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr
+https://api-shag-01.enfip-dev-devops.dgfip.nuage01.fi.francecloud.rie.gouv.fr
 ````
 
 ### Internet
@@ -138,6 +138,11 @@ Here is the diagram for the deployed V2 infrastructure.
 *Version shown is v2.2.0-prod, there is a monitoring machine in v2.3.0-prod*
 
 [![](assets/infrastructure_v2.png)](assets/infrastructure_v2.png)
+
+### V3
+Here is the diagram for the deployed V3 infrastructure
+
+[![](assets/infrastructure_v3.png)](assets/infrastructure_v3.png)
 
 ## Credits
 Logo is under CC0 for SVGRepo

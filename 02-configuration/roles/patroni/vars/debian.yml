@@ -1,0 +1,6 @@
+---
+
+patroni_package_name: "patroni={{ patroni_major_version }}*"
+patroni_systemd_dir: "/lib/systemd/system"
+postgresql_default_service_name: "postgresql@{{ postgresql_version }}-main"
+postgresql_default_bin_directory: "/usr/lib/postgresql/{{ postgresql_version }}/bin"

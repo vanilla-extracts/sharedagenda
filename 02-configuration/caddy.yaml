@@ -10,6 +10,22 @@
         - caddy
       tags:
         - packages
+    - name: Copy certificate
+      become: true
+      ansible.builtin.copy:
+        src: self-signed.pem
+        dest: /etc/caddy/self-signed.pem
+        owner: caddy
+        group: caddy
+        mode: '660'
+    - name: Decrypt and copy key
+      become: true
+      ansible.builtin.copy:
+        src: secret-key.key
+        dest: /etc/caddy/self-signed.key
+        owner: caddy
+        group: caddy
+        mode: '600'
     - name: Copy Caddyfile
       become: true
       ansible.builtin.template:

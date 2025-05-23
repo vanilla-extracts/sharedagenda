@@ -5,21 +5,19 @@
   tasks:
     - name: Delete SSH known_hosts
       ansible.builtin.file:
-        name: /home/stag/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
+        name: ~/.ssh/known_hosts_{{ deploy.platform_name }}-{{ deploy.phase }}
         state: absent
     - name: Change global SSH config 
       ansible.builtin.template:
         src: ssh_config.j2
-        dest: /home/stag/.ssh/config 
-        owner: stag 
+        dest: ~/.ssh/config 
         mode: '600'
     - name: Create hosts folder
       ansible.builtin.file:
-        name: /home/stag/.ssh/hosts
+        name: ~/.ssh/hosts
         state: directory
     - name: Create SSH config
       ansible.builtin.template:
         src: dgfip_ssh.conf.j2
-        dest: /home/stag/.ssh/hosts/dgfip_ssh.conf
-        owner: stag
+        dest: ~/.ssh/hosts/dgfip_ssh.conf
         mode: '644'

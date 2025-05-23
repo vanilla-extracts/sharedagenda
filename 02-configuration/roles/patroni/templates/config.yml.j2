@@ -1,0 +1,99 @@
+{# file: roles/patroni/templates/config.yml.j2 #}
+scope: {{ patroni_cluster_name }}
+namespace: /service/
+name: {{ ansible_hostname }}
+
+restapi:
+  listen: {{ admin_inet_addr }}:8008
+  connect_address: {{ admin_inet_addr }}:8008
+{% if patroni_use_ssl == true %}
+  certfile: {{ postgresql_certs_directory}}/server.crt
+  keyfile: {{ postgresql_certs_directory }}/server.key
+{% endif %}
+{% if patroni_restapi_username | default(None, true) and patroni_restapi_password | default(None, true) %}
+  authentication:
+    username: {{ patroni_restapi_username }}
+    password: {{ patroni_restapi_password }}
+{% endif %}
+
+log:
+  level: {{ patroni_log_level }}
+  dir: {{ patroni_log_dir }}
+
+etcd3:
+  hosts:
+{% for host_item in groups[etcd_cluster_group_ansible] %}
+  - {{ hostvars[host_item]['openstack']['addresses'][network_adm_name][0]['addr'] }}:2379
+{% endfor %}
+{% if patroni_use_ssl == true %}
+  protocol: https
+  cacert: {{ postgresql_certs_directory }}/{{ root_ca_cert_name }}
+  cert: {{ postgresql_certs_directory }}/server.crt
+  key: {{ postgresql_certs_directory }}/server.key
+{% else %}
+  protocol: http
+{% endif %}
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: false
+      use_slots: true 
+      parameters:
+        wal_level: {{ postgresql_combined_config.wal_level | default('replica')}}
+        hot_standby: {{ postgresql_combined_config.hot_standby | default('on') }}
+        max_connections: {{ postgresql_combined_config.max_connections | default('100') }}
+        max_worker_processes: {{ postgresql_combined_config.max_worker_processes | default('8')}}
+        max_wal_senders: {{ postgresql_combined_config.max_wal_senders | default('10') }}
+        max_replication_slots: {{ postgresql_combined_config.max_replication_slots | default('5')}}
+        max_prepared_transactions: {{ postgresql_combined_config.max_prepared_transactions | default('0')}}
+        max_locks_per_transaction: {{ postgresql_combined_config.max_locks_per_transaction | default('64')}}
+        wal_log_hints: {{ postgresql_combined_config.wal_log_hints | default('on')}}
+        track_commit_timestamp: {{ postgresql_combined_config.track_commit_timestamp | default('off')}}
+        log_rotation_size: {{ postgresql_combined_config.log_rotation_size | default('100MB') }}
+        log_line_prefix: '%t [%p]: user=%u,db=%d,app=%a,client=%h '
+        unix_socket_directories: {{ postgresql_combined_config.unix_socket_directories }} 
+        log_destination: {{ postgresql_combined_config.log_destination | default('stderr') }}
+        logging_collector: {{ postgresql_combined_config.logging_collector | default(true) }}
+        log_filename: {{ postgresql_combined_config.log_filename | default('postgresql-%a.log')  }}
+        log_rotation_age: {{ postgresql_combined_config.log_rotation_age | default('1d') }}
+        log_truncate_on_rotation: {{ postgresql_combined_config.log_truncate_on_rotation | default(true) }}
+
+
+{% if patroni_use_ssl == true %}
+        ssl: on
+        ssl_cert_file: {{ postgresql_certs_directory }}/server.crt
+        ssl_key_file:  {{ postgresql_certs_directory }}/server.key
+{% endif %}
+  
+  initdb:
+    - encoding: UTF8
+    - data-checksums 
+
+postgresql:
+  listen: "{{ postgresql_combined_config.listen_addresses }}:{{ postgresql_combined_config.port }}"
+  connect_address: {{ data_inet_addr }}:{{ postgresql_combined_config.port }}
+  data_dir: {{ postgresql_data_directory }}
+  bin_dir: {{ postgresql_bin_directory }}
+  create_replica_methods:
+    - basebackup
+  basebackup:
+    max-rate: "100M"
+    checkpoint: "fast"
+
+  authentication:
+    replication:
+      username: {{ patroni_replication_username }}
+      password: {{ patroni_replication_password }}
+    superuser:
+      username: {{ patroni_superuser_username }}
+      password: {{ patroni_superuser_password }}
+
+watchdog:
+  mode: required
+  device: {{ watchdog_path }}
+  safety_margin: 5
+failsafe_mode: true

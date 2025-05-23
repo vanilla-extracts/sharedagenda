@@ -1,10 +1,3 @@
 pub mod api;
-pub mod create;
-pub mod delete;
-pub mod event_deletion;
-pub mod list;
-pub mod login;
-pub mod logout;
-pub mod modify;
-pub mod register;
-pub mod whoami;
+pub mod event;
+pub mod user;
