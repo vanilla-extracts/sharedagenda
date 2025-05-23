@@ -1,0 +1,17 @@
+---
+
+- name: Copy SELinux pgbasebackup conf
+  ansible.builtin.copy:
+    src: pgbasebackup.te
+    dest: /var/tmp/pgbasebackup.te
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Compile SELinux rule for pgbasebackup
+  ansible.builtin.shell: checkmodule -M -m -o pgbasebackup /var/tmp/pgbasebackup.te && semodule_package -o /var/tmp/pgbasebackup.pp -m pgbasebackup
+  changed_when: false
+
+- name: Reload SELinux rule for pgbasebackup
+  ansible.builtin.command: semodule -X 300 -i  /var/tmp/pgbasebackup.pp
+  changed_when: false

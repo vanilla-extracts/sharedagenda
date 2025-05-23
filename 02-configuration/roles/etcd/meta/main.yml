@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: A2C
+  role_name: etcd
+  description: Install and configures etcd key-value store
+  license: DGFIP
+  company: DGFiP
+  min_ansible_version: '2.9'
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+    - name: Rocky
+      versions:
+        - "all"
+  galaxy_tags:
+    - etcd
+    - ha
+    - store
+
+dependencies: []

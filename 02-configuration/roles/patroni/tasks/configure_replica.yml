@@ -1,0 +1,75 @@
+---
+- name: Stop PostgreSQL, if running ...
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: stopped
+    enabled: false
+  ignore_errors: true
+  register: ignore_errors_register
+
+- name: Make sure the data directory is empty on replica host - {{ postgresql_data_directory }}
+  ansible.builtin.file:
+    path: "{{ postgresql_data_directory }}"
+    state: "{{ item }}"
+    owner: postgres
+    group: postgres
+    mode: "0700"
+  loop:
+    - absent
+    - directory
+
+- name: Set file context type to postgresql data directories
+  community.general.sefcontext:
+    setype: postgresql_db_t
+    target: "{{ item }}"
+    state: present
+  register: sefcontext
+  with_items:
+    - "{{ postgresql_data_directory }}"
+    - "/{{ postgresql_data_directory.split('/')[1] }}" # needed at start for patroni ; PATH is full PATH so taking 2nd element
+  # when: ansible_os_family == "Debian"]0
+
+- name: Apply SELinux context to postgresql directories
+  ansible.builtin.command:
+    cmd: "restorecon -Rv {{ item }}"
+  when: sefcontext.changed
+  with_items:
+    - "{{ postgresql_data_directory }}"
+    - "/{{ postgresql_data_directory.split('/')[1] }}"
+
+- name: Make sure postgres tablespaces directories are removed
+  ansible.builtin.file:
+    path: "{{ item.location }}"
+    state: absent
+  with_items: "{{ postgresql_tablespaces }}"
+  when:
+    - postgresql_tablespaces is defined
+    - postgresql_tablespaces | length > 0
+
+- name: SELinux fix when replica
+  ansible.builtin.include_tasks: selinux.yml
+
+- name: Starting and enabling the service on replica host
+  ansible.builtin.systemd:
+    name: patroni
+    state: started
+    enabled: true
+
+- name: Wait for port 8008 to become open on the replica host
+  ansible.builtin.wait_for:
+    port: 8008
+    host: "{{ admin_inet_addr }}"
+    state: started
+    timeout: 60
+    delay: 5
+  ignore_errors: false
+
+- name: "Check that the patroni is healthy on the replica host"
+  ansible.builtin.uri:
+    url: "{{ (patroni_use_ssl == true) | ternary('https', 'http') }}://{{ admin_inet_addr }}:8008/health"
+    status_code: 200
+    validate_certs: false
+  register: replica_result
+  until: replica_result.status == 200
+  retries: 10
+  delay: 10

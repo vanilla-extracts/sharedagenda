@@ -1,0 +1,25 @@
+---
+# file: roles/patroni/defaults/main.yml
+watchdog_path: "/dev/watchdog"
+patroni_log_dir: "/var/log/patroni"
+patroni_config_dir: "/etc/patroni"
+patroni_cluster_name: "patroni-cluster-01"
+patroni_superuser_username: "dba"
+patroni_superuser_password: "superuser_password"
+patroni_replication_username: "replicator"
+patroni_replication_password: "replicator_password"
+patroni_restapi_username: "patroni"
+patroni_restapi_password: "patroni"
+etcd_cluster_group_ansible: "cluster_etcd"
+patroni_major_version: "3"
+
+patroni_log_level: "INFO"
+patroni_add_replica: false
+
+postgresql_users_no_log: true
+
+postgresql_default_config: 
+  unix_socket_directories: "/var/run/postgresql"
+
+postgresql_service_name: "{{ postgresql_default_service_name }}"
+postgresql_bin_directory: "{{ postgresql_default_bin_directory }}"

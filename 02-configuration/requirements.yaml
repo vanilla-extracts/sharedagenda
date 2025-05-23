@@ -23,3 +23,10 @@ roles:
   - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/observability/postgres-exporter
     version: v1.2.0
     name: postgres-exporter
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/base-de-donnees/patroni.git
+    version: v2.1.5
+    name: patroni
+  - src: git+https://forge.dgfip.finances.rie.gouv.fr/dgfip/si1/dan-a2c/role-ansible-dgfip/base-de-donnees/etcd.git
+    version: v2.0.4
+    name: etcd
+

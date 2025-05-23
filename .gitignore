@@ -9,3 +9,5 @@ secure.yaml
 02-configuration/files/server
 04-vps/files/server
 assets/cli
+tfstate.tf
+devops-openrc.sh

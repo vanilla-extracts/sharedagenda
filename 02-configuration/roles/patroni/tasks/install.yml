@@ -1,0 +1,64 @@
+---
+- name: Install  packages from postgresql-common and epel reposiories (RHEL)
+  ansible.builtin.yum:
+    name: "{{ patroni_package_name }}"
+    state: present
+    enablerepo: "postgresql-common,epel-{{ ansible_distribution_major_version }}-x86_64"
+  when: ansible_os_family == "RedHat"
+
+- name: Install  packages from postgresql-common and epel reposiories (Debian)
+  ansible.builtin.apt:
+    name: "{{ patroni_package_name }}"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Create patroni config directory
+  ansible.builtin.file:
+    path: "{{ patroni_config_dir }}"
+    state: directory
+    owner: "postgres"
+    group: "postgres"
+    mode: "0750"
+
+- name: Create patroni log directory
+  ansible.builtin.file:
+    path: "{{ patroni_log_dir }}"
+    state: directory
+    owner: "postgres"
+    group: "postgres"
+    mode: "0770"
+    recurse: true
+
+- name: Stopping and deactivating the service ...
+  ansible.builtin.systemd:
+    name: patroni
+    state: stopped
+    enabled: false
+
+- name: Create patroni unit file
+  ansible.builtin.template:
+    src: patroni.service.j2
+    dest: "{{ patroni_systemd_dir }}/patroni.service"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy config file to '/etc/patroni/patroni.yml'
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: /etc/patroni/patroni.yml
+    mode: "0650"
+    owner: "root"
+    group: "postgres"
+
+- name: Add PATRONICTL_CONFIG_FILE environment variable into /etc/environment
+  ansible.builtin.lineinfile:
+    dest: "/etc/environment"
+    state: present
+    regexp: "^export PATRONICTL_CONFIG_FILE"
+    line: "export PATRONICTL_CONFIG_FILE=/etc/patroni/patroni.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  ignore_errors: true
+  register: ignore_errors_register

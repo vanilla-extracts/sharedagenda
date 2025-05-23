@@ -1,0 +1,9 @@
+admin_inet_addr: "{{ admin_ip }}" 
+data_inet_addr: "{{ data_ip }}"
+etcd_cluster_group_ansible: "platform_shag_etcds" # Nom du groupe ansible des machines hébergeant le cluster etcd ; en cas de colocalisation, peut être `platform_bdd` 
+etcd_cluster_name: "etcd-cluster-01" # Nom du cluster etcd
+etcd_initial_cluster_state: "new" # 'new' pour l'initialisation du cluster, 'existing' si le noeud est reconstruit. 
+etcd_volume_mntp: "/etcdata" # base de l'arborescence des données etcd
+etcd_use_ssl: false # true/false 
+force_install: false # true/false 
+
