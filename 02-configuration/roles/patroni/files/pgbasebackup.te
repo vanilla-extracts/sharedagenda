@@ -1,0 +1,14 @@
+module pgbasebackup 1.0;
+
+require {
+        type user_home_dir_t;
+        type postgresql_t;
+        class file open;
+        class file read;
+        class file getattr;
+}
+
+#============= postgresql_t ==============
+allow postgresql_t user_home_dir_t:file open;
+allow postgresql_t user_home_dir_t:file read;
+allow postgresql_t user_home_dir_t:file getattr;

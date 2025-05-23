@@ -1,0 +1,33 @@
+{# file: roles/etcd/templates/etc/etcd.conf.j2 #}
+ETCD_DATA_DIR="{{ etcd_data_directory }}/default.etcd" 
+{% if etcd_use_ssl == true %}
+ETCD_LISTEN_PEER_URLS="https://127.0.0.1:2380,https://{{ data_inet_addr }}:2380"
+ETCD_LISTEN_CLIENT_URLS="https://127.0.0.1:2379,https://{{ data_inet_addr }}:2379,https://{{ admin_inet_addr }}:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://{{  data_inet_addr }}:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://{{ data_inet_addr }}:2379"
+ETCD_INITIAL_CLUSTER="{% for host in groups[etcd_cluster_group_ansible] %}{{ hostvars[host]['ansible_hostname'] }}=https://{{ hostvars[host]['openstack']['addresses'][network_data_name][0]['addr'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+ETCD_CLIENT_CERT_AUTH="true"
+ETCD_CERT_FILE="{{ certs_path }}/{{ ansible_hostname }}.pem"
+ETCD_KEY_FILE="{{ certs_path }}/{{ ansible_hostname }}.key"
+ETCD_TRUSTED_CA_FILE="{{ certs_path }}/{{ root_ca_cert_name }}"
+ETCD_AUTO_TLS="false"
+ETCD_PEER_CLIENT_CERT_AUTH="true"
+ETCD_PEER_CERT_FILE="{{ certs_path }}/{{ ansible_hostname }}.pem"
+ETCD_PEER_KEY_FILE="{{ certs_path }}/{{ ansible_hostname }}.key"
+ETCD_PEER_TRUSTED_CA_FILE="{{ certs_path }}/{{ root_ca_cert_name }}"
+ETCD_PEER_AUTO_TLS="false"
+{% else %}
+ETCD_LISTEN_PEER_URLS="http://127.0.0.1:2380,http://{{ data_inet_addr }}:2380"
+ETCD_LISTEN_CLIENT_URLS="http://127.0.0.1:2379,http://{{ data_inet_addr }}:2379,http://{{ admin_inet_addr }}:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://{{  data_inet_addr }}:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://{{ data_inet_addr }}:2379"
+ETCD_INITIAL_CLUSTER="{% for host in groups[etcd_cluster_group_ansible] %}{{ hostvars[host]['ansible_hostname'] }}=http://{{ hostvars[host]['openstack']['addresses'][network_data_name][0]['addr'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+{% endif %}
+ETCD_NAME="{{ ansible_hostname }}"
+ETCD_INITIAL_CLUSTER_TOKEN="{{ cluster_token }}"
+ETCD_INITIAL_CLUSTER_STATE="{{ etcd_initial_cluster_state }}"
+ETCD_ELECTION_TIMEOUT="5000"
+ETCD_HEARTBEAT_INTERVAL="1000"
+ETCD_INITIAL_ELECTION_TICK_ADVANCE="false"
+ETCD_LOG_LEVEL="{{ etcd_log_level | default('info') }}"
+

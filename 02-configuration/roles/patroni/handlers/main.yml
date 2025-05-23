@@ -1,0 +1,22 @@
+---
+- name: Restart patroni-watchdog
+  ansible.builtin.systemd:
+    name: patroni-watchdog
+    state: restarted
+    daemon_reload: true
+    enabled: true
+  notify:
+    - Restart watchdog
+
+- name: Restart watchdog
+  ansible.builtin.systemd:
+    name: watchdog
+    state: restarted
+    enabled: true
+
+- name: Restart patroni
+  ansible.builtin.systemd:
+    name: patroni.service
+    state: restarted
+    daemon_reload: true
+    enabled: true

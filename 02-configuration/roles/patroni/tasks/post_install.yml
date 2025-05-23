@@ -1,0 +1,13 @@
+---
+- name: "Check postgresql cluster health"
+  run_once: true
+  become: true
+  become_user: postgres
+  ansible.builtin.command: patronictl -c /etc/patroni/patroni.yml list
+  register: patronictl_result
+  changed_when: patronictl_result.rc != 0
+
+- name: "PostgreSQL Cluster health"
+  run_once: true
+  ansible.builtin.debug:
+    var: patronictl_result.stdout_lines

@@ -1,0 +1,154 @@
+---
+- name: Gather variables for each operating system
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_version'].split('.')[0] }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+
+- name: "DCS (etcd) | Make sure that the required packages are installed"
+  ansible.builtin.package:
+    name:
+      - unzip
+      - tar
+    state: present
+
+- name: "DCS (etcd) | Ensure no previous temporary dir is present on ansible controller"
+  ansible.builtin.file:
+    path: "{{ temp_archive_download }}"
+    state: absent
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: "DCS (etcd) | Creating the temporary directory on ansible controller {{ temp_archive_download }}"
+  ansible.builtin.file:
+    path: "{{ temp_archive_download }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: "DCS (etcd) | Download and extract the etcd archive version {{ etcd_version }}"
+  ansible.builtin.unarchive:
+    src: "{{ etcd_root_download_url }}/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+    dest: "{{ temp_archive_download }}"
+    validate_certs: false
+    extra_opts:
+      - --strip-components=1
+    remote_src: true
+  delegate_to: localhost
+  become: false
+  check_mode: false
+  run_once: true
+
+- name: "DCS (etcd) | Copy 'etcd' and 'etcdctl' binary files to '/usr/bin/'"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/usr/bin/"
+    mode: "0755"
+  with_items:
+    - "{{ temp_archive_download }}/etcd"
+    - "{{ temp_archive_download }}/etcdctl"
+
+- name: "DCS (etcd) | Add the 'etcd' group"
+  ansible.builtin.group:
+    name: etcd
+    system: "yes"
+    state: present
+
+- name: "DCS (etcd) | Add the 'etcd' user"
+  ansible.builtin.user:
+    name: etcd
+    shell: /sbin/nologin
+    group: etcd
+    system: "yes"
+    state: present
+
+- name: "DCS (etcd) | Creating the data directory - {{ etcd_data_directory }}"
+  ansible.builtin.file:
+    path: "{{ etcd_data_directory }}"
+    state: directory
+    owner: etcd
+    group: etcd
+    mode: "0700"
+
+- name: "DCS (etcd) | Creating the '/etc/etcd' directory"
+  ansible.builtin.file:
+    path: "/etc/etcd"
+    state: directory
+    mode: "0755"
+
+- name: "DCS (etcd) | Copy systemd service file"
+  ansible.builtin.template:
+    src: etcd.service.j2
+    dest: "{{ etcd_systemd_dir }}/etcd.service"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: "DCS (etcd) | Disable and stop etcd service"
+  ansible.builtin.systemd:
+    name: etcd
+    state: stopped
+    enabled: true
+    daemon_reload: true
+
+- name: "DCS (etcd) | Generate conf file '/etc/etcd/etcd.conf'"
+  ansible.builtin.template:
+    src: etcd.conf.j2
+    dest: /etc/etcd/etcd.conf
+    owner: etcd
+    group: etcd
+    mode: "0755"
+
+- name: "DCS (etcd) | Deleting temp files on ansible controller"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  run_once: true
+  delegate_to: localhost
+  become: false
+  with_items:
+    - "/tmp/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+    - "{{ temp_archive_download }}"
+
+- name: "DCS (etcd) | Enable and start etcd service"
+  ansible.builtin.systemd:
+    name: etcd
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: "DCS (etcd) | Configure etcdctl connection properties"
+  ansible.builtin.template:
+    src: etcdctl.sh.j2
+    dest: "/etc/profile.d/etcdctl.sh"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Post-install checks
+  block:
+    - name: "DCS (etcd) | Wait until the etcd cluster is healthy"
+      ansible.builtin.command: "etcdctl --cluster=true endpoint health"
+      register: etcd_health_result
+      run_once: true
+      changed_when: false
+      until: "'is healthy' in etcd_health_result.stdout"
+      retries: 10
+      delay: 10
+      ignore_errors: false
+
+    - name: "DCS (etcd) | Display cluster health"
+      run_once: true
+      ansible.builtin.debug:
+        var: etcd_health_result.stdout_lines

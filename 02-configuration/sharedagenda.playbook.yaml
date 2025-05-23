@@ -10,10 +10,8 @@
     - node-exporter
 - name: Grafana
   ansible.builtin.import_playbook: grafana.yaml
-- name: Postgres
+- name: Postgres and Patroni
   ansible.builtin.import_playbook: postgresql.yaml
-- name: Replication
-  ansible.builtin.import_playbook: replication.yaml
 - name: Postgresql Keepalived
   ansible.builtin.import_playbook: keepalived.yaml
 - name: Postgresql Exporter

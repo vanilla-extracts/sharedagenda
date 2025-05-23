@@ -1,17 +1,7 @@
 - name: Keepalived
   become: true
   hosts: platform_shag_bdds
-  vars:
-    cloud: "openstack"
-    keepalived_vrrp_net_interface: "ens4"
-    keepalived_vip_name: "{{ deploy.pf_prefixe }}-port-data-vip-bdd-01-{{ deploy.phase }}"
-    keepalived_instances:
-      internal:
-        interface: "{{ keepalived_vrrp_net_interface }}"
-        state: "{{(play_hosts.index(inventory_hostname) == 0) | ternary('MASTER','BACKUP')}}"
-        virtual_router_id: 42
-        priority: "{{(play_hosts.index(inventory_hostname) == 0) | ternary('100','99')}}"
-        vips:
-          - "{{ keepalived_vip }}/24 dev {{ keepalived_vrrp_net_interface }} label {{ keepalived_vrrp_net_interface }}:1"
+  vars_files:
+    - "vars/keepalived.yaml"
   roles:
     - keepalived

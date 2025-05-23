@@ -1,0 +1,16 @@
+module postgresql 1.0;
+
+require {
+    type postgresql_t;
+    type default_t;
+    class dir search;
+    class dir { add_name getattr open read remove_name search write };
+    class file { create getattr open read rename unlink write };
+    class lnk_file read;
+}
+
+#============= postgresql_t ==============
+allow postgresql_t default_t:dir { add_name getattr open read remove_name search write };
+allow postgresql_t default_t:file { create getattr open read rename unlink write };
+allow postgresql_t default_t:lnk_file read;
+

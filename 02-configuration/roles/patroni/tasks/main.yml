@@ -1,0 +1,86 @@
+---
+- name: Gather variables for each operating system
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_version'].split('.')[0] }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+
+- name: Creating posgresql.conf dictionary variables using 'postgresql_default_config' and 'postgresql_custom_config' ...
+  ansible.builtin.set_fact:
+    postgresql_combined_config: "{{ postgresql_default_config | combine(postgresql_custom_config | default({}), list_merge='replace') }}"
+
+- name: Get all services facts
+  ansible.builtin.service_facts:
+
+- name: Conditional tasks based on Patroni installation
+  when: ansible_facts.services["patroni.service"] is not defined
+  block:
+
+    - name: Guess cluster node roles
+      block:
+        - name: Check patroni status
+          ansible.builtin.uri:
+            url: http://{{ admin_inet_addr }}:8008
+            return_content: true
+            status_code:
+              - 200
+              - 503
+          register: patroni_status
+
+        - name: Set node role
+          ansible.builtin.set_fact:
+            node_role: "{{ patroni_status.json.role }}"
+      rescue:
+        - name: Add replica feature
+          ansible.builtin.set_fact:
+            node_role: replica
+          when:
+            - patroni_add_replica | bool
+
+        - name: Init - Master node is first inventory node
+          ansible.builtin.set_fact:
+            node_role: master
+          when:
+            - not patroni_add_replica | bool
+            - ansible_play_hosts.index(inventory_hostname) == 0
+
+        - name: Init - Replica nodes are others
+          ansible.builtin.set_fact:
+            node_role: replica
+          when:
+            - not patroni_add_replica | bool
+            - ansible_play_hosts.index(inventory_hostname) != 0
+     # end block 
+ 
+    - name: Print cluster node roles
+      ansible.builtin.debug:
+        var: node_role
+
+    - name: "Import / Execute installation tasks"
+      ansible.builtin.import_tasks: install.yml
+
+    - name: "Import / Execute patroni watchdog tasks"
+      ansible.builtin.import_tasks: watchdog.yml
+
+    - name: "Import / Execute the master node tasks"
+      ansible.builtin.import_tasks: configure_master.yml
+      when:
+        - not patroni_add_replica|bool
+        - ansible_play_hosts.index(inventory_hostname) == 0
+
+    - name: "Import / Execute the replica node tasks"
+      ansible.builtin.import_tasks: configure_replica.yml
+      when:
+        - ((not patroni_add_replica|bool) and (ansible_play_hosts.index(inventory_hostname) != 0) or (patroni_add_replica|bool))
+
+  # end block 
+- name: "Import / Execute post installation tasks"
+  ansible.builtin.import_tasks: post_install.yml

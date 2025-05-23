@@ -1,0 +1,46 @@
+---
+- name: Watchdog - Device presence test
+  ansible.builtin.stat:
+    path: "{{ watchdog_path }}"
+  register: watchdog_device
+
+- name: Watchdog - Installation
+  when: not watchdog_device.stat.exists
+  block:
+    - name: Watchdog - Install 'softdog' package
+      ansible.builtin.package:
+        name: "watchdog"
+        state: present
+
+    - name: Watchdog - Loading the softdog module at system startup
+      ansible.builtin.copy:
+        dest: "/etc/modules-load.d/watchdog.conf"
+        mode: "0644"
+        content: |
+          softdog
+
+- name: Watchdog - Post-installation device presence test
+  ansible.builtin.stat:
+    path: "{{ watchdog_path }}"
+  register: watchdog_softdevice
+  when:
+    - not watchdog_device.stat.exists
+  failed_when:
+    - not watchdog_softdevice.stat.exists
+
+- name: Watchdog - Add 'udev' rule"
+  ansible.builtin.copy:
+    dest: /etc/udev/rules.d/99-watchdog.rules
+    mode: "0644"
+    content: |
+      KERNEL=="watchdog", OWNER="postgres", GROUP="postgres", MODE="0600"
+
+- name: "Watchdog - Reloading udev rules"
+  ansible.builtin.command: "udevadm control --reload-rules"
+  register: reload
+  changed_when: reload.rc != 0
+
+- name: Watchdog - Triggering udev rules
+  ansible.builtin.command: "udevadm trigger"
+  register: trigger
+  changed_when: trigger.rc != 0

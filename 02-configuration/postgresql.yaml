@@ -1,7 +1,21 @@
+- name: "Install etcd on VMs"
+  hosts: platform_shag_etcds
+  become: true
+  vars_files:
+    - vars/etcd.yaml
+    - vars/password.yaml
+  roles:
+    - role: etcd
+      tags: [etcd]
+
 - name: "Install postgresql on VMs"
   hosts: platform_shag_bdds
   become: true
   vars_files:
     - vars/postgresql.yaml
+    - vars/password.yaml
   roles:
-    - postgresql
+    - role: postgresql
+      tags: [etcd]
+    - role: patroni
+      tags: [patroni]
