@@ -2,17 +2,14 @@ use common::configuration::loader::{load, write_config};
 use crossterm::event::KeyCode;
 use ratatui::{
     layout::{Alignment, Constraint, Layout},
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     widgets::{Block, Widget},
 };
 use tui_textarea::TextArea;
 
-use crate::{
-    API_URL,
-    app::{App, CurrentScreen, TuiWidget},
-};
+use crate::{API_URL, app::TuiWidget};
 
-use super::main::MainWidget;
+use super::main::{MainWidget, switch_screen};
 
 #[derive(Clone, Debug)]
 pub struct ApiUrlWidget<'a> {
@@ -35,16 +32,7 @@ impl TuiWidget for ApiUrlWidget<'_> {
         self.text.input(key);
         match key.code {
             KeyCode::Esc => {
-                ratatui::restore();
-                let mut terminal = ratatui::init();
-                let res = App::new(MainWidget::default(), CurrentScreen::Main).run(&mut terminal);
-                match res {
-                    Ok(_) => {}
-                    Err(e) => {
-                        panic!("Error: {e}")
-                    }
-                }
-                ratatui::restore();
+                switch_screen::<MainWidget>();
             }
             KeyCode::Enter => {
                 let url = self.text.clone().into_lines().join("");
@@ -61,18 +49,8 @@ impl TuiWidget for ApiUrlWidget<'_> {
                         panic!("Error while updating configuration")
                     }
                 }
-
-                ratatui::restore();
-                let mut terminal = ratatui::init();
-                let res = App::new(MainWidget::default(), CurrentScreen::Main).run(&mut terminal);
-                match res {
-                    Ok(_) => {}
-                    Err(e) => {
-                        panic!("Error: {e}")
-                    }
-                }
-                ratatui::restore();
-            }
+                switch_screen::<MainWidget>();
+          }
             _ => {}
         }
     }
@@ -95,7 +73,7 @@ impl Widget for ApiUrlWidget<'_> {
 
         self.text.set_block(block);
         self.text.set_placeholder_text("http://localhost:8008");
-
+        self.text.set_style(Style::default().fg(Color::Blue).bold());
         self.text.render(chunks[0], buf);
     }
 }
