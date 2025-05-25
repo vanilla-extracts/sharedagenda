@@ -50,7 +50,7 @@ impl TuiWidget for ApiUrlWidget<'_> {
                     }
                 }
                 switch_screen::<MainWidget>();
-            }
+          }
             _ => {}
         }
     }
@@ -74,7 +74,6 @@ impl Widget for ApiUrlWidget<'_> {
         self.text.set_block(block);
         self.text.set_placeholder_text("http://localhost:8008");
         self.text.set_style(Style::default().fg(Color::Blue).bold());
-
         self.text.render(chunks[0], buf);
     }
 }
