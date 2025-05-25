@@ -1,28 +1,16 @@
-use serde::{Deserialize, Serialize};
+use common::structs::struct_user::UserListAnswer;
 
-use crate::API_URL;
-
-use super::login::{Answer, call};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct User {
-    pub uuid: String,
-    pub name: String,
-    pub email: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserListAnswer {
-    code: u16,
-    users: Vec<User>,
-}
+use crate::{
+    API_URL,
+    call::{Answer, call},
+};
 
 impl Answer for UserListAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        String::new()
+    fn process_error(&self) {
+        eprintln!("Error while fetching user list, code {}", self.code);
     }
     fn process(&mut self) {
         self.users.sort_by_key(|f| f.name.clone());

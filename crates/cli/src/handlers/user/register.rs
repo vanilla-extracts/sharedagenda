@@ -1,37 +1,30 @@
 use argon2::{Argon2, PasswordHasher};
+use common::structs::struct_user::{RegisterAnswer, RegisterPost};
 use password_hash::{SaltString, rand_core::OsRng};
-use serde::{Deserialize, Serialize};
 
-use crate::API_URL;
-
-use super::login::{Answer, call};
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RegisterPost<'r> {
-    name: &'r str,
-    email: &'r str,
-    password: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RegisterAnswer {
-    code: i32,
-    answer: String,
-}
+use crate::{
+    API_URL,
+    call::{Answer, call},
+};
 
 impl Answer for RegisterAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        self.answer.clone()
+    fn process_error(&self) {
+        eprintln!(
+            "Error while registering, code {}, message {}",
+            self.code, self.answer
+        );
     }
-    fn process(&mut self) {}
+    fn process(&mut self) {
+        println!("Your account has been created successfully, you can now log in");
+    }
 }
 
 pub async fn register(vec: Vec<String>) {
     if vec.len() < 3 {
-        println!("Usage: register <name> <email> <password>");
+        eprintln!("Usage: register <name> <email> <password>");
         return;
     }
 
@@ -40,7 +33,7 @@ pub async fn register(vec: Vec<String>) {
     let password_hashed = match argon.hash_password(vec[2].as_bytes(), &salt) {
         Ok(e) => e.to_string(),
         Err(e) => {
-            println!("Error, aborting registration of user.\n{e}");
+            eprintln!("Error, aborting registration of user.\n{e}");
             return;
         }
     };

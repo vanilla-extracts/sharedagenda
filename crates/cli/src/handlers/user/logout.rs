@@ -1,41 +1,30 @@
-use serde::{Deserialize, Serialize};
+use common::{
+    configuration::loader::{load, write_config},
+    structs::struct_user::{LogoutAnswer, LogoutPost},
+};
 
 use crate::{
     API_URL, TOKEN,
-    configuration::loader::{load, write_config},
+    call::{Answer, call},
 };
-
-use super::login::{Answer, call};
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LogoutPost<'r> {
-    token: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LogoutAnswer {
-    code: i32,
-}
 
 impl Answer for LogoutAnswer {
     fn code(&self) -> i32 {
         self.code
     }
-    fn answer(&self) -> String {
-        if self.code != 200 {
-            "Error while login in".to_string()
-        } else {
-            "You have successfully logout".to_string()
-        }
+    fn process_error(&self) {
+        eprintln!("Error while logging out, code {}", self.code);
     }
     fn process(&mut self) {
         *TOKEN.lock().unwrap() = "".to_string();
+
+        println!("You successfully logged out");
 
         let mut config = load().unwrap_or_default();
         config.token = "".to_string();
 
         if write_config(&config).is_err() {
-            println!("Error while updating configuration");
+            eprintln!("Error while updating configuration");
         }
     }
 }

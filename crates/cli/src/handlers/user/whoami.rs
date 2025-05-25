@@ -1,39 +1,16 @@
-use std::fmt::Debug;
+use common::structs::struct_event::{WhoamiAnswer, WhoamiPost};
 
-use serde::{Deserialize, Serialize};
-
-use crate::{API_URL, TOKEN};
-
-use super::login::{Answer, call};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct User {
-    pub uuid: String,
-    pub email: String,
-    pub name: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WhoamiPost<'r> {
-    token: &'r str,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WhoamiAnswer {
-    code: i64,
-    user: Option<User>,
-}
+use crate::{
+    API_URL, TOKEN,
+    call::{Answer, call},
+};
 
 impl Answer for WhoamiAnswer {
     fn code(&self) -> i32 {
         self.code as i32
     }
-    fn answer(&self) -> String {
-        if self.code == 200 {
-            String::new()
-        } else {
-            format!("{}", self.code)
-        }
+    fn process_error(&self) {
+        eprintln!("Error while fetching user information, code {}", self.code);
     }
     fn process(&mut self) {
         match &self.user {

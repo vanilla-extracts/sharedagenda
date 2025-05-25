@@ -23,7 +23,7 @@ pub struct Configuration {
     pub prompt: Prompt,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Loaded<'a> {
     pub api_link: String,
     pub token: String,
