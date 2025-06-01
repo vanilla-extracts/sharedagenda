@@ -10,13 +10,20 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-      - name: Build
-        run: cargo build --verbose
+
+      - name: Install rust
+        uses: ./.forgejo/actions/rust-toolchain
+
+      - run: sudo apt-get update
+      - name: Install system dependencies
+        uses: https://github.com/awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: clang liburing-dev
+          version: 1
+
       - name: Run tests
         run: cargo test --verbose
 
